@@ -1,0 +1,72 @@
+:root{
+  --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a;
+  --tx:#e8eaed; --tx2:#9aa3b2; --pri:#4f7cff; --pri2:#3a63e0;
+  --ok:#22c55e; --err:#ef4444; --warn:#f59e0b; --radius:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.55 "Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx)}
+.hidden{display:none!important}
+h1{font-size:22px;margin:0 0 4px}
+.lead{color:var(--tx2);margin:0 0 18px}
+.lbl{display:block;color:var(--tx2);font-size:13px;margin:14px 0 6px;font-weight:600}
+.lbl.big{font-size:15px;color:var(--tx);margin-top:0}
+.hint{color:var(--tx2);font-size:12.5px;margin:6px 0 10px}
+.hint code,code{background:#0c0e13;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12px}
+.msg{font-size:13px;margin-top:8px;min-height:18px}
+.msg.ok{color:var(--ok)} .msg.err{color:var(--err)}
+
+.in{width:100%;background:#0c0e13;border:1px solid var(--line);color:var(--tx);
+  border-radius:8px;padding:10px 12px;font:14px "Segoe UI",sans-serif;margin-bottom:4px;outline:none}
+.in:focus{border-color:var(--pri)}
+.area{resize:vertical;min-height:70px} .mono{font-family:"Consolas",monospace;font-size:12.5px}
+select.in{cursor:pointer}
+
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--tx);
+  border-radius:8px;padding:9px 16px;cursor:pointer;font:600 14px "Segoe UI",sans-serif;transition:.12s}
+.btn:hover{border-color:#3a4150}
+.btn-primary{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn-primary:hover{background:var(--pri2)}
+.btn-ghost{background:transparent}
+.btn-block{width:100%;margin-top:14px}
+.btn-sm{padding:6px 12px;font-size:13px}
+.btn.big{padding:14px;font-size:16px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.row .in{margin-bottom:0;flex:1;min-width:160px}
+
+/* Login */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:32px;width:360px}
+.brand{font-size:22px;font-weight:800;letter-spacing:.3px}
+.brand-mark{color:var(--pri)}
+.brand.small{font-size:17px;margin-bottom:22px}
+.brand-sub{color:var(--tx2);font-size:13px;margin:4px 0 22px}
+.login-card .in{margin-bottom:12px}
+
+/* App layout */
+.app{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--panel);border-right:1px solid var(--line);
+  padding:22px 16px;display:flex;flex-direction:column}
+.nav{margin-top:26px;display:flex;flex-direction:column;gap:4px;flex:1}
+.nav-item{padding:10px 12px;border-radius:8px;color:var(--tx2);cursor:pointer;font-weight:600;font-size:14px}
+.nav-item:hover{background:var(--panel2);color:var(--tx)}
+.nav-item.active{background:var(--panel2);color:var(--tx)}
+.sidebar-foot{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:8px}
+.who{color:var(--tx2);font-size:13px}
+.content{flex:1;padding:30px 34px;overflow:auto;max-height:100vh}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 20px;margin-bottom:16px;max-width:760px}
+
+/* Log */
+.log-card{max-width:760px}
+.log-head{display:flex;align-items:center;justify-content:space-between}
+.badge{background:var(--warn);color:#111;border-radius:20px;padding:2px 12px;font-size:12px;font-weight:700}
+.log{margin-top:10px;background:#0c0e13;border:1px solid var(--line);border-radius:8px;
+  padding:12px;font:12.5px/1.6 "Consolas",monospace;color:var(--tx2);
+  max-height:340px;overflow:auto;white-space:pre-wrap}
+.log .ok{color:var(--ok)} .log .err{color:var(--err)}
+
+/* History */
+.hist-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.hist-row:last-child{border-bottom:0}

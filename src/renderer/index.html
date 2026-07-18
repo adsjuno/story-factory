@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Story Factory</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- MAN DANG NHAP -->
+<div id="loginView" class="login-wrap">
+  <div class="login-card">
+    <div class="brand"><span class="brand-mark">✍</span> Story Factory</div>
+    <div class="brand-sub">Truyện Mỹ 55+ — kéo traffic Facebook → Website</div>
+    <input id="loginUser" class="in" placeholder="Tên đăng nhập" autocomplete="username">
+    <input id="loginPass" class="in" type="password" placeholder="Mật khẩu" autocomplete="current-password">
+    <button id="loginBtn" class="btn btn-primary btn-block">Đăng nhập</button>
+    <div id="loginMsg" class="msg"></div>
+  </div>
+</div>
+
+<!-- APP CHINH -->
+<div id="appView" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand small"><span class="brand-mark">✍</span> Story Factory</div>
+    <nav class="nav">
+      <a class="nav-item active" data-view="write">📝 Viết bài</a>
+      <a class="nav-item" data-view="history">🕘 Lịch sử</a>
+      <a class="nav-item" data-view="settings">⚙️ Cài đặt</a>
+    </nav>
+    <div class="sidebar-foot">
+      <span id="whoami" class="who"></span>
+      <button id="logoutBtn" class="btn btn-ghost btn-sm">Đăng xuất</button>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- VIET BAI -->
+    <section id="view-write" class="view">
+      <h1>Viết bài</h1>
+      <p class="lead">Chọn ngách và số lượng, phần mềm sẽ để Claude tự sinh truyện rồi đẩy lên Google Sheet.</p>
+
+      <div class="card">
+        <label class="lbl">Ngách (page)</label>
+        <select id="nicheSel" class="in"></select>
+
+        <label class="lbl">Số bài viết liên tiếp</label>
+        <input id="countInput" class="in" type="number" min="1" max="50" value="1">
+        <div class="hint">Mỗi bài là một phiên Claude riêng (chống lặp tốt hơn). Tối đa 50 bài/lần.</div>
+
+        <button id="writeBtn" class="btn btn-primary btn-block big">▶ Bắt đầu viết</button>
+      </div>
+
+      <div class="card log-card">
+        <div class="log-head">
+          <span class="lbl">Tiến trình</span>
+          <span id="progBadge" class="badge hidden">Đang chạy…</span>
+        </div>
+        <div id="log" class="log"></div>
+      </div>
+    </section>
+
+    <!-- LICH SU -->
+    <section id="view-history" class="view hidden">
+      <h1>Lịch sử</h1>
+      <p class="lead">Các lượt viết gần đây (lưu trên máy này).</p>
+      <div id="historyList" class="card"></div>
+    </section>
+
+    <!-- CAI DAT -->
+    <section id="view-settings" class="view hidden">
+      <h1>Cài đặt</h1>
+
+      <div class="card">
+        <div class="lbl big">🤖 Đăng nhập Claude (1 lần)</div>
+        <p class="hint">Bấm "Đăng nhập Claude" → cửa sổ mở ra → đăng nhập tài khoản Claude của bạn → đóng cửa sổ. Phần mềm nhớ phiên để tự viết bài. Không dùng API, không tốn phí.</p>
+        <div class="row">
+          <button id="claudeLoginBtn" class="btn btn-primary">Đăng nhập Claude</button>
+          <button id="claudeLogoutBtn" class="btn btn-ghost">Đăng xuất Claude</button>
+        </div>
+        <div id="aiMsg" class="msg"></div>
+      </div>
+
+      <div class="card">
+        <div class="lbl big">📊 Google Sheets (nơi lưu bài)</div>
+        <p class="hint">Dán URL Web App của Google Apps Script. Cách lấy: xem file <b>docs/GOOGLE-SHEETS-SETUP.md</b>.</p>
+        <input id="sheetUrl" class="in" placeholder="https://script.google.com/macros/s/AKfy.../exec">
+        <div class="row">
+          <button id="saveSheetBtn" class="btn btn-primary">Lưu</button>
+          <button id="testSheetBtn" class="btn btn-ghost">Ghi thử 1 dòng</button>
+        </div>
+        <div id="sheetMsg" class="msg"></div>
+      </div>
+
+      <div class="card">
+        <div class="lbl big">🎯 Ngách (page) — tùy biến</div>
+        <p class="hint">Mỗi dòng 1 ngách, dạng <code>Mã | Tên ngách</code>. Ví dụ: <code>A | Mẹ già – con bạc bẽo</code></p>
+        <textarea id="nichesText" class="in area" rows="6"></textarea>
+      </div>
+
+      <div class="card">
+        <div class="lbl big">🧠 Câu lệnh gọi skill — tùy biến (nâng cao)</div>
+        <p class="hint">Câu lệnh phần mềm gửi cho Claude. Giữ nguyên <code>{NICHE}</code> (sẽ thay bằng tên ngách) và các nhãn <code>===...===</code> để phần mềm bóc tách đúng. Chỉ sửa khi bạn hiểu rõ.</p>
+        <textarea id="skillCmd" class="in area mono" rows="10"></textarea>
+        <div class="row">
+          <button id="saveStoryBtn" class="btn btn-primary">Lưu ngách & câu lệnh</button>
+        </div>
+        <div id="storyMsg" class="msg"></div>
+      </div>
+
+      <div class="card">
+        <div class="lbl big">🔒 Đổi mật khẩu</div>
+        <div class="row">
+          <input id="oldPass" class="in" type="password" placeholder="Mật khẩu cũ">
+          <input id="newPass" class="in" type="password" placeholder="Mật khẩu mới">
+          <button id="changePassBtn" class="btn btn-ghost">Đổi</button>
+        </div>
+        <div id="passMsg" class="msg"></div>
+      </div>
+
+      <div class="card">
+        <div class="lbl">Phiên bản</div>
+        <div class="row"><span id="verText" class="hint">—</span>
+          <button id="checkUpdateBtn" class="btn btn-ghost btn-sm">Kiểm tra cập nhật</button></div>
+        <div id="updMsg" class="msg"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

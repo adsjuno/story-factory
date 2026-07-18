@@ -1,0 +1,49 @@
+{
+  "name": "story-factory",
+  "version": "1.0.0",
+  "description": "Story Factory - Tu dong viet truyen My 55+ (Claude login -> Google Sheets -> n8n -> Facebook + Website)",
+  "main": "src/main/main.js",
+  "author": "",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build:win": "electron-builder --win --x64"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "electron-updater": "^6.8.9"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.sohaaqua.storyfactory",
+    "productName": "Story Factory",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "adsjuno",
+      "repo": "story-factory",
+      "releaseType": "release"
+    }
+  },
+  "allowScripts": {
+    "electron@31.7.7": true
+  }
+}
