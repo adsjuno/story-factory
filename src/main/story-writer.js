@@ -211,8 +211,12 @@ async function generateArticleImages(storyId, s, onProgress = () => {}) {
     { kind: 'p3', prompt: s.WEB_P3_PROMPT },
   ];
   let okCount = 0;
+  let madeAny = false; // da bat dau tao it nhat 1 anh chua -> de gian cach 8s giua CAC LAN tao
   for (const j of jobs) {
     if (!j.prompt) { result.errors.push(`${j.kind}: thiếu prompt`); continue; }
+    // TUAN TU: gian cach 8s giua 2 lan tao anh (tranh rate-limit/phut cua Gemini free tier)
+    if (madeAny) { onProgress({ message: 'Đợi 8 giây trước khi tạo ảnh tiếp (tránh giới hạn Gemini)...' }); await delay(8000); }
+    madeAny = true;
     const r = await imageGen.createAndUpload({ prompt: j.prompt, storyId, kind: j.kind, cfg }, logger);
     if (r.ok) {
       okCount++;

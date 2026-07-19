@@ -21,6 +21,11 @@ const path = require('path');
 
 const GEMINI_MODEL = 'gemini-2.5-flash-image';
 
+// Backoff cho retry khi dinh rate-limit (429) / qua tai (503): 15s, 30s, 60s, 90s -> toi da 4 lan.
+const RETRY_BACKOFFS_MS = [15000, 30000, 60000, 90000];
+
+function delay(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
 function log(logger, msg) {
   try { (logger || (() => {}))(msg); } catch (_) {}
   try { console.log('[image-gen] ' + msg); } catch (_) {}
@@ -46,7 +51,7 @@ async function generateImage(prompt, { apiKey } = {}, logger) {
   }
 
   const txt = await res.text();
-  if (!res.ok) return { ok: false, error: `Gemini HTTP ${res.status}: ${txt.slice(0, 300)}` };
+  if (!res.ok) return { ok: false, status: res.status, error: `Gemini HTTP ${res.status}: ${txt.slice(0, 300)}` };
 
   let data;
   try { data = JSON.parse(txt); } catch (_) { return { ok: false, error: 'Gemini trả về không phải JSON' }; }
@@ -148,7 +153,21 @@ async function createAndUpload({ prompt, storyId, kind, cfg }, logger) {
   }
 
   log(logger, `Tạo ảnh ${kind} cho ${storyId}...`);
-  const gen = await generateImage(prompt, { apiKey: cfg.geminiKey }, logger);
+  // Goi Gemini co RETRY khi 429 (rate-limit) / 503 (qua tai): doi tang dan 15s,30s,60s,90s (toi da 4 lan).
+  // Loi khac (400, khong co anh, mang...) -> bo qua anh nay, KHONG retry.
+  let gen;
+  for (let attempt = 0; attempt <= RETRY_BACKOFFS_MS.length; attempt++) {
+    gen = await generateImage(prompt, { apiKey: cfg.geminiKey }, logger);
+    if (gen.ok) break;
+    const retryable = gen.status === 429 || gen.status === 503;
+    if (retryable && attempt < RETRY_BACKOFFS_MS.length) {
+      const waitMs = RETRY_BACKOFFS_MS[attempt];
+      log(logger, `⏳ Gemini ${gen.status} — đang đợi ${waitMs / 1000} giây rồi thử lại ảnh ${kind} (lần ${attempt + 1}/${RETRY_BACKOFFS_MS.length}, 429).`);
+      await delay(waitMs);
+      continue;
+    }
+    break; // het luot retry, hoac loi khong the retry
+  }
   if (!gen.ok) { log(logger, `✗ Gemini ${kind}: ${gen.error}`); return { ok: false, error: gen.error }; }
 
   // Ten file theo quy uoc: {story_id thuong}-{kind}.jpg  (vd st00000001-fb.jpg)
