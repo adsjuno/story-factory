@@ -1,27 +1,34 @@
-# Cài Google Sheets nhận truyện (16 cột) — làm 1 lần, ~3 phút
+# Cài Google Sheets nhận truyện (21 cột) — làm 1 lần, ~3 phút
 
-Phần mềm ghi mỗi bài thành **1 dòng, 16 cột** qua Google Apps Script Web App (miễn phí, không cần API key). n8n sẽ đọc các cột này để đăng lên WordPress + Facebook.
+Phần mềm ghi mỗi bài thành **1 dòng, 21 cột** qua Google Apps Script Web App (miễn phí, không cần API key). n8n sẽ đọc các cột này để đăng lên WordPress + Facebook.
 
-## 16 cột (thứ tự cố định — n8n cào theo thứ tự này)
+> ⚠️ **Nâng cấp từ bản 16 cột cũ:** bộ cột đã đổi (thêm `story_id`, tách 3 prompt ảnh web, thêm `fb_image_url`/`thumbnail_url`, các cột JSON). Nếu bạn đang dùng Sheet cũ: tạo **Sheet mới** (khuyên dùng) hoặc xoá dòng header cũ + cập nhật lại code Apps Script bên dưới rồi **Deploy → New version**.
+
+## 21 cột (thứ tự cố định — n8n cào theo thứ tự này)
 
 | # | Cột | Nội dung | n8n dùng để |
 |---|---|---|---|
-| A | timestamp | Ngày giờ tạo | Sắp xếp |
-| B | status | new / posted_web / posted_fb / done | Biết bài nào chưa đăng |
-| C | page_target | Ngách/page | Đăng đúng page |
-| D | web_title | Tiêu đề web (SEO) | Tiêu đề WordPress |
-| E | web_slug | Đường dẫn URL | Link web |
-| F | web_body | Bài web Part 1/2/3 | Nội dung WordPress |
-| G | web_image_prompt | Mô tả ảnh trong bài | Gemini tạo ảnh bài |
+| A | story_id | Mã bài `ST` + 8 số (ST00000001) | Khoá định danh, đặt tên ảnh |
+| B | timestamp | Ngày giờ tạo | Sắp xếp |
+| C | status | new / need_image / posted_web / posted_fb / done | Biết bài nào chưa đăng / cần tạo lại ảnh |
+| D | page_target | Ngách/page | Đăng đúng page |
+| E | web_title | Tiêu đề web (SEO) | Tiêu đề WordPress |
+| F | web_slug | Đường dẫn URL | Link web |
+| G | web_body | Bài web HTML gộp 3 Part (đã chèn link ảnh) | Nội dung WordPress |
 | H | fb_caption_a | Caption FB bản A (dài) | Đăng FB (test A) |
 | I | fb_caption_b | Caption FB bản B (ngắn) | Đăng FB (test B) |
 | J | fb_cta | Câu "Type YES..." | Ghép cuối caption |
-| K | fb_image_prompt | Mô tả ảnh mồi FB | Gemini tạo ảnh FB |
-| L | fb_comment_link | [LINK] | Chỗ thả link vào comment |
-| M | web_url | Link web thật | n8n điền sau khi đăng web |
-| N | dedup_config | Cấu hình chống lặp | Sổ cái |
-| O | reveal_type | Kiểu lật mở | Chống lặp reveal |
-| P | kpi_scores | Điểm KPI | Kiểm tra chất lượng |
+| K | fb_comment_link | [LINK] | Chỗ thả link vào comment |
+| L | web_url | Link web thật | n8n điền sau khi đăng web |
+| M | fb_image_url | Link ảnh mồi FB (R2) | Ảnh đăng FB |
+| N | thumbnail_url | Thumbnail (dùng chung link ảnh FB) | Thumbnail WP/FB |
+| O | fb_image_prompt | Prompt ảnh FB (Human Conflict) | Tạo lại ảnh nếu cần |
+| P | web_p1_prompt | Prompt ảnh Part 1 | Tạo lại ảnh nếu cần |
+| Q | web_p2_prompt | Prompt ảnh Part 2 | Tạo lại ảnh nếu cần |
+| R | web_p3_prompt | Prompt ảnh Part 3 | Tạo lại ảnh nếu cần |
+| S | dedup_config | JSON chống lặp | Sổ cái |
+| T | story_dna | JSON ADN truyện (reveal...) | Chống lặp reveal |
+| U | kpi_scores | JSON điểm KPI (số) | Kiểm tra chất lượng |
 
 ## Các bước
 
@@ -32,10 +39,10 @@ Phần mềm ghi mỗi bài thành **1 dòng, 16 cột** qua Google Apps Script 
 ```javascript
 function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
-  var HEADER = ['timestamp','status','page_target','web_title','web_slug','web_body',
-    'web_image_prompt','fb_caption_a','fb_caption_b','fb_cta',
-    'fb_image_prompt','fb_comment_link','web_url','dedup_config',
-    'reveal_type','kpi_scores'];
+  var HEADER = ['story_id','timestamp','status','page_target','web_title','web_slug','web_body',
+    'fb_caption_a','fb_caption_b','fb_cta','fb_comment_link','web_url',
+    'fb_image_url','thumbnail_url','fb_image_prompt','web_p1_prompt','web_p2_prompt','web_p3_prompt',
+    'dedup_config','story_dna','kpi_scores'];
   try {
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(HEADER);
@@ -66,4 +73,5 @@ function doPost(e) {
 ## Lưu ý
 
 - Sửa code Apps Script sau này: **Deploy → Manage deployments → ✏️ Edit → Version: New version → Deploy** (URL giữ nguyên).
-- Cột M (web_url) và L (fb_comment_link) để n8n điền sau khi đăng — phần mềm để trống/[LINK].
+- Cột L (web_url) và K (fb_comment_link) để n8n điền sau khi đăng — phần mềm để trống/[LINK].
+- Ảnh: phần mềm tạo bằng Gemini + up Cloudflare R2 (Cài đặt → **Ảnh & Lưu trữ**). Nếu chưa cấu hình hoặc tạo ảnh lỗi, bài vẫn được đẩy: cột ảnh để trống, `status = need_image` để chạy lại sau, các cột `*_prompt` vẫn giữ để tạo lại.

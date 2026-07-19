@@ -71,6 +71,8 @@ ipcMain.handle('auth:setActive', async (_e, { userId, active }) =>
 ipcMain.handle('settings:get', () => {
   requireAuth();
   const s = loadSettings();
+  const img = s.image || {};
+  const dec = (v) => { try { return store.decryptSecret(v); } catch (_) { return ''; } };
   return {
     ok: true,
     sheets: { webhookUrl: s.sheets?.webhookUrl || '' },
@@ -78,7 +80,30 @@ ipcMain.handle('settings:get', () => {
       niches: (s.story && s.story.niches) || storyWriter.DEFAULT_NICHES,
       skillCommand: (s.story && s.story.skillCommand) || storyWriter.DEFAULT_SKILL_COMMAND,
     },
+    image: {
+      geminiKey: dec(img.geminiKey),
+      r2AccessKeyId: dec(img.r2AccessKeyId),
+      r2SecretAccessKey: dec(img.r2SecretAccessKey),
+      r2Endpoint: img.r2Endpoint || '',
+      r2Bucket: img.r2Bucket || 'story-factory',
+      r2PublicDomain: img.r2PublicDomain || 'https://cdn-story.jovaaqua.com',
+    },
   };
+});
+// Cai dat "Anh & Luu tru": Gemini key + R2. Secret duoc MA HOA truoc khi luu.
+ipcMain.handle('settings:saveImage', (_e, payload) => {
+  requireAuth();
+  const p = payload || {};
+  const s = loadSettings();
+  s.image = s.image || {};
+  s.image.geminiKey = store.encryptSecret(String(p.geminiKey || '').trim());
+  s.image.r2AccessKeyId = store.encryptSecret(String(p.r2AccessKeyId || '').trim());
+  s.image.r2SecretAccessKey = store.encryptSecret(String(p.r2SecretAccessKey || '').trim());
+  s.image.r2Endpoint = String(p.r2Endpoint || '').trim();
+  s.image.r2Bucket = String(p.r2Bucket || '').trim() || 'story-factory';
+  s.image.r2PublicDomain = String(p.r2PublicDomain || '').trim().replace(/\/+$/, '');
+  saveSettings(s);
+  return { ok: true };
 });
 ipcMain.handle('settings:saveSheets', (_e, { webhookUrl }) => {
   requireAuth();

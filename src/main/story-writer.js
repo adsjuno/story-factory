@@ -6,14 +6,16 @@
  *  - KHONG dich. KHONG can link. Skill tu sinh chu de.
  *  - Dieu khien Claude WEB (login, khong API) qua webai-electron.js.
  *  - Goi skill "story-us-senior-viral" da Save trong tai khoan Claude (Cach 1 - gon).
- *  - Nhan ket qua theo khuon ===COT=== (khong JSON - ngoac kep lam vo JSON, giong ban dich cu).
- *  - Tach thanh 16 cot dung thu tu Google Sheet -> n8n cao dung.
+ *  - Nhan ket qua theo khuon ===COT=== (3 cot cuoi la JSON: dedup_config, story_dna, kpi_scores).
+ *  - Tach thanh 21 cot dung thu tu Google Sheet -> n8n cao dung.
+ *  - Tao anh (Gemini) + up R2 cho moi bai, chen link vao web_body. Loi anh khong lam sap bai.
  *
- * Ket qua 1 bai: { row: [16 o], raw: '<van ban Claude tra ve>' }
+ * Ket qua 1 bai: { row: [21 o], raw: '<van ban Claude tra ve>', sections, storyId, status }
  */
 
 const store = require('./store');
 const webai = require('./webai-electron');
+const imageGen = require('./image-gen');
 
 // ---- Cac NGACH mac dinh (page target). Nguoi dung sua duoc trong Cai dat. ----
 const DEFAULT_NICHES = [
@@ -24,13 +26,18 @@ const DEFAULT_NICHES = [
   { code: 'E', label: 'Người nghèo tử tế vs họ hàng giàu' },
 ];
 
-// Cac COT xuat ra Google Sheet - PHAI khop HEADER trong Apps Script (docs/GOOGLE-SHEETS-SETUP.md)
+// Cac COT xuat ra Google Sheet (21 cot) - PHAI khop HEADER trong Apps Script (docs/GOOGLE-SHEETS-SETUP.md)
 const SHEET_COLUMNS = [
-  'timestamp', 'status', 'page_target', 'web_title', 'web_slug', 'web_body',
-  'web_image_prompt', 'fb_caption_a', 'fb_caption_b', 'fb_cta',
-  'fb_image_prompt', 'fb_comment_link', 'web_url', 'dedup_config',
-  'reveal_type', 'kpi_scores',
+  'story_id', 'timestamp', 'status', 'page_target', 'web_title', 'web_slug', 'web_body',
+  'fb_caption_a', 'fb_caption_b', 'fb_cta', 'fb_comment_link', 'web_url',
+  'fb_image_url', 'thumbnail_url', 'fb_image_prompt', 'web_p1_prompt', 'web_p2_prompt', 'web_p3_prompt',
+  'dedup_config', 'story_dna', 'kpi_scores',
 ];
+
+// ---- Khuon JSON mac dinh cho 3 cot JSON (dam bao du khoa ke ca khi Claude tra thieu) ----
+const DEDUP_TEMPLATE = { victim: '', villain: '', theme: '', emotion: '', justice: '', object: '', setting: '', ending: '' };
+const STORY_DNA_TEMPLATE = { reveal: '', reveal_source: '', object: '', justice: '' };
+const KPI_TEMPLATE = { hook: 0, facebook_ctr: 0, justice: 0, empathy: 0, novelty: 0, american: 0, final: 0 };
 
 // Cau lenh goi skill - MAC DINH (Cach 1). Nguoi dung sua duoc trong Cai dat (tuy bien).
 // {NICHE} se duoc thay bang ten ngach. Skill tu chay pipeline 11 buoc.
@@ -39,16 +46,14 @@ const DEFAULT_SKILL_COMMAND =
 
 Chạy đầy đủ pipeline tự động (tự sinh idea, 20 hook, chấm KPI, đóng vai độc giả 55-75 chọn hook, viết caption A/B, viết bài web Part 1/2/3, 7 reviewer, adaptive threshold). Chống lặp với các bài đã sinh.
 
-QUAN TRỌNG — xuất kết quả theo ĐÚNG khuôn nhãn dưới đây để phần mềm bóc tách (KHÔNG JSON, KHÔNG lời dẫn thừa, mỗi nhãn 1 dòng riêng):
+QUAN TRỌNG — xuất kết quả theo ĐÚNG khuôn nhãn dưới đây để phần mềm bóc tách (mỗi nhãn 1 dòng riêng, KHÔNG lời dẫn thừa). Ba nhãn cuối (DEDUP_CONFIG, STORY_DNA, KPI_SCORES) phải là JSON hợp lệ đúng khoá như mẫu.
 
 ===WEB_TITLE===
 <tiêu đề web SEO, dài, nhồi twist, tiếng Anh>
 ===WEB_SLUG===
 <đường dẫn url chữ thường gạch ngang, tiếng Anh>
 ===WEB_BODY===
-<toàn bộ bài web Part 1/2/3, tiếng Anh Mỹ>
-===WEB_IMAGE_PROMPT===
-<mô tả ảnh minh họa trong bài, tiếng Anh, tả cảnh cao trào>
+<Toàn bộ bài web gộp 3 Part trong 1 bài, xuất HTML tiếng Anh Mỹ. Mỗi part mở đầu bằng <h2>Part 1 — tên part</h2> rồi các đoạn <p>...</p>. CHÈN đúng 3 ảnh, mỗi part 1 ảnh, đặt giữa part đúng ngữ cảnh, dạng: <img src="{{IMG_P1}}" alt="mô tả có keyword SEO"> cho Part 1, {{IMG_P2}} cho Part 2, {{IMG_P3}} cho Part 3. GIỮ NGUYÊN các chuỗi {{IMG_P1}} {{IMG_P2}} {{IMG_P3}} — phần mềm sẽ thay bằng link ảnh thật.>
 ===FB_CAPTION_A===
 <caption Facebook bản A dài ~600-900 từ, cắt cliffhanger>
 ===FB_CAPTION_B===
@@ -56,13 +61,19 @@ QUAN TRỌNG — xuất kết quả theo ĐÚNG khuôn nhãn dưới đây để
 ===FB_CTA===
 <câu CTA kiểu "Type YES...", KHÔNG kèm link>
 ===FB_IMAGE_PROMPT===
-<mô tả ảnh mồi Facebook, tiếng Anh, kịch tính, tỉ lệ vuông>
+<Prompt ảnh mồi Facebook, TIẾNG ANH, theo công thức Human Conflict 3 lớp: khuôn mặt nhân vật chính là trung tâm, kẻ gây bất công, người chứng kiến, và một vật biểu tượng phụ. KHÔNG spoil twist/reveal. Kết thúc BẮT BUỘC bằng đúng câu: Square 1:1, restrained emotion, natural facial expressions, believable body language, not theatrical, no text, no watermark>
+===WEB_P1_PROMPT===
+<Prompt ảnh minh hoạ Part 1, TIẾNG ANH, đúng ngữ cảnh Part 1, cinematic, 16:9 aspect ratio, no text>
+===WEB_P2_PROMPT===
+<Prompt ảnh minh hoạ Part 2, TIẾNG ANH, đúng ngữ cảnh Part 2, cinematic, 16:9 aspect ratio, no text>
+===WEB_P3_PROMPT===
+<Prompt ảnh minh hoạ Part 3, TIẾNG ANH, đúng ngữ cảnh Part 3, cinematic, 16:9 aspect ratio, no text>
 ===DEDUP_CONFIG===
-<nạn nhân | kẻ ác | đòn công lý | icon object — để chống lặp>
-===REVEAL_TYPE===
-<kiểu lật mở đã dùng, ví dụ: military history / old letter / DNA...>
+{"victim":"","villain":"","theme":"","emotion":"","justice":"","object":"","setting":"","ending":""}
+===STORY_DNA===
+{"reveal":"","reveal_source":"","object":"","justice":""}
 ===KPI_SCORES===
-<bảng điểm KPI ngắn gọn: hook, CTR, justice, novelty, trung bình reviewer>
+{"hook":0,"facebook_ctr":0,"justice":0,"empathy":0,"novelty":0,"american":0,"final":0}
 ===END===`;
 
 function delay(ms) { return new Promise((r) => setTimeout(r, ms)); }
@@ -82,35 +93,137 @@ function parseSections(text) {
   return out;
 }
 
-// Lay cau lenh skill (co the da tuy bien trong Cai dat), thay {NICHE}
+// Chuan hoa 1 doan text thanh JSON string DUNG KHOA theo template.
+// Neu Claude tra JSON hong/thieu -> van dam bao du khoa (dien mac dinh), tra chuoi JSON gon.
+function normalizeJson(text, template, numeric = false) {
+  const t = String(text || '').trim();
+  let obj = null;
+  try { obj = JSON.parse(t); } catch (_) {
+    const m = t.match(/\{[\s\S]*\}/);
+    if (m) { try { obj = JSON.parse(m[0]); } catch (_) { /* van null */ } }
+  }
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) obj = {};
+  const out = {};
+  for (const k of Object.keys(template)) {
+    let v = obj[k] !== undefined ? obj[k] : template[k];
+    if (numeric) { const n = Number(v); v = Number.isFinite(n) ? n : 0; }
+    out[k] = v;
+  }
+  return JSON.stringify(out);
+}
+
+// Thay placeholder {{IMG_Px}} trong web_body:
+//  - co link  -> thay bang link that (giu the <img>)
+//  - khong co -> xoa CA the <img ...{{IMG_Px}}...> (tranh de lai src rong / token tho)
+function applyImagePlaceholders(html, urls) {
+  let out = String(html || '');
+  const map = { '{{IMG_P1}}': urls.p1, '{{IMG_P2}}': urls.p2, '{{IMG_P3}}': urls.p3 };
+  for (const token of Object.keys(map)) {
+    const url = map[token];
+    if (url) {
+      out = out.split(token).join(url);
+    } else {
+      // xoa the img chua token; neu khong nam trong the img thi xoa token tho
+      const tokEsc = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      out = out.replace(new RegExp('<img\\b[^>]*' + tokEsc + '[^>]*>', 'gi'), '');
+      out = out.split(token).join('');
+    }
+  }
+  return out;
+}
+
+// Doc cau hinh anh (Gemini + R2) tu store, GIAI MA secret. Tra object cfg cho image-gen.
+function getImageConfig() {
+  let s = {};
+  try { s = store.read('settings.json'); } catch (_) { s = {}; }
+  const img = s.image || {};
+  const dec = (v) => { try { return store.decryptSecret(v); } catch (_) { return ''; } };
+  return {
+    geminiKey: dec(img.geminiKey),
+    r2AccessKeyId: dec(img.r2AccessKeyId),
+    r2SecretAccessKey: dec(img.r2SecretAccessKey),
+    r2Endpoint: (img.r2Endpoint || '').trim(),
+    r2Bucket: (img.r2Bucket || '').trim(),
+    r2PublicDomain: (img.r2PublicDomain || '').trim(),
+  };
+}
+
+function imageConfigReady(cfg) {
+  return !!(cfg.geminiKey && cfg.r2Endpoint && cfg.r2AccessKeyId && cfg.r2SecretAccessKey && cfg.r2Bucket && cfg.r2PublicDomain);
+}
+
+// Lay cau lenh skill (co the da tuy bien trong Cai dat), thay {NICHE}.
+// Neu template da luu la BAN CU (thieu nhan moi) -> tu dung DEFAULT moi (tu di tan).
 function buildPrompt(nicheLabel) {
   const settings = store.read('settings.json');
-  const tmpl = (settings.story && settings.story.skillCommand) || DEFAULT_SKILL_COMMAND;
+  const saved = settings.story && settings.story.skillCommand;
+  const usable = saved && saved.includes('WEB_P1_PROMPT') && saved.includes('STORY_DNA');
+  const tmpl = usable ? saved : DEFAULT_SKILL_COMMAND;
   return tmpl.replace(/\{NICHE\}/g, nicheLabel);
 }
 
-// Ghep 1 bai thanh 16 o dung thu tu SHEET_COLUMNS
-function buildRow(nicheLabel, s) {
+// Ghep 1 bai thanh 21 o dung thu tu SHEET_COLUMNS.
+// @param extra { storyId, status, webBody, fbImageUrl, thumbnailUrl }
+function buildRow(nicheLabel, s, extra = {}) {
   const now = new Date().toLocaleString('vi-VN');
   const map = {
+    story_id: extra.storyId || '',
     timestamp: now,
-    status: 'new',                                  // n8n nhin cot nay biet bai chua dang
+    status: extra.status || 'new',                   // n8n nhin cot nay biet bai chua dang / can tao lai anh
     page_target: nicheLabel,
     web_title: s.WEB_TITLE || '',
     web_slug: s.WEB_SLUG || '',
-    web_body: s.WEB_BODY || '',
-    web_image_prompt: s.WEB_IMAGE_PROMPT || '',
+    web_body: extra.webBody != null ? extra.webBody : (s.WEB_BODY || ''),
     fb_caption_a: s.FB_CAPTION_A || '',
     fb_caption_b: s.FB_CAPTION_B || '',
     fb_cta: s.FB_CTA || '',
+    fb_comment_link: '[LINK]',                        // n8n dien link web sau khi dang
+    web_url: '',                                      // n8n dien sau khi dang WordPress
+    fb_image_url: extra.fbImageUrl || '',
+    thumbnail_url: extra.thumbnailUrl || '',          // dung chung link anh fb
     fb_image_prompt: s.FB_IMAGE_PROMPT || '',
-    fb_comment_link: '[LINK]',                       // n8n dien link web sau khi dang
-    web_url: '',                                     // n8n dien sau khi dang WordPress
-    dedup_config: s.DEDUP_CONFIG || '',
-    reveal_type: s.REVEAL_TYPE || '',
-    kpi_scores: s.KPI_SCORES || '',
+    web_p1_prompt: s.WEB_P1_PROMPT || '',
+    web_p2_prompt: s.WEB_P2_PROMPT || '',
+    web_p3_prompt: s.WEB_P3_PROMPT || '',
+    dedup_config: normalizeJson(s.DEDUP_CONFIG, DEDUP_TEMPLATE),
+    story_dna: normalizeJson(s.STORY_DNA, STORY_DNA_TEMPLATE),
+    kpi_scores: normalizeJson(s.KPI_SCORES, KPI_TEMPLATE, true),
   };
-  return SHEET_COLUMNS.map((c) => map[c] || '');
+  return SHEET_COLUMNS.map((c) => (map[c] != null ? map[c] : ''));
+}
+
+/**
+ * Tao 4 anh (fb, p1, p2, p3) -> up R2 -> tra link. Loi 1 anh KHONG lam sap ca bai.
+ * @returns { fbImageUrl, thumbnailUrl, webUrls:{p1,p2,p3}, allOk, configured, errors[] }
+ */
+async function generateArticleImages(storyId, s, onProgress = () => {}) {
+  const cfg = getImageConfig();
+  const result = { fbImageUrl: '', thumbnailUrl: '', webUrls: { p1: '', p2: '', p3: '' }, allOk: false, configured: imageConfigReady(cfg), errors: [] };
+  if (!result.configured) {
+    onProgress({ message: 'ℹ️ Chưa cấu hình Ảnh & Lưu trữ — bỏ qua tạo ảnh (đẩy bài dạng chữ).' });
+    return result;
+  }
+  const logger = (m) => onProgress({ message: m });
+  const jobs = [
+    { kind: 'fb', prompt: s.FB_IMAGE_PROMPT },
+    { kind: 'p1', prompt: s.WEB_P1_PROMPT },
+    { kind: 'p2', prompt: s.WEB_P2_PROMPT },
+    { kind: 'p3', prompt: s.WEB_P3_PROMPT },
+  ];
+  let okCount = 0;
+  for (const j of jobs) {
+    if (!j.prompt) { result.errors.push(`${j.kind}: thiếu prompt`); continue; }
+    const r = await imageGen.createAndUpload({ prompt: j.prompt, storyId, kind: j.kind, cfg }, logger);
+    if (r.ok) {
+      okCount++;
+      if (j.kind === 'fb') { result.fbImageUrl = r.url; result.thumbnailUrl = r.url; }
+      else result.webUrls[j.kind] = r.url;
+    } else {
+      result.errors.push(`${j.kind}: ${r.error}`);
+    }
+  }
+  result.allOk = okCount === jobs.length;
+  return result;
 }
 
 // Kiem tra bai co du cac phan quan trong khong (de thu lai neu Claude tra thieu khuon)
@@ -135,8 +248,36 @@ async function writeOne(nicheLabel, onProgress = () => {}) {
 
     const s = parseSections(res.text);
     if (isComplete(s)) {
-      onProgress({ message: `✓ Xong bài ngách "${nicheLabel}"` });
-      return { ok: true, row: buildRow(nicheLabel, s), raw: res.text, sections: s };
+      // Cap story_id (bo dem local, +1 moi bai)
+      const storyId = store.nextStoryId();
+      onProgress({ message: `✓ Claude xong bài ${storyId} — ngách "${nicheLabel}". Đang tạo ảnh...` });
+
+      // Tao 4 anh (fb, p1, p2, p3) -> up R2. Loi anh KHONG lam sap bai.
+      let imgs;
+      try {
+        imgs = await generateArticleImages(storyId, s, onProgress);
+      } catch (e) {
+        imgs = { fbImageUrl: '', thumbnailUrl: '', webUrls: { p1: '', p2: '', p3: '' }, allOk: false, configured: true, errors: [e.message] };
+        onProgress({ message: '⚠️ Lỗi tạo ảnh: ' + e.message + ' — vẫn đẩy bài (link ảnh để trống).' });
+      }
+
+      // Thay {{IMG_Px}} trong web_body bang link that (thieu link thi go the img)
+      const webBody = applyImagePlaceholders(s.WEB_BODY || '', imgs.webUrls);
+
+      // Trang thai: neu co cau hinh anh nhung chua tao du -> 'need_image' de chay lai sau
+      const status = (imgs.configured && !imgs.allOk) ? 'need_image' : 'new';
+      if (status === 'need_image') {
+        onProgress({ message: `⚠️ Bài ${storyId}: tạo ảnh chưa đủ (${imgs.errors.join('; ')}). Đẩy bài, đánh dấu need_image để chạy lại.` });
+      } else {
+        onProgress({ message: `✓ Xong bài ${storyId} — ngách "${nicheLabel}"` });
+      }
+
+      const row = buildRow(nicheLabel, s, {
+        storyId, status, webBody,
+        fbImageUrl: imgs.fbImageUrl,
+        thumbnailUrl: imgs.thumbnailUrl,
+      });
+      return { ok: true, row, raw: res.text, sections: s, storyId, status };
     }
     lastErr = new Error('Claude trả về thiếu khuôn (thiếu WEB_BODY / caption / title).');
     await delay(1000);
@@ -179,4 +320,12 @@ module.exports = {
   SHEET_COLUMNS,
   DEFAULT_SKILL_COMMAND,
   DEFAULT_NICHES,
+  // exported for tests / reuse
+  parseSections,
+  normalizeJson,
+  applyImagePlaceholders,
+  buildRow,
+  DEDUP_TEMPLATE,
+  STORY_DNA_TEMPLATE,
+  KPI_TEMPLATE,
 };

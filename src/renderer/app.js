@@ -100,7 +100,28 @@ async function loadSettings(){
   // ngach -> text
   $('nichesText').value=(r.story.niches||[]).map(n=>n.code+' | '+n.label).join('\n');
   $('skillCmd').value=r.story.skillCommand||'';
+  // Anh & Luu tru
+  const im=r.image||{};
+  $('geminiKey').value=im.geminiKey||'';
+  $('r2AccessKeyId').value=im.r2AccessKeyId||'';
+  $('r2SecretAccessKey').value=im.r2SecretAccessKey||'';
+  $('r2Endpoint').value=im.r2Endpoint||'';
+  $('r2Bucket').value=im.r2Bucket||'story-factory';
+  $('r2PublicDomain').value=im.r2PublicDomain||'https://cdn-story.jovaaqua.com';
 }
+
+$('saveImageBtn').onclick=async()=>{
+  msg($('imageMsg'),'Đang lưu...',true);
+  const r=await api.saveImage({
+    geminiKey:$('geminiKey').value.trim(),
+    r2AccessKeyId:$('r2AccessKeyId').value.trim(),
+    r2SecretAccessKey:$('r2SecretAccessKey').value.trim(),
+    r2Endpoint:$('r2Endpoint').value.trim(),
+    r2Bucket:$('r2Bucket').value.trim(),
+    r2PublicDomain:$('r2PublicDomain').value.trim(),
+  });
+  msg($('imageMsg'),r.ok?'Đã lưu key ảnh & R2':(r.error||'Lỗi'),r.ok);
+};
 
 $('saveSheetBtn').onclick=async()=>{
   const r=await api.saveSheets({webhookUrl:$('sheetUrl').value.trim()});

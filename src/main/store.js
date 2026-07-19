@@ -29,6 +29,7 @@ function init(userDataPath) {
   ensureFile('users.json', { users: [] });
   ensureFile('settings.json', {});
   ensureFile('jobs.json', { jobs: [] });
+  ensureFile('counter.json', { story: 0 });   // bo dem story_id (tang dan)
 }
 
 function filePath(name) {
@@ -69,11 +70,21 @@ function decryptSecret(stored) {
   return stored;
 }
 
+// ---- Bo dem story_id: moi lan goi +1, tra ve dang 'ST' + 8 chu so ----
+function nextStoryId() {
+  let c;
+  try { c = read('counter.json'); } catch (_) { c = { story: 0 }; }
+  c.story = (parseInt(c.story, 10) || 0) + 1;
+  write('counter.json', c);
+  return 'ST' + String(c.story).padStart(8, '0');
+}
+
 module.exports = {
   init,
   read,
   write,
   encryptSecret,
   decryptSecret,
+  nextStoryId,
   getDataDir: () => DATA_DIR,
 };

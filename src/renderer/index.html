@@ -95,6 +95,27 @@
       </div>
 
       <div class="card">
+        <div class="lbl big">🖼️ Ảnh & Lưu trữ (Gemini + Cloudflare R2)</div>
+        <p class="hint">Nhập key để phần mềm tự tạo ảnh (Gemini) và lưu lên R2. Key được mã hoá, lưu trên máy này. Để trống nếu chưa dùng ảnh — bài vẫn đẩy dạng chữ.</p>
+        <label class="lbl">Gemini API Key</label>
+        <input id="geminiKey" class="in" type="password" placeholder="AIza... hoặc key Gemini">
+        <label class="lbl">R2 Access Key ID</label>
+        <input id="r2AccessKeyId" class="in" type="password" placeholder="R2 Access Key ID">
+        <label class="lbl">R2 Secret Access Key</label>
+        <input id="r2SecretAccessKey" class="in" type="password" placeholder="R2 Secret Access Key">
+        <label class="lbl">R2 Endpoint</label>
+        <input id="r2Endpoint" class="in" placeholder="https://&lt;account_id&gt;.r2.cloudflarestorage.com">
+        <label class="lbl">R2 Bucket name</label>
+        <input id="r2Bucket" class="in" placeholder="story-factory" value="story-factory">
+        <label class="lbl">R2 Public domain</label>
+        <input id="r2PublicDomain" class="in" placeholder="https://cdn-story.jovaaqua.com" value="https://cdn-story.jovaaqua.com">
+        <div class="row">
+          <button id="saveImageBtn" class="btn btn-primary">Lưu key ảnh & R2</button>
+        </div>
+        <div id="imageMsg" class="msg"></div>
+      </div>
+
+      <div class="card">
         <div class="lbl big">🎯 Ngách (page) — tùy biến</div>
         <p class="hint">Mỗi dòng 1 ngách, dạng <code>Mã | Tên ngách</code>. Ví dụ: <code>A | Mẹ già – con bạc bẽo</code></p>
         <textarea id="nichesText" class="in area" rows="6"></textarea>
