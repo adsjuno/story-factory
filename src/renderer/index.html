@@ -27,6 +27,8 @@
     <nav class="nav">
       <a class="nav-item active" data-view="write">📝 Viết bài</a>
       <a class="nav-item" data-view="history">🕘 Lịch sử</a>
+      <a class="nav-item" data-view="logs">📄 Log</a>
+      <a class="nav-item" data-view="accounts">👥 Tài khoản</a>
       <a class="nav-item" data-view="settings">⚙️ Cài đặt</a>
     </nav>
     <div class="sidebar-foot">
@@ -67,6 +69,68 @@
       <h1>Lịch sử</h1>
       <p class="lead">Các lượt viết gần đây (lưu trên máy này).</p>
       <div id="historyList" class="card"></div>
+    </section>
+
+    <!-- LOG -->
+    <section id="view-logs" class="view hidden">
+      <h1>Log</h1>
+      <p class="lead">Nguyên văn kết quả Claude trả về ở lần chạy gần nhất. Khi báo "thiếu khuôn", xem ở đây để biết Claude thực sự trả về gì.</p>
+
+      <div class="card">
+        <div class="lbl big">📊 Tóm tắt lần chạy gần nhất</div>
+        <div id="logMeta" class="hint">Chưa có dữ liệu.</div>
+        <div class="row">
+          <button id="reloadLogBtn" class="btn btn-primary">Tải lại</button>
+          <button id="openLogFolderBtn" class="btn btn-ghost">Mở thư mục log</button>
+          <button id="copyLogBtn" class="btn btn-ghost">Copy nguyên văn</button>
+        </div>
+        <div id="logMsg" class="msg"></div>
+      </div>
+
+      <div class="card">
+        <div class="lbl big">📝 Nguyên văn Claude trả về</div>
+        <p class="hint">Nếu ô này trống nghĩa là Claude chưa trả về gì (có thể chưa đăng nhập, hoặc trang bị chặn).</p>
+        <textarea id="logRaw" class="in area mono" rows="20" readonly placeholder="(chưa có)"></textarea>
+      </div>
+
+      <div class="card">
+        <div class="lbl big">🕘 Nhật ký các lần chạy</div>
+        <textarea id="logHistory" class="in area mono" rows="8" readonly placeholder="(chưa có)"></textarea>
+      </div>
+    </section>
+
+    <!-- TAI KHOAN -->
+    <section id="view-accounts" class="view hidden">
+      <h1>Tài khoản</h1>
+      <p class="lead">Quản lý tài khoản nhân sự dùng phần mềm. Chỉ tài khoản <b>admin</b> mới tạo/xoá/khoá được người khác.</p>
+
+      <div class="card">
+        <div class="lbl big">➕ Tạo tài khoản mới</div>
+        <label class="lbl">Tên đăng nhập</label>
+        <input id="newUsername" class="in" placeholder="vd: nhanvien01" autocomplete="off">
+        <label class="lbl">Mật khẩu</label>
+        <input id="newUserPass" class="in" type="password" placeholder="Mật khẩu cho tài khoản này">
+        <label class="lbl">Tên hiển thị</label>
+        <input id="newUserDisplay" class="in" placeholder="vd: Nguyễn Văn A">
+        <label class="lbl">Quyền</label>
+        <select id="newUserRole" class="in">
+          <option value="staff">staff — chỉ viết bài</option>
+          <option value="admin">admin — quản lý được tài khoản</option>
+        </select>
+        <div class="row">
+          <button id="createUserBtn" class="btn btn-primary">Tạo tài khoản</button>
+        </div>
+        <div id="createUserMsg" class="msg"></div>
+      </div>
+
+      <div class="card">
+        <div class="lbl big">👥 Danh sách tài khoản</div>
+        <div class="row">
+          <button id="reloadUsersBtn" class="btn btn-ghost btn-sm">Tải lại danh sách</button>
+        </div>
+        <div id="usersMsg" class="msg"></div>
+        <div id="usersList"></div>
+      </div>
     </section>
 
     <!-- CAI DAT -->

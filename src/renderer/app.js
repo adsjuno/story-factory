@@ -59,8 +59,114 @@ document.querySelectorAll('.nav-item').forEach(a=>{
     document.querySelectorAll('.view').forEach(s=>s.classList.add('hidden'));
     $('view-'+v).classList.remove('hidden');
     if(v==='history')loadHistory();
+    if(v==='logs')loadLogs();
+    if(v==='accounts')loadUsers();
   };
 });
+
+// ---------- LOG ----------
+function fmtWhen(iso){ try{ return new Date(iso).toLocaleString('vi-VN'); }catch(_){ return iso||'?'; } }
+
+async function loadLogs(){
+  const r=await api.getLogs();
+  if(!r||!r.ok){ msg($('logMsg'),(r&&r.error)||'Không đọc được log',false); return; }
+  $('logRaw').value=r.raw||'';
+  $('logHistory').value=r.history||'';
+  const m=r.meta;
+  if(!m){ $('logMeta').textContent='Chưa có lần chạy nào được ghi log.'; return; }
+  const parts=[];
+  parts.push('Lúc: '+fmtWhen(m.at));
+  parts.push('Ngách: '+(m.niche||'?'));
+  parts.push('Lần thử: '+(m.attempt||'?'));
+  parts.push('Kết quả: '+(m.ok?'✅ ĐỦ KHUÔN':'❌ THIẾU KHUÔN'));
+  if(typeof m.rawLength==='number')parts.push('Độ dài Claude trả về: '+m.rawLength+' ký tự');
+  if(m.missing&&m.missing.length)parts.push('THIẾU: '+m.missing.join(' | '));
+  if(m.found&&m.found.length)parts.push('Tìm thấy các mảnh: '+m.found.join(', '));
+  else parts.push('Tìm thấy các mảnh: KHÔNG có mảnh nào');
+  if(m.error)parts.push('Lỗi: '+m.error);
+  $('logMeta').innerHTML=parts.map(p=>'<div>'+p.replace(/</g,'&lt;')+'</div>').join('');
+  msg($('logMsg'),'Đã tải log ('+(r.dir||'')+')',true);
+}
+$('reloadLogBtn').onclick=loadLogs;
+$('openLogFolderBtn').onclick=async()=>{
+  const r=await api.openLogsFolder();
+  msg($('logMsg'),r.ok?('Đã mở: '+r.dir):(r.error||'Không mở được'),r.ok);
+};
+$('copyLogBtn').onclick=async()=>{
+  const t=$('logRaw').value||'';
+  if(!t){msg($('logMsg'),'Chưa có gì để copy',false);return;}
+  try{ await navigator.clipboard.writeText(t); msg($('logMsg'),'Đã copy nguyên văn vào clipboard',true); }
+  catch(_){ $('logRaw').select(); document.execCommand('copy'); msg($('logMsg'),'Đã copy',true); }
+};
+
+// ---------- TAI KHOAN ----------
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+async function loadUsers(){
+  const box=$('usersList');
+  box.innerHTML='<div class="hint">Đang tải...</div>';
+  const r=await api.listUsers();
+  if(!r||!r.ok){
+    box.innerHTML='';
+    msg($('usersMsg'),(r&&r.error)||'Không tải được danh sách (có thể tài khoản của bạn không phải admin)',false);
+    return;
+  }
+  msg($('usersMsg'),'',true);
+  const users=r.users||r.data||[];
+  if(!users.length){ box.innerHTML='<div class="hint">Chưa có tài khoản nào.</div>'; return; }
+  box.innerHTML=users.map(u=>{
+    const id=esc(u.id||u.user_id||'');
+    const name=esc(u.display_name||u.displayName||u.username||'');
+    const uname=esc(u.username||'');
+    const role=esc(u.role||'staff');
+    const active=(u.active===undefined?true:!!u.active);
+    return '<div class="hist-row">'
+      +'<span><b>'+uname+'</b>'+(name&&name!==uname?(' — '+name):'')
+      +' <span class="hint">['+role+(active?'':' · ĐANG KHOÁ')+']</span></span>'
+      +'<span>'
+      +'<button class="btn btn-ghost btn-sm act-pass" data-id="'+id+'" data-u="'+uname+'">Đổi MK</button> '
+      +'<button class="btn btn-ghost btn-sm act-active" data-id="'+id+'" data-active="'+(active?'1':'0')+'">'+(active?'Khoá':'Mở khoá')+'</button> '
+      +'<button class="btn btn-ghost btn-sm act-del" data-id="'+id+'" data-u="'+uname+'">Xoá</button>'
+      +'</span></div>';
+  }).join('');
+
+  box.querySelectorAll('.act-pass').forEach(b=>{
+    b.onclick=async()=>{
+      const np=prompt('Mật khẩu MỚI cho tài khoản "'+b.dataset.u+'":');
+      if(!np)return;
+      const r2=await api.setPassword({userId:b.dataset.id,newPassword:np});
+      msg($('usersMsg'),r2.ok?('Đã đổi mật khẩu cho '+b.dataset.u):(r2.error||'Lỗi'),r2.ok);
+    };
+  });
+  box.querySelectorAll('.act-active').forEach(b=>{
+    b.onclick=async()=>{
+      const makeActive=b.dataset.active!=='1';
+      const r2=await api.setActive({userId:b.dataset.id,active:makeActive});
+      if(r2.ok)loadUsers(); else msg($('usersMsg'),r2.error||'Lỗi',false);
+    };
+  });
+  box.querySelectorAll('.act-del').forEach(b=>{
+    b.onclick=async()=>{
+      if(!confirm('Xoá hẳn tài khoản "'+b.dataset.u+'"? Không khôi phục được.'))return;
+      const r2=await api.deleteUser({userId:b.dataset.id});
+      if(r2.ok)loadUsers(); else msg($('usersMsg'),r2.error||'Lỗi',false);
+    };
+  });
+}
+$('reloadUsersBtn').onclick=loadUsers;
+$('createUserBtn').onclick=async()=>{
+  const username=$('newUsername').value.trim();
+  const password=$('newUserPass').value;
+  const displayName=$('newUserDisplay').value.trim();
+  const role=$('newUserRole').value;
+  if(!username||!password){msg($('createUserMsg'),'Nhập tên đăng nhập và mật khẩu',false);return;}
+  const r=await api.createUser({username,password,displayName,role});
+  if(r.ok){
+    msg($('createUserMsg'),'Đã tạo tài khoản '+username,true);
+    $('newUsername').value='';$('newUserPass').value='';$('newUserDisplay').value='';
+    loadUsers();
+  } else msg($('createUserMsg'),r.error||'Lỗi tạo tài khoản',false);
+};
 
 // ---------- NGACH ----------
 async function loadNiches(){

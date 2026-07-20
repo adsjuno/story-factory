@@ -70,6 +70,52 @@ function decryptSecret(stored) {
   return stored;
 }
 
+// ---- LOG: luu nguyen van ket qua THO Claude tra ve (de chan doan loi "thieu khuon") ----
+function logsDir() {
+  const d = path.join(path.dirname(DATA_DIR), 'logs');
+  if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
+  return d;
+}
+
+/**
+ * Ghi ket qua tho + thong tin chan doan.
+ * @param {string} raw   toan bo van ban Claude tra ve
+ * @param {object} meta  { at, niche, attempt, ok, missing[], found[], error }
+ */
+function writeRawLog(raw, meta) {
+  try {
+    const d = logsDir();
+    fs.writeFileSync(path.join(d, 'last-response.txt'), String(raw == null ? '' : raw), 'utf8');
+    fs.writeFileSync(path.join(d, 'last-run.json'), JSON.stringify(meta || {}, null, 2), 'utf8');
+    // Nhat ky don gian: noi them dong tom tat (giu 200 dong gan nhat)
+    const histFile = path.join(d, 'history.log');
+    const line = `[${(meta && meta.at) || new Date().toISOString()}] ${(meta && meta.ok) ? 'OK' : 'LOI'}`
+      + ` | ngach=${(meta && meta.niche) || '?'}`
+      + ` | lan=${(meta && meta.attempt) || '?'}`
+      + ` | thieu=${(meta && meta.missing && meta.missing.length) ? meta.missing.join(',') : '-'}`
+      + ` | thay=${(meta && meta.found && meta.found.length) ? meta.found.join(',') : '-'}`
+      + `${meta && meta.error ? ' | ' + meta.error : ''}`;
+    let old = '';
+    try { old = fs.readFileSync(histFile, 'utf8'); } catch (_) {}
+    const lines = (old ? old.split(/\r?\n/) : []).filter(Boolean);
+    lines.push(line);
+    fs.writeFileSync(histFile, lines.slice(-200).join('\n') + '\n', 'utf8');
+  } catch (_) { /* log hong khong duoc lam sap tien trinh */ }
+}
+
+function readRawLog() {
+  const out = { raw: '', meta: null, dir: '', file: '', history: '' };
+  try {
+    const d = logsDir();
+    out.dir = d;
+    out.file = path.join(d, 'last-response.txt');
+    try { out.raw = fs.readFileSync(out.file, 'utf8'); } catch (_) { out.raw = ''; }
+    try { out.meta = JSON.parse(fs.readFileSync(path.join(d, 'last-run.json'), 'utf8')); } catch (_) { out.meta = null; }
+    try { out.history = fs.readFileSync(path.join(d, 'history.log'), 'utf8'); } catch (_) { out.history = ''; }
+  } catch (_) {}
+  return out;
+}
+
 // ---- Bo dem story_id: moi lan goi +1, tra ve dang 'ST' + 8 chu so ----
 function nextStoryId() {
   let c;
@@ -86,5 +132,8 @@ module.exports = {
   encryptSecret,
   decryptSecret,
   nextStoryId,
+  writeRawLog,
+  readRawLog,
   getDataDir: () => DATA_DIR,
+  getLogsDir: () => logsDir(),
 };

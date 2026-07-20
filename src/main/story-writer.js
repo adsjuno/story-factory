@@ -79,19 +79,95 @@ QUAN TRỌNG — xuất kết quả theo ĐÚNG khuôn nhãn dưới đây để
 
 function delay(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
-// Doc output theo khuon ===KEY=== (giong parseSections cua ban dich cu - ben vung voi ngoac/xuong dong)
-function parseSections(text) {
+// Cac NHAN hop le ma skill co the tra ve (dung lam DANH SACH TRANG -> tranh nhan nham
+// mot dong trong bai thanh nhan). Co ca ten CU de con doc duoc ket qua skill ban truoc.
+const KNOWN_KEYS = [
+  'WEB_TITLE', 'WEB_SLUG', 'WEB_BODY',
+  'FB_CAPTION_A', 'FB_CAPTION_B', 'FB_CTA',
+  'FB_IMAGE_PROMPT', 'WEB_P1_PROMPT', 'WEB_P2_PROMPT', 'WEB_P3_PROMPT',
+  'DEDUP_CONFIG', 'STORY_DNA', 'KPI_SCORES', 'END',
+  'WEB_IMAGE_PROMPT', 'REVEAL_TYPE', // ten cu
+];
+
+// Chuan hoa chuoi nhan: hoa het, khoang trang/gach ngang -> gach duoi, bo ky tu la
+function normKey(s) {
+  return String(s || '').toUpperCase().replace(/[\s-]+/g, '_').replace(/[^A-Z0-9_]/g, '');
+}
+
+// Bo lop trang tri markdown quanh dong (#, **, -, khoang trang, dau hai cham cuoi)
+function stripDecor(line) {
+  return String(line)
+    .replace(/^\s*#{1,6}\s*/, '')      // ## tieu de
+    .replace(/^\s*[-*]\s+/, '')        // gach dau dong
+    .replace(/\*\*/g, '')              // in dam
+    .replace(/\s*:\s*$/, '')           // dau hai cham cuoi
+    .trim();
+}
+
+// Nhan dien dong nhan kieu ===KEY=== (chap nhan 2-6 dau =, khoang trang, hoa thuong,
+// va lop markdown bao ngoai). Tra ve ten nhan da chuan hoa, hoac null.
+function matchEqualsHeader(line) {
+  const s = stripDecor(line);
+  const m = s.match(/^={2,6}\s*([A-Za-z0-9 _-]+?)\s*={2,6}$/);
+  if (!m) return null;
+  const k = normKey(m[1]);
+  return KNOWN_KEYS.includes(k) ? k : null;
+}
+
+// Du phong: dong CHI chua ten nhan (co the boc [ ] hoac markdown), vd "WEB_BODY", "[WEB_BODY]", "## WEB_BODY:"
+function matchBareHeader(line) {
+  const s = stripDecor(line).replace(/^\[\s*|\s*\]$/g, '').trim();
+  if (!s || s.length > 40) return null;
+  const k = normKey(s);
+  return KNOWN_KEYS.includes(k) ? k : null;
+}
+
+// Boc noi dung theo 1 ham nhan dien nhan
+function collect(text, matcher) {
   const map = {};
+  const order = [];
   let cur = null;
   for (const raw of String(text || '').split(/\r?\n/)) {
-    const m = raw.match(/^\s*===\s*([A-Z0-9_]+)\s*===\s*$/i);
-    if (m) { cur = m[1].toUpperCase(); if (cur !== 'END') map[cur] = []; continue; }
-    if (raw.trim().startsWith('```')) continue; // bo dong fence
+    const key = matcher(raw);
+    if (key) { cur = key; if (cur !== 'END' && !map[cur]) { map[cur] = []; order.push(cur); } continue; }
+    if (raw.trim().startsWith('```')) continue; // bo dong fence (giu nguyen HTML ben trong)
     if (cur && cur !== 'END') map[cur].push(raw);
   }
   const out = {};
   for (const k of Object.keys(map)) out[k] = map[k].join('\n').trim();
   return out;
+}
+
+/**
+ * Doc output cua Claude. Uu tien khuon ===KEY===; neu khong ra du nhan thi thu
+ * kieu nhan tran ("WEB_BODY" / "[WEB_BODY]" / "## WEB_BODY"). HTML trong web_body
+ * duoc giu nguyen (chi bo dong ```fence```).
+ */
+function parseSections(text) {
+  const a = collect(text, matchEqualsHeader);
+  const countA = Object.keys(a).length;
+  if (countA >= 3) return a;                    // khuon chuan chay tot -> dung luon
+  const b = collect(text, matchBareHeader);     // du phong
+  return Object.keys(b).length > countA ? b : a;
+}
+
+// Cac mang BAT BUOC phai co de luu duoc bai
+const REQUIRED = [
+  { key: 'WEB_TITLE', label: 'WEB_TITLE (tiêu đề)' },
+  { key: 'WEB_BODY', label: 'WEB_BODY (nội dung bài)', minLen: 300 },
+  { key: 'FB_CAPTION_A', label: 'FB_CAPTION_A (caption A)' },
+  { key: 'FB_CAPTION_B', label: 'FB_CAPTION_B (caption B)' },
+];
+
+// Tra ve DANH SACH CU THE cac mang bi thieu (kem ly do), thay vi bao chung chung
+function missingSections(s) {
+  const missing = [];
+  for (const r of REQUIRED) {
+    const v = (s && s[r.key]) ? String(s[r.key]).trim() : '';
+    if (!v) { missing.push(r.label + ' — KHÔNG có'); continue; }
+    if (r.minLen && v.length < r.minLen) missing.push(`${r.label} — quá ngắn (${v.length} ký tự, cần ≥ ${r.minLen})`);
+  }
+  return missing;
 }
 
 // Chuan hoa 1 doan text thanh JSON string DUNG KHOA theo template.
@@ -235,8 +311,7 @@ async function generateArticleImages(storyId, s, onProgress = () => {}) {
 
 // Kiem tra bai co du cac phan quan trong khong (de thu lai neu Claude tra thieu khuon)
 function isComplete(s) {
-  return !!(s.WEB_BODY && s.WEB_BODY.length > 300 &&
-            s.FB_CAPTION_A && s.FB_CAPTION_B && s.WEB_TITLE);
+  return missingSections(s).length === 0;
 }
 
 /**
@@ -251,9 +326,29 @@ async function writeOne(nicheLabel, onProgress = () => {}) {
   for (let attempt = 1; attempt <= 2; attempt++) {
     onProgress({ message: `Ngách "${nicheLabel}"${attempt > 1 ? ` (thử lại lần ${attempt})` : ''}: Claude đang chạy skill viết truyện...` });
     const res = await webai.ask(engine, { prompt, show: false, timeoutMs: 420000 }); // skill dai -> cho 7 phut
-    if (!res.ok) { lastErr = new Error(res.error || 'Claude không trả về'); continue; }
+    if (!res.ok) {
+      lastErr = new Error(res.error || 'Claude không trả về');
+      // Van ghi log de biet Claude tra ve gi (co the la thong bao loi cua trang)
+      store.writeRawLog(res.text || '', {
+        at: new Date().toISOString(), niche: nicheLabel, attempt,
+        ok: false, missing: [], found: [], error: lastErr.message,
+      });
+      onProgress({ message: `✗ ${lastErr.message}` });
+      continue;
+    }
 
     const s = parseSections(res.text);
+    const found = Object.keys(s);
+    const missing = missingSections(s);
+
+    // LUON ghi log tho -> co loi la mo man Log xem duoc ngay Claude tra ve gi
+    store.writeRawLog(res.text, {
+      at: new Date().toISOString(), niche: nicheLabel, attempt,
+      ok: missing.length === 0, missing, found,
+      rawLength: String(res.text || '').length,
+      error: missing.length ? 'Thiếu khuôn' : '',
+    });
+
     if (isComplete(s)) {
       // Cap story_id (bo dem local, +1 moi bai)
       const storyId = store.nextStoryId();
@@ -286,7 +381,15 @@ async function writeOne(nicheLabel, onProgress = () => {}) {
       });
       return { ok: true, row, raw: res.text, sections: s, storyId, status };
     }
-    lastErr = new Error('Claude trả về thiếu khuôn (thiếu WEB_BODY / caption / title).');
+    // BAO RO thieu mang nao + tim thay mang nao + do dai ket qua tho
+    const rawLen = String(res.text || '').length;
+    lastErr = new Error(
+      'Claude trả về THIẾU KHUÔN. Thiếu: ' + missing.join('; ') + '. '
+      + 'Các mảnh tìm thấy: ' + (found.length ? found.join(', ') : 'KHÔNG có mảnh nào')
+      + `. (Claude trả về ${rawLen} ký tự — mở mục "Log" để xem nguyên văn.)`
+    );
+    onProgress({ message: '✗ ' + lastErr.message });
+    onProgress({ message: 'ℹ️ Đã lưu nguyên văn kết quả Claude vào mục "Log" (bên trái) để chẩn đoán.' });
     await delay(1000);
   }
   return { ok: false, error: lastErr ? lastErr.message : 'không rõ' };
@@ -329,6 +432,8 @@ module.exports = {
   DEFAULT_NICHES,
   // exported for tests / reuse
   parseSections,
+  missingSections,
+  isComplete,
   normalizeJson,
   applyImagePlaceholders,
   buildRow,

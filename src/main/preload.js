@@ -44,6 +44,10 @@ const api = {
   write: (p) => call('story:write', p),
   sheetsTest: () => call('sheets:test'),
   listJobs: () => call('jobs:list'),
+
+  // Log (xem nguyen van ket qua Claude tra ve khi loi "thieu khuon")
+  getLogs: () => call('logs:get'),
+  openLogsFolder: () => call('logs:openFolder'),
   onProgress: (cb) => {
     const h = (_e, data) => cb(data);
     ipcRenderer.on('story:progress', h);

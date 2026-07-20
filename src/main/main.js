@@ -1,6 +1,6 @@
 'use strict';
 
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 
 app.setName('story-factory');       // userData co dinh -> khong lac tai khoan
@@ -186,3 +186,18 @@ ipcMain.handle('sheets:test', async () => {
 });
 
 ipcMain.handle('jobs:list', () => { requireAuth(); return { ok: true, jobs: store.read('jobs.json').jobs }; });
+
+// ---------------- IPC: Log (xem nguyen van ket qua Claude tra ve) ----------------
+ipcMain.handle('logs:get', () => {
+  requireAuth();
+  const l = store.readRawLog();
+  return { ok: true, raw: l.raw, meta: l.meta, history: l.history, dir: l.dir, file: l.file };
+});
+ipcMain.handle('logs:openFolder', async () => {
+  requireAuth();
+  try {
+    const dir = store.getLogsDir();
+    await shell.openPath(dir);
+    return { ok: true, dir };
+  } catch (e) { return { ok: false, error: e.message }; }
+});
