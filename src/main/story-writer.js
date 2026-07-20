@@ -17,6 +17,7 @@
 const store = require('./store');
 const webai = require('./webai-electron');
 const imageGen = require('./image-gen');
+const storyDna = require('./story-dna');
 
 // ---- Cac NGACH mac dinh (page target). Nguoi dung sua duoc trong Cai dat. ----
 const DEFAULT_NICHES = [
@@ -27,12 +28,13 @@ const DEFAULT_NICHES = [
   { code: 'E', label: 'Người nghèo tử tế vs họ hàng giàu' },
 ];
 
-// Cac COT xuat ra Google Sheet (21 cot) - PHAI khop HEADER trong Apps Script (docs/GOOGLE-SHEETS-SETUP.md)
+// Cac COT xuat ra Google Sheet (22 cot) - PHAI khop HEADER trong Apps Script (docs/GOOGLE-SHEETS-SETUP.md)
+// Cot 22 story_dna_combo = to hop DNA App gan san (JSON, kem ma quoc gia).
 const SHEET_COLUMNS = [
   'story_id', 'timestamp', 'status', 'page_target', 'web_title', 'web_slug', 'web_body',
   'fb_caption_a', 'fb_caption_b', 'fb_cta', 'fb_comment_link', 'web_url',
   'fb_image_url', 'thumbnail_url', 'fb_image_prompt', 'web_p1_prompt', 'web_p2_prompt', 'web_p3_prompt',
-  'dedup_config', 'story_dna', 'kpi_scores',
+  'dedup_config', 'story_dna', 'kpi_scores', 'story_dna_combo',
 ];
 
 // ---- Khuon JSON mac dinh cho 3 cot JSON (dam bao du khoa ke ca khi Claude tra thieu) ----
@@ -284,14 +286,37 @@ function imageConfigReady(cfg) {
             && cfg.r2SecretAccessKey && cfg.r2Bucket && cfg.r2PublicDomain);
 }
 
-// Lay cau lenh skill (co the da tuy bien trong Cai dat), thay {NICHE}.
-// Neu template da luu la BAN CU (thieu nhan moi) -> tu dung DEFAULT moi (tu di tan).
-function buildPrompt(nicheLabel) {
-  const settings = store.read('settings.json');
-  const saved = settings.story && settings.story.skillCommand;
+// Nuoc dang chay (mac dinh US). Nguoi dung chon trong Cai dat -> Story DNA.
+function getRunningCountry() {
+  try {
+    const s = store.read('settings.json');
+    const c = s.dna && s.dna.runningCountry;
+    return (c ? String(c) : storyDna.DEFAULT_COUNTRY).toUpperCase();
+  } catch (_) { return storyDna.DEFAULT_COUNTRY; }
+}
+
+// Cau lenh skill goc. Co the tuy bien chung (settings.story.skillCommand) hoac
+// RIENG theo nuoc (settings.dna.skillByCountry[COUNTRY]) - de sau nay moi nuoc 1 skill.
+// Mac dinh: /story-us-senior-viral cho US (DEFAULT_SKILL_COMMAND).
+function getSkillTemplate(country) {
+  let s = {};
+  try { s = store.read('settings.json'); } catch (_) {}
+  const perCountry = s.dna && s.dna.skillByCountry && s.dna.skillByCountry[String(country).toUpperCase()];
+  if (perCountry && String(perCountry).trim()) return perCountry;
+  const saved = s.story && s.story.skillCommand;
   const usable = saved && saved.includes('WEB_P1_PROMPT') && saved.includes('STORY_DNA');
-  const tmpl = usable ? saved : DEFAULT_SKILL_COMMAND;
-  return tmpl.replace(/\{NICHE\}/g, nicheLabel);
+  return usable ? saved : DEFAULT_SKILL_COMMAND;
+}
+
+// Dung prompt cuoi = KHOI DNA (bat buoc dung to hop) + cau lenh goi skill.
+// @param dna { combo, country } da chon san (co the null -> khong nhet DNA)
+function buildPrompt(nicheLabel, dna) {
+  const country = (dna && dna.country) || getRunningCountry();
+  const tmpl = getSkillTemplate(country).replace(/\{NICHE\}/g, nicheLabel);
+  if (dna && dna.combo) {
+    return storyDna.buildDnaBlock(dna.combo, country) + '\n' + tmpl;
+  }
+  return tmpl;
 }
 
 // Ghep 1 bai thanh 21 o dung thu tu SHEET_COLUMNS.
@@ -320,6 +345,8 @@ function buildRow(nicheLabel, s, extra = {}) {
     dedup_config: normalizeJson(s.DEDUP_CONFIG, DEDUP_TEMPLATE),
     story_dna: normalizeJson(s.STORY_DNA, STORY_DNA_TEMPLATE),
     kpi_scores: normalizeJson(s.KPI_SCORES, KPI_TEMPLATE, true),
+    // Cot 22: to hop DNA App gan san (JSON, kem ma quoc gia)
+    story_dna_combo: extra.dnaCombo != null ? extra.dnaCombo : '',
   };
   return SHEET_COLUMNS.map((c) => (map[c] != null ? map[c] : ''));
 }
@@ -373,7 +400,19 @@ function isComplete(s) {
  */
 async function writeOne(nicheLabel, onProgress = () => {}) {
   const engine = 'claude'; // skill manh nhat o Claude (dung theo y anh Thang)
-  const prompt = buildPrompt(nicheLabel);
+
+  // STORY DNA: App gan to hop TRUOC (pool nuoc dang chay, da loc trung) roi nhet vao dau prompt.
+  const country = getRunningCountry();
+  const pick = storyDna.pickCombo(country, nicheLabel);
+  if (pick.poolEmpty) {
+    onProgress({ message: `ℹ️ Pool DNA của nước ${country} đang rỗng — chạy không có DNA (bài vẫn viết bình thường).` });
+  } else {
+    onProgress({ message: `🧬 DNA (${country}): ${pick.combo.hero_name} — ${pick.combo.icon_object}${pick.fellBack ? ' [không tránh hết trùng sau nhiều lần thử]' : ` [chọn sau ${pick.tries} lần random]`}` });
+  }
+  const dna = pick.poolEmpty ? null : { combo: pick.combo, country };
+  const dnaComboJson = dna ? JSON.stringify(Object.assign({ country }, pick.combo)) : '';
+
+  const prompt = buildPrompt(nicheLabel, dna);
   let lastErr = null;
 
   for (let attempt = 1; attempt <= 2; attempt++) {
@@ -400,6 +439,8 @@ async function writeOne(nicheLabel, onProgress = () => {}) {
       at: new Date().toISOString(), niche: nicheLabel, attempt,
       ok: missing.length === 0, missing, found, warnings,
       rawLength: String(res.text || '').length,
+      country, dnaCombo: dna ? Object.assign({ country }, pick.combo) : null,
+      dnaTries: pick.tries, dnaFellBack: pick.fellBack,
       error: missing.length ? 'Thiếu khuôn' : '',
     });
     if (warnings.length) {
@@ -435,8 +476,16 @@ async function writeOne(nicheLabel, onProgress = () => {}) {
         storyId, status, webBody,
         fbImageUrl: imgs.fbImageUrl,
         thumbnailUrl: imgs.thumbnailUrl,
+        dnaCombo: dnaComboJson,
       });
-      return { ok: true, row, raw: res.text, sections: s, storyId, status };
+
+      // GHI SO chong trung: chi ghi khi da chot bai thanh cong (tranh dot bo dem oan)
+      if (dna) {
+        try { storyDna.remember({ storyId, country, niche: nicheLabel, combo: pick.combo }); }
+        catch (_) { /* ghi so hong khong lam sap bai */ }
+      }
+
+      return { ok: true, row, raw: res.text, sections: s, storyId, status, dnaCombo: dnaComboJson };
     }
     // BAO RO thieu mang nao + tim thay mang nao + do dai ket qua tho
     const rawLen = String(res.text || '').length;

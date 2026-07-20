@@ -48,6 +48,12 @@ const api = {
   // Log (xem nguyen van ket qua Claude tra ve khi loi "thieu khuon")
   getLogs: () => call('logs:get'),
   openLogsFolder: () => call('logs:openFolder'),
+
+  // Story DNA (pool da quoc gia)
+  dnaGet: () => call('dna:get'),
+  dnaGetPool: (p) => call('dna:getPool', p),
+  dnaSavePool: (p) => call('dna:savePool', p),
+  dnaSetRunning: (p) => call('dna:setRunning', p),
   onProgress: (cb) => {
     const h = (_e, data) => cb(data);
     ipcRenderer.on('story:progress', h);

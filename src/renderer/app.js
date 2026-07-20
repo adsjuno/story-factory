@@ -45,6 +45,8 @@ async function enterApp(user){
   $('whoami').textContent=(user&&(user.displayName||user.username))||'';
   await loadNiches();
   await loadSettings();
+  bindDna();
+  await loadDna();
   await loadVersion();
 }
 
@@ -216,6 +218,52 @@ async function loadSettings(){
   $('r2Endpoint').value=im.r2Endpoint||'';
   $('r2Bucket').value=im.r2Bucket||'story-factory';
   $('r2PublicDomain').value=im.r2PublicDomain||'https://cdn-story.jovaaqua.com';
+}
+
+// ---------- STORY DNA ----------
+let dnaAxes=[];
+async function loadDna(){
+  const r=await api.dnaGet();
+  if(!r||!r.ok)return;
+  dnaAxes=r.axes||[];
+  // dropdown nuoc dang chay + nuoc sua
+  const opts=(r.countries||['US']).map(c=>'<option value="'+c+'">'+c+'</option>').join('');
+  $('dnaRunning').innerHTML=opts;
+  $('dnaEditCountry').innerHTML=opts;
+  $('dnaRunning').value=r.running||'US';
+  $('dnaEditCountry').value=r.running||'US';
+  // render 12 textarea theo truc
+  $('dnaAxes').innerHTML=dnaAxes.map(a=>
+    '<label class="lbl">'+esc(a.label)+'</label>'
+    +'<textarea class="in area mono dna-axis" data-key="'+esc(a.key)+'" rows="4" placeholder="mỗi dòng 1 mục"></textarea>'
+  ).join('');
+  await loadDnaPool($('dnaEditCountry').value);
+}
+async function loadDnaPool(country){
+  const r=await api.dnaGetPool({country});
+  if(!r||!r.ok)return;
+  const pool=r.pool||{};
+  document.querySelectorAll('.dna-axis').forEach(ta=>{
+    const arr=pool[ta.dataset.key]||[];
+    ta.value=Array.isArray(arr)?arr.join('\n'):'';
+  });
+}
+function bindDna(){
+  const es=$('dnaEditCountry'); if(es)es.onchange=()=>loadDnaPool(es.value);
+  const sr=$('dnaSaveRunningBtn'); if(sr)sr.onclick=async()=>{
+    const r=await api.dnaSetRunning({country:$('dnaRunning').value});
+    msg($('dnaRunMsg'),r.ok?('Nước đang chạy: '+r.running):(r.error||'Lỗi'),r.ok);
+  };
+  const sp=$('dnaSavePoolBtn'); if(sp)sp.onclick=async()=>{
+    const country=$('dnaEditCountry').value;
+    const pool={};
+    document.querySelectorAll('.dna-axis').forEach(ta=>{
+      pool[ta.dataset.key]=ta.value.split(/\n/).map(s=>s.trim()).filter(Boolean);
+    });
+    const r=await api.dnaSavePool({country,pool});
+    if(r.ok){msg($('dnaPoolMsg'),'Đã lưu pool cho '+country,true);await loadDna();}
+    else msg($('dnaPoolMsg'),r.error||'Lỗi',false);
+  };
 }
 
 $('saveImageBtn').onclick=async()=>{

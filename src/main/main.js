@@ -9,6 +9,8 @@ app.disableHardwareAcceleration();  // on dinh tren may driver GPU yeu (giu tu b
 const store = require('./store');
 const supabase = require('./supabase');
 const storyWriter = require('./story-writer');
+const storyDna = require('./story-dna');
+const storyMemory = require('./story-memory');
 const sheets = require('./sheets');
 const webai = require('./webai-electron');
 const updater = require('./updater');
@@ -200,4 +202,36 @@ ipcMain.handle('logs:openFolder', async () => {
     await shell.openPath(dir);
     return { ok: true, dir };
   } catch (e) { return { ok: false, error: e.message }; }
+});
+
+// ---------------- IPC: Story DNA (pool da quoc gia + nuoc dang chay) ----------------
+function loadRunningCountry() {
+  const s = loadSettings();
+  return ((s.dna && s.dna.runningCountry) || storyDna.DEFAULT_COUNTRY).toUpperCase();
+}
+ipcMain.handle('dna:get', () => {
+  requireAuth();
+  return {
+    ok: true,
+    axes: storyDna.AXES,
+    countries: storyDna.listCountries(),
+    running: loadRunningCountry(),
+    stats: storyMemory.stats(),
+  };
+});
+ipcMain.handle('dna:getPool', (_e, { country }) => {
+  requireAuth();
+  return { ok: true, country: String(country || storyDna.DEFAULT_COUNTRY).toUpperCase(), pool: storyDna.getPool(country) };
+});
+ipcMain.handle('dna:savePool', (_e, { country, pool }) => {
+  requireAuth();
+  return storyDna.savePool(country, pool);
+});
+ipcMain.handle('dna:setRunning', (_e, { country }) => {
+  requireAuth();
+  const s = loadSettings();
+  s.dna = s.dna || {};
+  s.dna.runningCountry = String(country || storyDna.DEFAULT_COUNTRY).toUpperCase();
+  saveSettings(s);
+  return { ok: true, running: s.dna.runningCountry };
 });

@@ -1,6 +1,6 @@
-# Cài Google Sheets nhận truyện (21 cột) — làm 1 lần, ~3 phút
+# Cài Google Sheets nhận truyện (22 cột) — làm 1 lần, ~3 phút
 
-Phần mềm ghi mỗi bài thành **1 dòng, 21 cột** qua Google Apps Script Web App (miễn phí, không cần API key). n8n sẽ đọc các cột này để đăng lên WordPress + Facebook.
+Phần mềm ghi mỗi bài thành **1 dòng, 22 cột** qua Google Apps Script Web App (miễn phí, không cần API key). n8n sẽ đọc các cột này để đăng lên WordPress + Facebook.
 
 > ⚠️ **Nâng cấp từ bản 16 cột cũ:** bộ cột đã đổi (thêm `story_id`, tách 3 prompt ảnh web, thêm `fb_image_url`/`thumbnail_url`, các cột JSON). Nếu bạn đang dùng Sheet cũ: tạo **Sheet mới** (khuyên dùng) hoặc xoá dòng header cũ + cập nhật lại code Apps Script bên dưới rồi **Deploy → New version**.
 
@@ -29,6 +29,7 @@ Phần mềm ghi mỗi bài thành **1 dòng, 21 cột** qua Google Apps Script 
 | S | dedup_config | JSON chống lặp | Sổ cái |
 | T | story_dna | JSON ADN truyện (reveal...) | Chống lặp reveal |
 | U | kpi_scores | JSON điểm KPI (số) | Kiểm tra chất lượng |
+| V | story_dna_combo | JSON tổ hợp DNA App gán sẵn (kèm mã quốc gia) | Chống trùng lặp giữa các bài |
 
 ## Các bước
 
@@ -42,7 +43,7 @@ function doPost(e) {
   var HEADER = ['story_id','timestamp','status','page_target','web_title','web_slug','web_body',
     'fb_caption_a','fb_caption_b','fb_cta','fb_comment_link','web_url',
     'fb_image_url','thumbnail_url','fb_image_prompt','web_p1_prompt','web_p2_prompt','web_p3_prompt',
-    'dedup_config','story_dna','kpi_scores'];
+    'dedup_config','story_dna','kpi_scores','story_dna_combo'];
   try {
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(HEADER);

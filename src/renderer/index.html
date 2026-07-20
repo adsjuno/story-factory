@@ -159,6 +159,29 @@
       </div>
 
       <div class="card">
+        <div class="lbl big">🧬 Story DNA (chống trùng, đa quốc gia)</div>
+        <p class="hint">App tự gán tổ hợp DNA (tên nhân vật, vật biểu tượng, nút lật...) trước khi để AI kể, nên bài không bị lặp. Mỗi quốc gia có kho pool riêng — thêm nước mới chỉ cần điền pool, không cần sửa code.</p>
+
+        <label class="lbl">Quốc gia đang chạy (App random theo nước này)</label>
+        <div class="row">
+          <select id="dnaRunning" class="in"></select>
+          <button id="dnaSaveRunningBtn" class="btn btn-primary">Đặt làm nước chạy</button>
+        </div>
+        <div id="dnaRunMsg" class="msg"></div>
+
+        <hr style="border:none;border-top:1px solid #2a2f3a;margin:14px 0">
+
+        <label class="lbl">Sửa pool cho quốc gia:</label>
+        <select id="dnaEditCountry" class="in"></select>
+        <div class="hint">Mỗi trục: <b>mỗi dòng 1 mục</b>. Để trống trục nào thì App bỏ qua trục đó. US đã có sẵn dữ liệu mẫu; ES/CA để trống chờ bạn điền.</div>
+        <div id="dnaAxes"></div>
+        <div class="row">
+          <button id="dnaSavePoolBtn" class="btn btn-primary">Lưu pool nước này</button>
+        </div>
+        <div id="dnaPoolMsg" class="msg"></div>
+      </div>
+
+      <div class="card">
         <div class="lbl big">🖼️ Ảnh & Lưu trữ (Cloudflare Workers AI + R2)</div>
         <p class="hint">Phần mềm tạo ảnh bằng <b>Cloudflare Workers AI</b> (model FLUX 2 klein-9b) rồi lưu lên R2. Key được mã hoá, lưu trên máy này. Để trống nếu chưa dùng ảnh — bài vẫn đẩy dạng chữ.</p>
         <label class="lbl">Cloudflare Account ID</label>
