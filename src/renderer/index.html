@@ -95,10 +95,12 @@
       </div>
 
       <div class="card">
-        <div class="lbl big">🖼️ Ảnh & Lưu trữ (Gemini + Cloudflare R2)</div>
-        <p class="hint">Nhập key để phần mềm tự tạo ảnh (Gemini) và lưu lên R2. Key được mã hoá, lưu trên máy này. Để trống nếu chưa dùng ảnh — bài vẫn đẩy dạng chữ.</p>
-        <label class="lbl">Gemini API Key</label>
-        <input id="geminiKey" class="in" type="password" placeholder="AIza... hoặc key Gemini">
+        <div class="lbl big">🖼️ Ảnh & Lưu trữ (Cloudflare Workers AI + R2)</div>
+        <p class="hint">Phần mềm tạo ảnh bằng <b>Cloudflare Workers AI</b> (model FLUX 2 klein-9b) rồi lưu lên R2. Key được mã hoá, lưu trên máy này. Để trống nếu chưa dùng ảnh — bài vẫn đẩy dạng chữ.</p>
+        <label class="lbl">Cloudflare Account ID</label>
+        <input id="cfAccountId" class="in" type="password" placeholder="Account ID (trang dash.cloudflare.com, cột bên phải)">
+        <label class="lbl">Cloudflare Workers AI API Token</label>
+        <input id="cfApiToken" class="in" type="password" placeholder="API Token có quyền Account → Workers AI">
         <label class="lbl">R2 Access Key ID</label>
         <input id="r2AccessKeyId" class="in" type="password" placeholder="R2 Access Key ID">
         <label class="lbl">R2 Secret Access Key</label>

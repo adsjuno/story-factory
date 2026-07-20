@@ -102,7 +102,8 @@ async function loadSettings(){
   $('skillCmd').value=r.story.skillCommand||'';
   // Anh & Luu tru
   const im=r.image||{};
-  $('geminiKey').value=im.geminiKey||'';
+  $('cfAccountId').value=im.cfAccountId||'';
+  $('cfApiToken').value=im.cfApiToken||'';
   $('r2AccessKeyId').value=im.r2AccessKeyId||'';
   $('r2SecretAccessKey').value=im.r2SecretAccessKey||'';
   $('r2Endpoint').value=im.r2Endpoint||'';
@@ -113,7 +114,8 @@ async function loadSettings(){
 $('saveImageBtn').onclick=async()=>{
   msg($('imageMsg'),'Đang lưu...',true);
   const r=await api.saveImage({
-    geminiKey:$('geminiKey').value.trim(),
+    cfAccountId:$('cfAccountId').value.trim(),
+    cfApiToken:$('cfApiToken').value.trim(),
     r2AccessKeyId:$('r2AccessKeyId').value.trim(),
     r2SecretAccessKey:$('r2SecretAccessKey').value.trim(),
     r2Endpoint:$('r2Endpoint').value.trim(),

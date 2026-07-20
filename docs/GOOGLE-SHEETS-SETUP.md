@@ -74,4 +74,5 @@ function doPost(e) {
 
 - Sửa code Apps Script sau này: **Deploy → Manage deployments → ✏️ Edit → Version: New version → Deploy** (URL giữ nguyên).
 - Cột L (web_url) và K (fb_comment_link) để n8n điền sau khi đăng — phần mềm để trống/[LINK].
-- Ảnh: phần mềm tạo bằng Gemini + up Cloudflare R2 (Cài đặt → **Ảnh & Lưu trữ**). Nếu chưa cấu hình hoặc tạo ảnh lỗi, bài vẫn được đẩy: cột ảnh để trống, `status = need_image` để chạy lại sau, các cột `*_prompt` vẫn giữ để tạo lại.
+- Ảnh: phần mềm tạo bằng **Cloudflare Workers AI** (model FLUX 2 klein-9b) + up Cloudflare R2 (Cài đặt → **Ảnh & Lưu trữ**). Ảnh FB 1024×1024, ảnh web 1280×720. Nếu chưa cấu hình hoặc tạo ảnh lỗi, bài vẫn được đẩy: cột ảnh để trống, `status = need_image` để chạy lại sau, các cột `*_prompt` vẫn giữ để tạo lại.
+- Model FLUX 2 có **bộ lọc nội dung** riêng, đôi khi từ chối ảnh drama nặng (code 3030). Gặp lỗi này phần mềm bỏ qua ảnh đó và đánh dấu `need_image` — không tự thử lại để lách bộ lọc.

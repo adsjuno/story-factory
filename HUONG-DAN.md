@@ -29,8 +29,10 @@ File cài nằm trong thư mục `dist/`.
 Nhân viên bấm "Viết bài"
    → phần mềm gửi câu lệnh gọi skill "story-us-senior-viral" vào cửa sổ Claude login
    → Claude chạy pipeline 11 bước, trả về theo khuôn ===CỘT===
-   → phần mềm bóc tách thành 16 cột, đẩy lên Google Sheet
-   → (n8n đọc Sheet → Gemini tạo ảnh → đăng WordPress + Facebook + thả link comment)
+   → phần mềm bóc tách thành 21 cột
+   → phần mềm tự tạo 4 ảnh bằng Cloudflare Workers AI (FLUX 2 klein-9b), up lên R2,
+     chèn link ảnh vào bài, rồi đẩy tất cả lên Google Sheet
+   → (n8n đọc Sheet → đăng WordPress + Facebook + thả link comment)
 ```
 
 ## Yêu cầu QUAN TRỌNG

@@ -8,7 +8,8 @@
  *  - Goi skill "story-us-senior-viral" da Save trong tai khoan Claude (Cach 1 - gon).
  *  - Nhan ket qua theo khuon ===COT=== (3 cot cuoi la JSON: dedup_config, story_dna, kpi_scores).
  *  - Tach thanh 21 cot dung thu tu Google Sheet -> n8n cao dung.
- *  - Tao anh (Gemini) + up R2 cho moi bai, chen link vao web_body. Loi anh khong lam sap bai.
+ *  - Tao anh (Cloudflare Workers AI - FLUX 2 klein-9b) + up R2, chen link vao web_body.
+ *    Loi anh khong lam sap bai. Prompt anh LAY NGUYEN tu cot skill da viet (khong tu che).
  *
  * Ket qua 1 bai: { row: [21 o], raw: '<van ban Claude tra ve>', sections, storyId, status }
  */
@@ -132,14 +133,15 @@ function applyImagePlaceholders(html, urls) {
   return out;
 }
 
-// Doc cau hinh anh (Gemini + R2) tu store, GIAI MA secret. Tra object cfg cho image-gen.
+// Doc cau hinh anh (Cloudflare Workers AI + R2) tu store, GIAI MA secret.
 function getImageConfig() {
   let s = {};
   try { s = store.read('settings.json'); } catch (_) { s = {}; }
   const img = s.image || {};
   const dec = (v) => { try { return store.decryptSecret(v); } catch (_) { return ''; } };
   return {
-    geminiKey: dec(img.geminiKey),
+    cfAccountId: dec(img.cfAccountId),
+    cfApiToken: dec(img.cfApiToken),
     r2AccessKeyId: dec(img.r2AccessKeyId),
     r2SecretAccessKey: dec(img.r2SecretAccessKey),
     r2Endpoint: (img.r2Endpoint || '').trim(),
@@ -149,7 +151,8 @@ function getImageConfig() {
 }
 
 function imageConfigReady(cfg) {
-  return !!(cfg.geminiKey && cfg.r2Endpoint && cfg.r2AccessKeyId && cfg.r2SecretAccessKey && cfg.r2Bucket && cfg.r2PublicDomain);
+  return !!(cfg.cfAccountId && cfg.cfApiToken && cfg.r2Endpoint && cfg.r2AccessKeyId
+            && cfg.r2SecretAccessKey && cfg.r2Bucket && cfg.r2PublicDomain);
 }
 
 // Lay cau lenh skill (co the da tuy bien trong Cai dat), thay {NICHE}.
@@ -214,8 +217,8 @@ async function generateArticleImages(storyId, s, onProgress = () => {}) {
   let madeAny = false; // da bat dau tao it nhat 1 anh chua -> de gian cach 8s giua CAC LAN tao
   for (const j of jobs) {
     if (!j.prompt) { result.errors.push(`${j.kind}: thiếu prompt`); continue; }
-    // TUAN TU: gian cach 8s giua 2 lan tao anh (tranh rate-limit/phut cua Gemini free tier)
-    if (madeAny) { onProgress({ message: 'Đợi 8 giây trước khi tạo ảnh tiếp (tránh giới hạn Gemini)...' }); await delay(8000); }
+    // TUAN TU: gian cach vai giay giua 2 lan tao anh (tranh gioi han tan suat Cloudflare)
+    if (madeAny) { onProgress({ message: 'Đợi 5 giây trước khi tạo ảnh tiếp (tránh giới hạn Cloudflare)...' }); await delay(5000); }
     madeAny = true;
     const r = await imageGen.createAndUpload({ prompt: j.prompt, storyId, kind: j.kind, cfg }, logger);
     if (r.ok) {

@@ -81,7 +81,8 @@ ipcMain.handle('settings:get', () => {
       skillCommand: (s.story && s.story.skillCommand) || storyWriter.DEFAULT_SKILL_COMMAND,
     },
     image: {
-      geminiKey: dec(img.geminiKey),
+      cfAccountId: dec(img.cfAccountId),
+      cfApiToken: dec(img.cfApiToken),
       r2AccessKeyId: dec(img.r2AccessKeyId),
       r2SecretAccessKey: dec(img.r2SecretAccessKey),
       r2Endpoint: img.r2Endpoint || '',
@@ -90,13 +91,15 @@ ipcMain.handle('settings:get', () => {
     },
   };
 });
-// Cai dat "Anh & Luu tru": Gemini key + R2. Secret duoc MA HOA truoc khi luu.
+// Cai dat "Anh & Luu tru": Cloudflare Workers AI + R2. Secret duoc MA HOA truoc khi luu.
 ipcMain.handle('settings:saveImage', (_e, payload) => {
   requireAuth();
   const p = payload || {};
   const s = loadSettings();
   s.image = s.image || {};
-  s.image.geminiKey = store.encryptSecret(String(p.geminiKey || '').trim());
+  s.image.cfAccountId = store.encryptSecret(String(p.cfAccountId || '').trim());
+  s.image.cfApiToken = store.encryptSecret(String(p.cfApiToken || '').trim());
+  delete s.image.geminiKey; // bo key Gemini cu (khong dung nua)
   s.image.r2AccessKeyId = store.encryptSecret(String(p.r2AccessKeyId || '').trim());
   s.image.r2SecretAccessKey = store.encryptSecret(String(p.r2SecretAccessKey || '').trim());
   s.image.r2Endpoint = String(p.r2Endpoint || '').trim();

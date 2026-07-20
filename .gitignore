@@ -17,6 +17,10 @@ logs/
 .env.*
 *.tmp
 
+# File test FLUX (chua token Cloudflare) + anh test - KHONG commit
+.flux-test.json
+flux-test-output/
+
 # OS files
 .DS_Store
 Thumbs.db

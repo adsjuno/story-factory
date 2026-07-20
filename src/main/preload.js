@@ -26,7 +26,7 @@ const api = {
   getSettings: () => call('settings:get'),
   saveSheets: (p) => call('settings:saveSheets', p),
   saveStory: (p) => call('settings:saveStory', p),  // tuy bien ngach + cau lenh skill
-  saveImage: (p) => call('settings:saveImage', p),  // Gemini key + R2 (Anh & Luu tru)
+  saveImage: (p) => call('settings:saveImage', p),  // Cloudflare Workers AI + R2 (Anh & Luu tru)
   aiLogin: (p) => call('settings:aiLogin', p),
   aiLogout: (p) => call('settings:aiLogout', p),
 
