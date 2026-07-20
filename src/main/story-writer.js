@@ -104,16 +104,6 @@ function stripDecor(line) {
     .trim();
 }
 
-// Nhan dien dong nhan kieu ===KEY=== (chap nhan 2-6 dau =, khoang trang, hoa thuong,
-// va lop markdown bao ngoai). Tra ve ten nhan da chuan hoa, hoac null.
-function matchEqualsHeader(line) {
-  const s = stripDecor(line);
-  const m = s.match(/^={2,6}\s*([A-Za-z0-9 _-]+?)\s*={2,6}$/);
-  if (!m) return null;
-  const k = normKey(m[1]);
-  return KNOWN_KEYS.includes(k) ? k : null;
-}
-
 // Du phong: dong CHI chua ten nhan (co the boc [ ] hoac markdown), vd "WEB_BODY", "[WEB_BODY]", "## WEB_BODY:"
 function matchBareHeader(line) {
   const s = stripDecor(line).replace(/^\[\s*|\s*\]$/g, '').trim();
@@ -122,33 +112,96 @@ function matchBareHeader(line) {
   return KNOWN_KEYS.includes(k) ? k : null;
 }
 
-// Boc noi dung theo 1 ham nhan dien nhan
-function collect(text, matcher) {
+// Mau nhan ===KEY=== o BAT KY dau nao (KHONG neo dong). Day la mau chot sua bug
+// "noi dung khoi nay nuot nhan cua khoi sau" khi Claude viet nhan cung dong voi noi dung.
+const LABEL_ANYWHERE = /={2,}[ \t]*([A-Za-z0-9 _-]{2,40}?)[ \t]*={2,}/g;
+
+/**
+ * Don sach 1 khoi noi dung sau khi cat:
+ *  - bo dong ```fence```
+ *  - bo MOI nhan ===...=== con sot (dau/cuoi/giua dong)
+ *  - bo khoang trang, xuong dong, rac markdown thua o hai dau
+ * HTML ben trong duoc giu nguyen.
+ */
+function cleanBlock(s) {
+  let out = String(s == null ? '' : s);
+  // bo dong fence
+  out = out.split(/\r?\n/).filter((l) => !l.trim().startsWith('```')).join('\n');
+  // bo moi nhan ===...=== con sot o bat ky vi tri nao
+  out = out.replace(LABEL_ANYWHERE, '');
+  // bo dau bang tho con lai lac lo tren dong rieng (vd "======")
+  out = out.split(/\r?\n/).filter((l) => !/^\s*[*#\s]*={2,}[*#\s]*$/.test(l)).join('\n');
+  // don rac markdown/khoang trang o hai dau (khong dung toi noi dung HTML)
+  out = out.replace(/^(?:\s|\*{1,2}|#{1,6})+/, '').replace(/(?:\s|\*{1,2}|#{1,6})+$/, '');
+  return out.trim();
+}
+
+/**
+ * Cat khoi theo nhan ===KEY=== bang cach quet TOAN VAN BAN.
+ * Noi dung 1 khoi = doan tu NGAY SAU nhan cua no toi NGAY TRUOC nhan hop le ke tiep
+ * -> ve cau truc KHONG THE nuot nhan cua khoi sau.
+ */
+function collectByLabel(text) {
+  const src = String(text || '');
+  const hits = [];
+  LABEL_ANYWHERE.lastIndex = 0;
+  let m;
+  while ((m = LABEL_ANYWHERE.exec(src)) !== null) {
+    const k = normKey(m[1]);
+    if (KNOWN_KEYS.includes(k)) hits.push({ key: k, start: m.index, end: LABEL_ANYWHERE.lastIndex });
+  }
+  const out = {};
+  for (let i = 0; i < hits.length; i++) {
+    const h = hits[i];
+    if (h.key === 'END') continue;
+    const next = hits[i + 1];                       // nhan hop le KE TIEP (bat ky nhan nao)
+    const body = cleanBlock(src.slice(h.end, next ? next.start : src.length));
+    // giu lan xuat hien DAU TIEN co noi dung (tranh nhan lap lam mat du lieu)
+    if (out[h.key] === undefined || (!out[h.key] && body)) out[h.key] = body;
+  }
+  return out;
+}
+
+// Du phong (khi khong co nhan ===): cat theo dong, cung don sach bang cleanBlock
+function collectByLine(text, matcher) {
   const map = {};
-  const order = [];
   let cur = null;
   for (const raw of String(text || '').split(/\r?\n/)) {
     const key = matcher(raw);
-    if (key) { cur = key; if (cur !== 'END' && !map[cur]) { map[cur] = []; order.push(cur); } continue; }
-    if (raw.trim().startsWith('```')) continue; // bo dong fence (giu nguyen HTML ben trong)
+    if (key) { cur = key; if (cur !== 'END' && !map[cur]) map[cur] = []; continue; }
     if (cur && cur !== 'END') map[cur].push(raw);
   }
   const out = {};
-  for (const k of Object.keys(map)) out[k] = map[k].join('\n').trim();
+  for (const k of Object.keys(map)) out[k] = cleanBlock(map[k].join('\n'));
   return out;
 }
 
 /**
- * Doc output cua Claude. Uu tien khuon ===KEY===; neu khong ra du nhan thi thu
- * kieu nhan tran ("WEB_BODY" / "[WEB_BODY]" / "## WEB_BODY"). HTML trong web_body
- * duoc giu nguyen (chi bo dong ```fence```).
+ * Doc output cua Claude. Uu tien khuon ===KEY=== (quet toan van ban); neu khong ra
+ * du nhan thi thu kieu nhan tran ("WEB_BODY" / "[WEB_BODY]" / "## WEB_BODY").
+ * HTML trong web_body duoc giu nguyen (chi bo dong ```fence``` va nhan lot).
  */
 function parseSections(text) {
-  const a = collect(text, matchEqualsHeader);
+  const a = collectByLabel(text);
   const countA = Object.keys(a).length;
-  if (countA >= 3) return a;                    // khuon chuan chay tot -> dung luon
-  const b = collect(text, matchBareHeader);     // du phong
+  if (countA >= 3) return a;                       // khuon chuan chay tot -> dung luon
+  const b = collectByLine(text, matchBareHeader);  // du phong
   return Object.keys(b).length > countA ? b : a;
+}
+
+/**
+ * Kiem tra cuoi: khoi nao VAN con chuoi '===' la dau hieu lot nhan -> tra ve canh bao
+ * (ghi vao last-run.json de phat hien som, tranh AI tao anh doc nham nhan).
+ */
+function checkLeakedLabels(sections) {
+  const warnings = [];
+  for (const k of Object.keys(sections || {})) {
+    const v = sections[k];
+    if (typeof v === 'string' && v.includes('===')) {
+      warnings.push(`${k.toLowerCase()} còn chứa === (có thể lọt nhãn khối khác)`);
+    }
+  }
+  return warnings;
 }
 
 // Cac mang BAT BUOC phai co de luu duoc bai
@@ -340,14 +393,18 @@ async function writeOne(nicheLabel, onProgress = () => {}) {
     const s = parseSections(res.text);
     const found = Object.keys(s);
     const missing = missingSections(s);
+    const warnings = checkLeakedLabels(s);   // canh bao lot nhan (vd: web_p2_prompt con chua ===)
 
     // LUON ghi log tho -> co loi la mo man Log xem duoc ngay Claude tra ve gi
     store.writeRawLog(res.text, {
       at: new Date().toISOString(), niche: nicheLabel, attempt,
-      ok: missing.length === 0, missing, found,
+      ok: missing.length === 0, missing, found, warnings,
       rawLength: String(res.text || '').length,
       error: missing.length ? 'Thiếu khuôn' : '',
     });
+    if (warnings.length) {
+      onProgress({ message: '⚠️ CẢNH BÁO lọt nhãn: ' + warnings.join('; ') + ' — xem mục "Log".' });
+    }
 
     if (isComplete(s)) {
       // Cap story_id (bo dem local, +1 moi bai)
@@ -433,6 +490,8 @@ module.exports = {
   // exported for tests / reuse
   parseSections,
   missingSections,
+  checkLeakedLabels,
+  cleanBlock,
   isComplete,
   normalizeJson,
   applyImagePlaceholders,

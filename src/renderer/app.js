@@ -81,6 +81,7 @@ async function loadLogs(){
   parts.push('Kết quả: '+(m.ok?'✅ ĐỦ KHUÔN':'❌ THIẾU KHUÔN'));
   if(typeof m.rawLength==='number')parts.push('Độ dài Claude trả về: '+m.rawLength+' ký tự');
   if(m.missing&&m.missing.length)parts.push('THIẾU: '+m.missing.join(' | '));
+  if(m.warnings&&m.warnings.length)parts.push('⚠️ CẢNH BÁO LỌT NHÃN: '+m.warnings.join(' | '));
   if(m.found&&m.found.length)parts.push('Tìm thấy các mảnh: '+m.found.join(', '));
   else parts.push('Tìm thấy các mảnh: KHÔNG có mảnh nào');
   if(m.error)parts.push('Lỗi: '+m.error);
