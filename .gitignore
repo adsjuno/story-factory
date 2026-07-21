@@ -21,9 +21,10 @@ logs/
 .flux-test.json
 flux-test-output/
 
-# File du lieu nguon (input) de o goc - da nap vao src/main, khong commit ban trung
-story-dna-pool-US-full.json
-story-conflict-tree-US.json
+# File du lieu nguon (input) de o THU MUC GOC - da nap vao src/main, khong commit ban trung.
+# Pattern neo-goc: chan moi story-*.json o goc (full, US, optimized-v2, engine-config-v2...)
+# Luu y: JSON that cua app nam trong src/main/ nen KHONG bi anh huong.
+/story-*.json
 
 # OS files
 .DS_Store
@@ -34,3 +35,6 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
+
+# Claude Code local settings (cau hinh quyen cuc bo tung may - khong commit)
+.claude/settings.local.json
