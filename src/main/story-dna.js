@@ -143,12 +143,16 @@ function chooseWeighted(candidates, { country, field, affinityKeywords, hardDays
     const aff = list.filter((x) => affinityMatch(x, affinityKeywords));
     if (aff.length >= 3) list = aff;
   }
+  const { familyOf, softFamilies, hardFamilies } = arguments[1] || {};
   const weights = list.map((item) => {
     const days = memory.daysSinceField(country, field, item);
-    if (hardDays != null && days < hardDays) return 0;               // hard block
+    if (hardDays != null && days < hardDays) return 0;               // hard block theo ngay
+    const fam = familyOf ? familyOf(item) : null;
+    if (fam && hardFamilies && hardFamilies.has(fam)) return 0;      // hard block theo family
     let w = 1;
     if (affinityMatch(item, affinityKeywords)) w *= (wr.affinity_match_multiplier || 2.5);
     if (softDays != null && days < softDays) w *= (wr.recent_soft_penalty_multiplier != null ? wr.recent_soft_penalty_multiplier : 0.25);
+    if (fam && softFamilies && softFamilies.has(fam)) w *= 0.25;     // soft penalty family (lap gan)
     if (days === Infinity) w *= (wr.underused_item_bonus_multiplier || 1.5);
     return w;
   });
@@ -168,6 +172,127 @@ function isHiddenWealthTwist(t) {
 function isReconciliationEnding(e) {
   return /reconciliation|breaks the cycle and apologizes|gathers again under new rules|apologizes publicly/i.test(e || '');
 }
+
+// ==================== LOP 1: GEOGRAPHY (location x town x season x weather) ====================
+// Nhom dia ly. town_setting 'generic' -> hop moi noi. Con lai phai giao voi geo cua location.
+const TOWN_GEO = [
+  ['rust_belt', 'prairie_plains', 'appalachian'],          // 0 factory town
+  ['appalachian'],                                          // 1 Appalachian mountain
+  ['prairie_plains', 'southern', 'appalachian', 'great_lakes', 'mountain_west'], // 2 rural farming
+  ['coastal'],                                              // 3 Gulf Coast retirement
+  ['generic'],                                              // 4 suburb outside major city
+  ['new_england', 'coastal'],                              // 5 quiet New England
+  ['desert'],                                               // 6 desert town interstate
+  ['appalachian', 'mountain_west', 'rust_belt'],           // 7 former mining
+  ['great_lakes', 'mountain_west', 'new_england'],         // 8 lakeside summer tourism
+  ['southern', 'prairie_plains'],                          // 9 Southern church town
+  ['generic'],                                              // 10 military town near Army base
+  ['rust_belt', 'great_lakes'],                            // 11 Rust Belt neighborhood
+  ['prairie_plains', 'mountain_west', 'desert'],           // 12 ranching community
+  ['generic'],                                              // 13 college town
+  ['coastal'],                                              // 14 coastal fishing town
+  ['prairie_plains', 'southern', 'great_lakes', 'generic'], // 15 suburban over farmland
+];
+const STATE_GEO = {
+  Ohio: ['great_lakes', 'rust_belt', 'appalachian', 'prairie_plains'], Iowa: ['prairie_plains'],
+  Kansas: ['prairie_plains'], Missouri: ['prairie_plains', 'southern'], Oklahoma: ['prairie_plains', 'southern'],
+  Nebraska: ['prairie_plains'], Indiana: ['great_lakes', 'rust_belt', 'prairie_plains'],
+  Kentucky: ['appalachian', 'southern'], Tennessee: ['appalachian', 'southern'], Arkansas: ['southern', 'prairie_plains'],
+  Montana: ['mountain_west', 'prairie_plains'], Wyoming: ['mountain_west', 'prairie_plains'],
+  'North Dakota': ['prairie_plains'], 'South Dakota': ['prairie_plains'], 'West Virginia': ['appalachian', 'rust_belt'],
+  Maine: ['coastal', 'new_england'], Michigan: ['great_lakes', 'rust_belt'], Wisconsin: ['great_lakes', 'prairie_plains'],
+  Minnesota: ['great_lakes', 'prairie_plains'], Alabama: ['southern', 'coastal', 'appalachian'],
+  Georgia: ['southern', 'coastal', 'appalachian'], Texas: ['prairie_plains', 'southern', 'desert', 'coastal'],
+  Pennsylvania: ['appalachian', 'rust_belt', 'great_lakes'], Illinois: ['great_lakes', 'prairie_plains', 'rust_belt'],
+  Virginia: ['appalachian', 'coastal', 'southern'], 'North Carolina': ['appalachian', 'coastal', 'southern'],
+  Mississippi: ['southern', 'coastal'], Louisiana: ['southern', 'coastal'], Idaho: ['mountain_west'],
+  Utah: ['mountain_west', 'desert'], Arizona: ['desert', 'mountain_west'], Colorado: ['mountain_west', 'prairie_plains'],
+  Florida: ['coastal', 'southern', 'tropical'], 'New Mexico': ['desert', 'mountain_west'],
+  Oregon: ['coastal', 'mountain_west'], Washington: ['coastal', 'mountain_west'], 'South Carolina': ['southern', 'coastal'],
+  Maryland: ['coastal', 'appalachian'], Delaware: ['coastal'], 'New Hampshire': ['new_england', 'appalachian'],
+  Vermont: ['new_england', 'appalachian'], Connecticut: ['new_england', 'coastal'], 'Rhode Island': ['new_england', 'coastal'],
+  Massachusetts: ['new_england', 'coastal'], 'New Jersey': ['coastal'], 'New York': ['great_lakes', 'coastal', 'appalachian', 'rust_belt'],
+  California: ['coastal', 'desert', 'mountain_west'], Nevada: ['desert', 'mountain_west'],
+  Alaska: ['coastal', 'mountain_west'], Hawaii: ['coastal', 'tropical'],
+};
+function geoOfState(loc) { return STATE_GEO[loc] || ['generic', 'prairie_plains', 'southern']; }
+function townGeoAt(idx) { return TOWN_GEO[idx] || ['generic']; }
+function townCompatLocation(townIdx, loc) {
+  const tg = townGeoAt(townIdx);
+  if (tg.includes('generic')) return true;
+  const lg = geoOfState(loc);
+  return tg.some((g) => lg.includes(g));
+}
+
+// Season -> "mua/nhiet". Weather -> "nhiet". Ghep phai hop.
+function seasonBucket(s) {
+  s = lc(s);
+  if (/christmas/.test(s)) return 'winter';
+  if (/thanksgiving|veterans day|church homecoming/.test(s)) return 'late_fall';
+  if (/mother's day|memorial day|graduation/.test(s)) return 'spring';
+  if (/independence day|father's day|county fair/.test(s)) return 'summer';
+  return 'any'; // wedding/funeral/reunion/retirement/birthday/military reunion
+}
+function weatherBucket(w) {
+  w = lc(w);
+  if (/snow|freezing|cold november/.test(w)) return 'cold';
+  if (/heatwave|humid/.test(w)) return 'hot';
+  if (/golden light|thunderstorm|autumn sunlight/.test(w)) return 'warm';
+  if (/overcast|fog/.test(w)) return 'cool';
+  return 'any';
+}
+function seasonWeatherOk(season, weather) {
+  const sb = seasonBucket(season), wb = weatherBucket(weather);
+  if (sb === 'any' || wb === 'any') return true;
+  const allow = {
+    winter: ['cold', 'cool'],
+    late_fall: ['cold', 'cool', 'warm'],
+    spring: ['cool', 'warm'],
+    summer: ['hot', 'warm'],
+  };
+  return (allow[sb] || []).includes(wb);
+}
+function locationWeatherOk(loc, weather) {
+  const g = geoOfState(loc);
+  const wb = weatherBucket(weather);
+  if (g.includes('tropical') && wb === 'cold') return false; // Hawaii/Florida khong snow/freezing
+  return true;
+}
+
+// ==================== LOP 2: FAMILY (ngu nghia, khong theo text) ====================
+function revealFamily(twist) {
+  const t = lc(twist);
+  if (!t) return 'no_major_reveal';
+  if (/sealed legal document|beneficiary|will|letter|record|deed|patent/.test(t)) return 'document_evidence';
+  if (/witness|foster parent|neighbor|the person who paid|paid the villain|paid their tuition|kept the local clinic|whose recipe built/.test(t)) return 'ordinary_witness';
+  if (/veteran|judge|surgeon|officer|medal|olympic|war hero|detective|firefighter|nurse|commander|philanthropist|donor|owner of the land|inventor|built the family|fortune|business owner/.test(t)) return 'external_public_validator';
+  return 'self_disclosure';
+}
+function justiceFamily(j) {
+  const s = lc(j);
+  if (!s) return 'private_resolution';
+  if (/official records|audit|legal review|records prove|careful records dismantle|controls the only key document|patent|property right/.test(s)) return 'procedural';
+  if (/saves the very person|competence saves|only one who can save|calmly ends the arrangement|quietly walks away|refusing to beg|declines money|walks away with/.test(s)) {
+    if (/walks away|refusing to beg|declines money|calmly ends/.test(s)) return 'walk_away_dignity';
+    return 'hero_choice';
+  }
+  if (/publicly|community rallies|honors|standing ovation|plaque|award|recognizes them publicly|authority figure|someone the villain respects|someone powerful the victim once helped|tells the whole story|repeats the villain|chooses the narrator/.test(s)) return 'public_recognition';
+  return 'private_resolution';
+}
+function relationshipFamily(rel) {
+  const r = lc(rel);
+  if (/grandparent|grandchild|grandson|granddaughter/.test(r)) return 'grandparent_vs_grandchild';
+  if (/veteran/.test(r)) return 'veteran_vs_civilian';
+  if (/bride|mother-in-law|father-in-law|new husband/.test(r)) return 'bride_vs_inlaws';
+  if (/wife|husband|spouse|widow/.test(r)) return 'spouse_betrayal';
+  if (/sibling|brother|sister/.test(r)) return 'sibling_rivalry';
+  if (/aunt|uncle|niece|nephew/.test(r)) return 'extended_family';
+  if (/employee|boss|founder/.test(r)) return 'work_hierarchy';
+  return 'parent_vs_adult_child';
+}
+// Family reveal it dung (uu tien khi phai doi loai)
+const UNDERUSED_REVEAL = new Set(['document_evidence', 'self_disclosure', 'ordinary_witness', 'natural_consequence']);
+const UNDERUSED_JUSTICE = new Set(['procedural', 'hero_choice', 'walk_away_dignity', 'private_resolution']);
 
 // ---------------- Age & relationship theo theme ----------------
 const THEME_REL = {
@@ -284,11 +409,25 @@ function buildOnce(country, theme, pool, extra, conf, cfg) {
   bp.hero_first = heroFirst; bp.hero_surname = heroSurname; bp.hero_full_name = fullName(heroFirst, heroSurname);
   bp.villain_first = villainFirst; bp.villain_surname = villainSurname; bp.villain_full_name = fullName(villainFirst, villainSurname);
 
-  // 5) location + town_setting + season + weather
+  // 5) location + town_setting (LOP 1: town phai hop GEOGRAPHY cua location) + season + weather
   bp.location = chooseWeighted(pool.location || [], { country, field: 'location', softDays: soft.location, wr }) || '';
-  bp.town_setting = pickOne(extra.town_setting || ['']) || '';
+  const towns = extra.town_setting || [];
+  // random town cho toi khi hop geography voi location (giu location)
+  let townIdx = -1;
+  for (let k = 0; k < 40 && townIdx < 0; k++) {
+    const idx = Math.floor(Math.random() * towns.length);
+    if (townCompatLocation(idx, bp.location)) townIdx = idx;
+  }
+  if (townIdx < 0) { // khong tim thay -> chon town 'generic' bat ky
+    const gens = towns.map((_, i) => i).filter((i) => townGeoAt(i).includes('generic'));
+    townIdx = gens.length ? gens[Math.floor(Math.random() * gens.length)] : 0;
+  }
+  bp.town_setting = towns[townIdx] || '';
+  // season: uu tien theme preferred_events
   bp.season_event = pickOne((aff.preferred_events && aff.preferred_events.length) ? aff.preferred_events : (extra.season_event || [''])) || '';
-  bp.weather_mood = pickOne(extra.weather_mood || ['']) || '';
+  // weather: chi lay weather HOP season + HOP location; khong co -> de null (thà bỏ trống)
+  const weatherCands = (extra.weather_mood || []).filter((w) => seasonWeatherOk(bp.season_event, w) && locationWeatherOk(bp.location, w));
+  bp.weather_mood = weatherCands.length ? pickOne(weatherCands) : '';
 
   // 6) occupation (affinity)
   bp.occupation = chooseWeighted(pool.occupation || [], { country, field: 'occupation', affinityKeywords: aff.preferred_occupations, affinityHard: true, softDays: soft.occupation, wr }) || '';
@@ -302,22 +441,39 @@ function buildOnce(country, theme, pool, extra, conf, cfg) {
   // 9) humiliation_type
   bp.humiliation_type = pickOne(pool.humiliation_type || ['']) || '';
 
-  // 10) twist (reveal) — plot: gioi han hidden-wealth reveal
+  // ---- LOP 2: family gan day (de tranh lap reveal_family + justice_family) ----
+  const lastStory = memory.recentByCountry(country, 1)[0];
+  const lastReveal = lastStory && lastStory.combo ? lastStory.combo.reveal_family : null;
+  const lastJustice = lastStory && lastStory.combo ? lastStory.combo.justice_family : null;
+  // combo lap nhieu nhat: external_public_validator + public_recognition -> cap <=25%
+  const extcomboRate = memory.rateRecent(country, 20, (c) => c.reveal_family === 'external_public_validator' && c.justice_family === 'public_recognition').rate;
+  const capExternal = extcomboRate >= 0.25; // combo lap nhieu nhat -> gioi han manh
+
+  // 10) twist (reveal) — plot hidden-wealth + LOP2 family (tranh lap family bai truoc; cap external)
   const hwRate = memory.rateRecent(country, 20, (c) => isHiddenWealthTwist(c.twist)).rate;
   const excludeTwist = new Set();
   if (hwRate >= (plot.max_hidden_wealth_reveal_rate != null ? plot.max_hidden_wealth_reveal_rate : 0.2)) {
     for (const t of (pool.twist || [])) if (isHiddenWealthTwist(t)) excludeTwist.add(t);
   }
-  bp.twist = chooseWeighted(pool.twist || [], { country, field: 'twist', wr, exclude: excludeTwist }) || '';
+  const twistSoftFam = new Set(); if (lastReveal) twistSoftFam.add(lastReveal);
+  const twistHardFam = new Set(); if (capExternal) twistHardFam.add('external_public_validator');
+  bp.twist = chooseWeighted(pool.twist || [], { country, field: 'twist', wr, exclude: excludeTwist, familyOf: revealFamily, softFamilies: twistSoftFam, hardFamilies: twistHardFam }) || '';
   bp.reveal_type = bp.twist;
+  bp.reveal_family = revealFamily(bp.twist);
 
-  // 11) justice_type — plot: gioi han authority-rescue
+  // 11) justice_type — plot authority-rescue + LOP2 family (tranh lap; cap public_recognition khi external cao)
   const arRate = memory.rateRecent(country, 20, (c) => isAuthorityRescueJustice(c.justice_type)).rate;
   const excludeJust = new Set();
   if (arRate >= (plot.max_powerful_authority_rescue_rate != null ? plot.max_powerful_authority_rescue_rate : 0.25)) {
     for (const j of (pool.justice_type || [])) if (isAuthorityRescueJustice(j)) excludeJust.add(j);
   }
-  bp.justice_type = chooseWeighted(pool.justice_type || [], { country, field: 'justice_type', softDays: soft.justice_type, wr, exclude: excludeJust }) || '';
+  const justSoftFam = new Set(); if (lastJustice) justSoftFam.add(lastJustice);
+  const justHardFam = new Set();
+  // neu vua chon reveal = external_public_validator VA combo external dang bi cap -> chan public_recognition
+  if (bp.reveal_family === 'external_public_validator' && capExternal) justHardFam.add('public_recognition');
+  bp.justice_type = chooseWeighted(pool.justice_type || [], { country, field: 'justice_type', softDays: soft.justice_type, wr, exclude: excludeJust, familyOf: justiceFamily, softFamilies: justSoftFam, hardFamilies: justHardFam }) || '';
+  bp.justice_family = justiceFamily(bp.justice_type);
+  bp.relationship_family = relationshipFamily(bp.relationship);
 
   // 12) ending — plot: tranh total reconciliation (avoid_total_reconciliation_rate)
   const recRate = memory.rateRecent(country, 20, (c) => isReconciliationEnding(c.ending)).rate;
@@ -373,6 +529,9 @@ function pickCombo(country, niche, nicheCode, { maxTries = 60 } = {}) {
   }
 
   const sigHard = (extra.dedup_policy && extra.dedup_policy.hard_block_days && extra.dedup_policy.hard_block_days.story_signature) || 365;
+  const last = memory.recentByCountry(c, 1)[0];
+  const lastRF = last && last.combo ? last.combo.reveal_family : null;
+  const lastJF = last && last.combo ? last.combo.justice_family : null;
   let tries = 0, regen = 0, lastReason = '';
   let bp = null, sig = '';
   while (tries < maxTries) {
@@ -381,6 +540,10 @@ function pickCombo(country, niche, nicheCode, { maxTries = 60 } = {}) {
     // validate compatibility
     const comp = compatOk(bp, extra);
     if (!comp.ok) { regen++; lastReason = comp.reason; continue; }
+    // LOP 2: KHONG cho 2 bai LIEN TIEP trung ca reveal_family + justice_family
+    if (lastRF && bp.reveal_family === lastRF && bp.justice_family === lastJF) {
+      regen++; lastReason = `trùng family bài trước (${lastRF} + ${lastJF})`; continue;
+    }
     // story_signature dedup theo ngay
     sig = buildSignature(bp, extra);
     bp.story_signature = sig;
@@ -409,7 +572,9 @@ function buildDnaBlock(bp, country) {
     `- opening_scene = ${g('opening_scene')}`,
     `- humiliation = ${g('humiliation_type')}`,
   ];
-  if (bp && bp.conflict) lines.push(`- conflict = ${bp.conflict}`);
+  if (bp && bp.conflict) {
+    lines.push(`- ⚠️ CONFLICT CHÍNH (BẮT BUỘC kể ĐÚNG tình huống này, KHÔNG đổi sang tình huống khác): ${bp.conflict}`);
+  }
   lines.push(`- reveal (twist) = ${g('twist')}`);
   lines.push(`- justice = ${g('justice_type')}`);
   lines.push(`- ending = ${g('ending')}`);
@@ -439,6 +604,7 @@ function comboToSheetJson(bp, country, theme) {
     country: String(country || DEFAULT_COUNTRY).toUpperCase(),
     theme: c.theme || theme || '',
     conflict_id: c.conflict_id || '',
+    conflict: c.conflict || '',                 // TEXT conflict cuoi cung (sau validate)
     hero_full_name: c.hero_full_name || '',
     hero_age: c.hero_age || '',
     villain_full_name: c.villain_full_name || '',
@@ -456,6 +622,8 @@ function comboToSheetJson(bp, country, theme) {
     ending: c.ending || '',
     dominant_emotion: c.dominant_emotion || '',
     evidence_source: c.evidence_source || '',
+    reveal_family: c.reveal_family || '',
+    justice_family: c.justice_family || '',
     story_signature: c.story_signature || '',
   });
 }
@@ -466,4 +634,6 @@ module.exports = {
   pickCombo, buildDnaBlock, remember, comboToSheetJson, buildSignature, themeCodeOf,
   // phan loai (cho test)
   isAuthorityRescueJustice, isHiddenWealthTwist, isReconciliationEnding,
+  townCompatLocation, seasonWeatherOk, locationWeatherOk, geoOfState, townGeoAt,
+  revealFamily, justiceFamily, relationshipFamily,
 };
