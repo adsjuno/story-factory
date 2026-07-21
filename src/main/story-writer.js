@@ -429,6 +429,15 @@ function isComplete(s) {
   return missingSections(s).length === 0;
 }
 
+// Dem so tu trong web_body (bo the HTML). Tieng Anh -> tach theo khoang trang.
+function wordCount(html) {
+  const text = String(html || '').replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/gi, ' ').replace(/\s+/g, ' ').trim();
+  if (!text) return 0;
+  return text.split(' ').filter(Boolean).length;
+}
+const MIN_WORDS = 2000;         // duoi nguong -> yeu cau viet dai them
+const LENGTH_MAX_ATTEMPTS = 4;  // toi da vai lan ep dai
+
 /**
  * Viet 1 bai. Mo 1 phien Claude, gui prompt goi skill, nhan ve, tach 16 cot.
  * Thu lai toi da 2 lan neu Claude tra sai khuon.
@@ -444,14 +453,14 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
     onProgress({ message: `ℹ️ Pool DNA của nước ${country} đang rỗng — chạy không có DNA (bài vẫn viết bình thường).` });
   } else {
     const conflictNote = pick.combo.conflict
-      ? ` | conflict[${pick.conflictBranch}]: ${String(pick.combo.conflict).slice(0, 60)}...`
-      : ' | (ngách chưa có cây conflict — dùng humiliation_type)';
-    onProgress({ message: `🧬 DNA (${country}): ${pick.combo.hero_name} — ${pick.combo.villain_name} — ${pick.combo.icon_object}${conflictNote}` });
+      ? ` | conflict[${pick.conflictBranch}]: ${String(pick.combo.conflict).slice(0, 55)}...`
+      : '';
+    onProgress({ message: `🧬 DNA (${pick.theme || country}): ${pick.combo.hero_full_name} vs ${pick.combo.villain_full_name} | ${pick.combo.icon_object} | reveal: ${String(pick.combo.twist).slice(0, 40)}${conflictNote}` });
     if (pick.regen > 0) {
-      onProgress({ message: `↻ DNA random lại ${pick.regen} lần cho tương thích (relationship↔theme + giới tính tên khớp vai).` });
+      onProgress({ message: `↻ DNA random lại ${pick.regen} lần cho tương thích + không trùng signature (weighted random).` });
     }
     if (pick.fellBack && !pick.valid) {
-      onProgress({ message: `⚠️ Sau ${pick.tries} lần vẫn chưa có tổ hợp hoàn toàn hợp lệ (${pick.lastReason}) — dùng tổ hợp gần nhất.` });
+      onProgress({ message: `⚠️ Sau ${pick.tries} lần chưa có blueprint hoàn hảo (${pick.lastReason}) — dùng blueprint gần nhất.` });
     }
   }
   const dna = pick.poolEmpty ? null : { combo: pick.combo, country };
@@ -461,10 +470,12 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
     onProgress({ message: '⚠️ Cảnh báo: có DNA nhưng cột story_dna rỗng — kiểm tra story-dna.js.' });
   }
 
-  const prompt = buildPrompt(nicheLabel, dna);
+  const basePrompt = buildPrompt(nicheLabel, dna)
+    + '\n\n[YÊU CẦU ĐỘ DÀI] web_body PHẢI dài 2200-2800 từ tiếng Anh (đếm từ). Viết đầy đủ 3 phần, thêm hồi tưởng, đối thoại, chi tiết cảm xúc. TUYỆT ĐỐI không viết ngắn dưới 2000 từ.';
+  let prompt = basePrompt;
   let lastErr = null;
 
-  for (let attempt = 1; attempt <= 2; attempt++) {
+  for (let attempt = 1; attempt <= LENGTH_MAX_ATTEMPTS; attempt++) {
     onProgress({ message: `Ngách "${nicheLabel}"${attempt > 1 ? ` (thử lại lần ${attempt})` : ''}: Claude đang chạy skill viết truyện...` });
     const res = await webai.ask(engine, { prompt, show: false, timeoutMs: 420000 }); // skill dai -> cho 7 phut
     if (!res.ok) {
@@ -482,11 +493,12 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
     const found = Object.keys(s);
     const missing = missingSections(s);
     const warnings = checkLeakedLabels(s);   // canh bao lot nhan (vd: web_p2_prompt con chua ===)
+    const words = wordCount(s.WEB_BODY);     // so tu web_body (de ep do dai + log)
 
     // LUON ghi log tho -> co loi la mo man Log xem duoc ngay Claude tra ve gi
     store.writeRawLog(res.text, {
       at: new Date().toISOString(), niche: nicheLabel, attempt,
-      ok: missing.length === 0, missing, found, warnings,
+      ok: missing.length === 0, missing, found, warnings, words,
       rawLength: String(res.text || '').length,
       country,
       dnaCombo: dnaComboJson || null,                 // JSON that se ghi cot 22 (de verify)
@@ -500,9 +512,23 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
     }
 
     if (isComplete(s)) {
+      // EP DO DAI: dem tu web_body; qua ngan va con luot -> yeu cau viet dai them (giu DNA)
+      onProgress({ message: `📏 web_body ~${words} từ.` });
+      if (words < MIN_WORDS && attempt < LENGTH_MAX_ATTEMPTS) {
+        store.writeRawLog(res.text, {
+          at: new Date().toISOString(), niche: nicheLabel, attempt,
+          ok: false, missing: [], found, words, error: `Quá ngắn (${words} < ${MIN_WORDS})`,
+        });
+        onProgress({ message: `↻ Bài chỉ ${words} từ (< ${MIN_WORDS}) — yêu cầu Claude viết dài thêm (2200-2800 từ) rồi làm lại.` });
+        prompt = basePrompt
+          + `\n\n[LẦN TRƯỚC QUÁ NGẮN: chỉ ${words} từ] Viết LẠI DÀI HƠN HẲN, 2200-2800 từ: thêm hồi tưởng quá khứ, đối thoại chi tiết, mô tả cảm xúc và bối cảnh. Đủ 3 phần, mỗi phần dày dặn.`;
+        await delay(800);
+        continue;
+      }
+
       // Cap story_id (bo dem local, +1 moi bai)
       const storyId = store.nextStoryId();
-      onProgress({ message: `✓ Claude xong bài ${storyId} — ngách "${nicheLabel}". Đang tạo ảnh...` });
+      onProgress({ message: `✓ Claude xong bài ${storyId} (~${words} từ) — ngách "${nicheLabel}". Đang tạo ảnh...` });
 
       // Tao 4 anh (fb, p1, p2, p3) -> up R2. Loi anh KHONG lam sap bai.
       let imgs;
@@ -598,6 +624,8 @@ module.exports = {
   generateArticleImages,
   normalizeJson,
   normalizeKpi,
+  wordCount,
+  MIN_WORDS,
   applyImagePlaceholders,
   buildRow,
   DEDUP_TEMPLATE,

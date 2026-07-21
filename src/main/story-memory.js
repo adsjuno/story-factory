@@ -39,6 +39,51 @@ function writeDb(db) {
 /** Toan bo ban ghi (moi nhat o CUOI mang) */
 function all() { return readDb().entries; }
 
+// ---- Helpers DEDUP THEO NGAY (cho engine v2) ----
+function nowMs() { return Date.now(); }
+function entryDays(e, now) {
+  const t = Date.parse(e.at || '') || 0;
+  if (!t) return Infinity;
+  return (now - t) / 86400000; // ms -> ngay
+}
+function entriesOfCountry(country) {
+  const c = String(country || '').toUpperCase();
+  return readDb().entries.filter((e) => String(e.country || '').toUpperCase() === c);
+}
+
+/** So NGAY ke tu lan gan nhat 1 truc (field trong combo) mang gia tri `value`. Infinity neu chua tung. */
+function daysSinceField(country, field, value, now = nowMs()) {
+  if (value == null || value === '') return Infinity;
+  const list = entriesOfCountry(country);
+  let best = Infinity;
+  for (const e of list) {
+    if (e.combo && e.combo[field] === value) {
+      const d = entryDays(e, now);
+      if (d < best) best = d;
+    }
+  }
+  return best;
+}
+
+/** So NGAY ke tu lan gan nhat co story_signature = sig. Infinity neu chua tung. */
+function daysSinceSignature(country, sig, now = nowMs()) {
+  return daysSinceField(country, 'story_signature', sig, now);
+}
+
+/** N ban ghi gan nhat cua 1 nuoc trong `withinDays` ngay (moi nhat truoc). */
+function recentWithinDays(country, withinDays, now = nowMs()) {
+  return entriesOfCountry(country).filter((e) => entryDays(e, now) <= withinDays).reverse();
+}
+
+/** Ty le bai gan nhat (toi da `n`) thoa 1 predicate tren combo. Tra {rate, n}. */
+function rateRecent(country, n, predicate) {
+  const list = recentByCountry(country, n);
+  if (!list.length) return { rate: 0, n: 0 };
+  let hit = 0;
+  for (const e of list) { try { if (predicate(e.combo || {})) hit++; } catch (_) {} }
+  return { rate: hit / list.length, n: list.length };
+}
+
 /** N ban ghi gan nhat cua 1 nuoc (moi nhat truoc) */
 function recentByCountry(country, n) {
   const c = String(country || '').toUpperCase();
@@ -119,5 +164,6 @@ function stats() {
 
 module.exports = {
   all, recentByCountry, recentByCountryNiche, isDuplicate, add, stats,
+  daysSinceField, daysSinceSignature, recentWithinDays, rateRecent,
   HERO_WINDOW, COMBO_WINDOW, FILE,
 };

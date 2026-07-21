@@ -1,0 +1,75 @@
+{
+  "_meta": {
+    "schema_version": "2.0",
+    "purpose": "Deterministic, weighted, deduplicated Story DNA selection for US 55+ content.",
+    "country": "US",
+    "audience": "55+",
+    "language": "English"
+  },
+  "generation_order": [
+    "select_theme",
+    "select_conflict_by_theme",
+    "select_age_and_relationship",
+    "select_names_with_cooldown",
+    "select_location_and_town_setting",
+    "select_occupation",
+    "select_icon_object_by_affinity",
+    "select_opening_scene",
+    "select_humiliation_type",
+    "select_twist",
+    "select_justice_type",
+    "select_ending",
+    "select_dominant_emotion",
+    "validate_compatibility",
+    "build_story_signature",
+    "check_dedup",
+    "send_blueprint_to_writer"
+  ],
+  "weighted_random": {
+    "affinity_match_multiplier": 2.5,
+    "recent_soft_penalty_multiplier": 0.25,
+    "recent_hard_block_multiplier": 0.0,
+    "underused_item_bonus_multiplier": 1.5
+  },
+  "name_rules": {
+    "use_full_names": true,
+    "same_surname_for_close_family": true,
+    "prevent_same_first_name_in_story": true,
+    "hero_name_cooldown_days": 60,
+    "villain_name_cooldown_days": 30
+  },
+  "plot_rules": {
+    "max_major_reveals": 1,
+    "max_powerful_authority_rescue_rate": 0.25,
+    "max_hidden_wealth_reveal_rate": 0.2,
+    "require_cost_or_consequence": true,
+    "require_hero_choice_in_final_act": true,
+    "avoid_total_reconciliation_rate": 0.7,
+    "object_must_appear_in_parts": [
+      "P1",
+      "P2",
+      "P3"
+    ]
+  },
+  "output_blueprint_example": {
+    "story_id": "ST-US-20260721-0001",
+    "theme": "B_veteran",
+    "conflict_id": "B_cases-03",
+    "hero_full_name": "Walter Miller",
+    "hero_age": 74,
+    "villain_full_name": "Brandon Miller",
+    "relationship": "retired veteran and status-conscious grandson",
+    "occupation": "retired school bus driver",
+    "location": "Ohio",
+    "town_setting": "a fading Midwestern factory town",
+    "season_event": "Veterans Day",
+    "weather_mood": "cold November rain",
+    "icon_object": "a scratched dog tag on a ball chain",
+    "opening_scene": "starts with a single cruel sentence the villain said out loud in front of everyone",
+    "humiliation_type": "not introduced or acknowledged at an important event",
+    "twist": "the veteran who carried the commanding officer to safety",
+    "justice_type": "official records prove the narrator's version after years of denial",
+    "ending": "the final victory is simply being believed",
+    "dominant_emotion": "quiet vindication - satisfaction without gloating"
+  }
+}

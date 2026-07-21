@@ -20,8 +20,21 @@
 
 const store = require('./store');
 
+// Nap tu file v2 per-country (story-conflict-tree-<C>.json). Chi lay CAC NHANH ngach
+// (key dang A_me_gia/B_veteran...) cho man Cai dat; bo qua conflict_catalog/selection_policy.
+const COUNTRIES = ['US', 'ES', 'CA'];
 let BUNDLED = {};
-try { BUNDLED = require('./conflict-tree.json'); } catch (_) { BUNDLED = {}; }
+for (const c of COUNTRIES) {
+  let raw = null;
+  try { raw = require('./story-conflict-tree-' + c + '.json'); } catch (_) { raw = null; }
+  if (raw && typeof raw === 'object') {
+    const branches = {};
+    for (const k of Object.keys(raw)) {
+      if (/^[A-Z]_/.test(k) && raw[k] && typeof raw[k] === 'object' && !Array.isArray(raw[k])) branches[k] = raw[k];
+    }
+    if (Object.keys(branches).length) BUNDLED[c] = branches;
+  }
+}
 
 const FILE = 'conflict-tree.json'; // ban nguoi dung sua (userData)
 const DEFAULT_COUNTRY = 'US';

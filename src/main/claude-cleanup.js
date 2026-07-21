@@ -53,50 +53,71 @@ async function deleteFirstChat(wc) {
   const code = `(async function(){
     function txt(el){ return (el && (el.innerText||el.textContent) || '').trim(); }
     function vis(el){ if(!el) return false; var r=el.getBoundingClientRect(); return r.width>0&&r.height>0; }
-    function clickable(root, reText){
-      var els = Array.prototype.slice.call(root.querySelectorAll('button,[role="menuitem"],a,div[role="button"]'));
+    var sleep = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
+    function fire(el, type){ try{ el.dispatchEvent(new MouseEvent(type,{bubbles:true,cancelable:true,view:window})); }catch(e){} }
+    function hover(el){ fire(el,'pointerover'); fire(el,'mouseover'); fire(el,'mouseenter'); fire(el,'pointermove'); fire(el,'mousemove'); }
+    // tim phan tu KHOP text trong 1 menu/dialog dang mo (toan trang)
+    function findByText(reText, roles){
+      var sel = roles || 'button,[role="menuitem"],[role="menuitemradio"],a,div[role="button"]';
+      var els = Array.prototype.slice.call(document.querySelectorAll(sel));
       for(var i=0;i<els.length;i++){ if(vis(els[i]) && reText.test(txt(els[i]))) return els[i]; }
       return null;
     }
-    var sleep = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
 
-    var links = Array.prototype.slice.call(document.querySelectorAll('a[href^="/chat/"]'));
-    if(!links.length) return {ok:false, reason:'khong thay cuoc tro chuyen nao'};
+    var links = Array.prototype.slice.call(document.querySelectorAll('a[href^="/chat/"], a[href*="/chat/"]'));
+    if(!links.length) return {ok:false, reason:'khong thay cuoc tro chuyen nao (chua dang nhap?)'};
     var link = links[0];
     var title = txt(link).slice(0,60) || (link.getAttribute('href')||'');
     var before = links.length;
+    var item = link.closest('li,[data-testid],[role="listitem"]') || link.parentElement || link;
 
-    // Container cua item (li hoac div cha) de tim nut menu
-    var item = link.closest('li') || link.parentElement || link;
+    // 1) Hien nut menu: hover ca item lan link
+    hover(item); hover(link); await sleep(350);
 
-    // 1) Tim nut menu "..." (nhieu kha nang selector). Hover truoc cho menu button hien.
-    try{ item.dispatchEvent(new MouseEvent('mouseover',{bubbles:true})); item.dispatchEvent(new MouseEvent('mouseenter',{bubbles:true})); }catch(e){}
-    await sleep(250);
-    var menuBtn =
-      item.querySelector('button[aria-haspopup="menu"], button[aria-label*="menu" i], button[aria-label*="options" i], button[data-testid*="menu" i], button[id*="menu" i], button[aria-label*="tùy chọn" i]')
-      || item.querySelector('button');
-    if(!menuBtn || !vis(menuBtn)) return {ok:false, reason:'khong thay nut menu (...) cua chat', title:title};
-    menuBtn.click();
-    await sleep(400);
+    // Ung vien nut menu "..." (nhieu kha nang)
+    var cands = [];
+    function addAll(root){ if(!root)return; Array.prototype.push.apply(cands, Array.prototype.slice.call(root.querySelectorAll(
+      'button[aria-haspopup="menu"],button[aria-label*="menu" i],button[aria-label*="option" i],button[aria-label*="more" i],'
+      +'button[data-testid*="menu" i],button[data-testid*="option" i],[data-testid*="menu" i][role="button"],'
+      +'button[aria-label*="tùy chọn" i],button[aria-label*="conversation" i],button[aria-haspopup="true"]'))); }
+    addAll(item); addAll(item.parentElement); addAll(link.parentElement);
+    // du phong: nut cuoi cung trong item chi co icon (khong chu)
+    var allBtns = Array.prototype.slice.call(item.querySelectorAll('button')).filter(vis);
+    var iconBtns = allBtns.filter(function(b){ return txt(b).length===0; });
+    var menuBtn = cands.filter(vis)[0] || iconBtns[iconBtns.length-1] || null;
 
-    // 2) Muc "Delete"/"Xóa" trong menu vua mo (tim toan trang vi menu render o body)
-    var delItem = clickable(document, /^(delete|xóa|xoá|delete chat|xóa cuộc trò chuyện)/i);
-    if(!delItem) return {ok:false, reason:'khong thay muc Delete trong menu', title:title};
-    delItem.click();
-    await sleep(400);
+    // Log cau truc nut de chan doan (khi giao dien doi)
+    var diag = allBtns.map(function(b){ return (b.getAttribute('aria-label')||b.getAttribute('data-testid')||txt(b)||'?'); }).slice(0,8);
 
-    // 3) Nut xac nhan trong hop thoai (neu co)
-    var confirmBtn = clickable(document, /^(delete|xóa|xoá|confirm|đồng ý|ok)$/i);
-    if(confirmBtn){ confirmBtn.click(); await sleep(700); }
+    if(!menuBtn){
+      // du phong cuoi: chuot phai (context menu)
+      fire(link,'contextmenu'); await sleep(400);
+      var delRC = findByText(/^(delete|xóa|xoá)\\b/i);
+      if(!delRC) return {ok:false, reason:'khong thay nut menu (...) — cac nut thay: ['+diag.join(' | ')+']', title:title};
+      delRC.click(); await sleep(400);
+    } else {
+      menuBtn.click(); await sleep(500);
+      var delItem = findByText(/^(delete|xóa|xoá)\\b/i);
+      if(!delItem){
+        // co the menu mo cham / can hover menuBtn
+        hover(menuBtn); await sleep(400);
+        delItem = findByText(/^(delete|xóa|xoá)\\b/i);
+      }
+      if(!delItem) return {ok:false, reason:'mo menu nhung khong thay muc Delete — cac nut item: ['+diag.join(' | ')+']', title:title};
+      delItem.click(); await sleep(450);
+    }
 
-    // 4) Kiem tra so cuoc tro chuyen da giam (xac nhan xoa)
-    var after = document.querySelectorAll('a[href^="/chat/"]').length;
+    // 3) Hop thoai xac nhan (Radix dialog): nut Delete/Xoa
+    var confirmBtn = findByText(/^(delete|xóa|xoá|confirm|đồng ý|remove)$/i);
+    if(confirmBtn){ confirmBtn.click(); await sleep(800); }
+
+    // 4) Xac nhan danh sach da giam
+    var after = document.querySelectorAll('a[href^="/chat/"], a[href*="/chat/"]').length;
     if(after < before) return {ok:true, title:title};
-    // co the UI cham cap nhat -> cho them 1 nhip
-    await sleep(800);
-    after = document.querySelectorAll('a[href^="/chat/"]').length;
+    await sleep(900);
+    after = document.querySelectorAll('a[href^="/chat/"], a[href*="/chat/"]').length;
     if(after < before) return {ok:true, title:title};
-    return {ok:false, reason:'da bam Delete nhung danh sach chua giam (co the giao dien doi)', title:title};
+    return {ok:false, reason:'da bam Delete nhung danh sach chua giam (giao dien co the doi)', title:title};
   })()`;
   return (await jsEval(wc, code)) || { ok: false, reason: 'loi thuc thi trong trang' };
 }
