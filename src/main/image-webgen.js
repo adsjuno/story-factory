@@ -115,40 +115,49 @@ async function lastText(wc) {
   })()`)) || '';
 }
 
-// Tim URL anh sinh ra (lon, khong phai icon). Tra ve src hoac ''
-async function findImageSrc(wc, cfg) {
-  return (await jsEval(wc, `(function(){
-    var imgs = Array.prototype.slice.call(document.querySelectorAll(${JSON.stringify(cfg.imageSelectors)}));
-    var best=''; var bestArea=0;
-    for (var i=imgs.length-1;i>=0;i--){
-      var im=imgs[i]; var s=im.currentSrc||im.src||'';
-      if(!s) continue;
-      if(s.indexOf('data:image/svg')===0) continue;         // bo icon svg
-      var w=im.naturalWidth||im.width||0, h=im.naturalHeight||im.height||0;
-      if(w<256||h<256) continue;                            // bo anh nho (avatar/icon)
-      var area=w*h;
-      if(area>bestArea){bestArea=area; best=s;}
-    }
-    return best;
-  })()`)) || '';
-}
-
-// Tai bytes anh NGAY TRONG trang (fetch cung origin/CDN cua ho) -> dataURL
-async function fetchImageDataUrl(wc, src) {
+/**
+ * TRICH BYTES anh NGAY TRONG trang, thu LAN LUOT nhieu cach - cach nao duoc thi dung:
+ *   data-url        : the <img> src la data:image/... -> lay thang.
+ *   existing-canvas : ve <img> DA LOAD (naturalWidth>0) len canvas (khong goi mang;
+ *                     duoc neu anh khong bi taint CORS) -> ho tro ca webp -> jpeg.
+ *   fetch-blob      : fetch(src) -> blob -> dataURL (blob:/same-origin/CORS cho phep).
+ *   anon-canvas     : tao Image moi crossOrigin=anonymous -> canvas (CDN co CORS header).
+ * Tra: {status:'ok',dataUrl,method,mime} | {status:'pending'} (anh chua load xong)
+ *      | {status:'none'} (chua co anh) | {status:'fail'} (co anh nhung moi cach deu fail)
+ */
+async function extractBestImage(wc, cfg) {
   const code = `(async function(){
-    try {
-      var r = await fetch(${JSON.stringify(src)});
-      var b = await r.blob();
-      return await new Promise(function(res){ var fr=new FileReader(); fr.onerror=function(){res('');}; fr.onload=function(){res(fr.result);}; fr.readAsDataURL(b); });
-    } catch(e) {
-      // du phong: ve canvas (chi duoc neu anh khong bi taint CORS)
-      try {
-        var im=new Image(); im.crossOrigin='anonymous';
-        return await new Promise(function(res){ im.onload=function(){ try{var c=document.createElement('canvas'); c.width=im.naturalWidth; c.height=im.naturalHeight; c.getContext('2d').drawImage(im,0,0); res(c.toDataURL('image/jpeg',0.92)); }catch(_){res('');} }; im.onerror=function(){res('');}; im.src=${JSON.stringify(src)}; });
-      } catch(_) { return ''; }
+    function pick(){
+      var imgs=Array.prototype.slice.call(document.querySelectorAll(${JSON.stringify(cfg.imageSelectors)}));
+      var best=null,area=0;
+      for(var i=imgs.length-1;i>=0;i--){
+        var im=imgs[i]; var s=im.currentSrc||im.src||'';
+        if(!s) continue;
+        if(s.indexOf('data:image/svg')===0) continue;
+        var w=im.naturalWidth||0,h=im.naturalHeight||0, dw=im.width||0,dh=im.height||0;
+        if((w<256||h<256)&&(dw<256||dh<256)) continue;   // bo icon/avatar nho
+        var ar=(w*h)||(dw*dh);
+        if(ar>area){area=ar; best=im;}
+      }
+      return best;
     }
+    function toJpeg(cv){ try{return cv.toDataURL('image/jpeg',0.92);}catch(e){return '';} }
+    var img=pick();
+    if(!img) return {status:'none'};
+    var s=img.currentSrc||img.src||'';
+    // 0) data: URL -> lay thang (ho tro moi dinh dang gom webp)
+    if(s.indexOf('data:image/')===0) return {status:'ok',dataUrl:s,method:'data-url'};
+    // neu the img chua load xong -> bao pending de vong ngoai cho + thu lai
+    if(!(img.naturalWidth>0 && img.complete) && s.indexOf('blob:')!==0) return {status:'pending'};
+    // 1) canvas tu img DA LOAD (khong goi mang) - webp cung ve duoc
+    try{ if(img.naturalWidth>0){ var c=document.createElement('canvas'); c.width=img.naturalWidth;c.height=img.naturalHeight; c.getContext('2d').drawImage(img,0,0); var d1=toJpeg(c); if(d1) return {status:'ok',dataUrl:d1,method:'existing-canvas'}; } }catch(e){}
+    // 2) fetch blob (blob:/same-origin/CORS-ok) - giu nguyen mime (jpeg/png/webp)
+    try{ var r=await fetch(s,{cache:'force-cache'}); if(r.ok){ var b=await r.blob(); var d2=await new Promise(function(res){var fr=new FileReader();fr.onerror=function(){res('');};fr.onload=function(){res(fr.result);};fr.readAsDataURL(b);}); if(d2&&d2.indexOf('data:image')===0) return {status:'ok',dataUrl:d2,method:'fetch-blob',mime:b.type||''}; } }catch(e){}
+    // 3) anh moi crossOrigin anonymous -> canvas (CDN co CORS header)
+    try{ var d3=await new Promise(function(res){ var im=new Image(); im.crossOrigin='anonymous'; im.onload=function(){ try{var c2=document.createElement('canvas');c2.width=im.naturalWidth;c2.height=im.naturalHeight;c2.getContext('2d').drawImage(im,0,0);res(toJpeg(c2));}catch(_){res('');} }; im.onerror=function(){res('');}; im.src=s; }); if(d3) return {status:'ok',dataUrl:d3,method:'anon-canvas'}; }catch(e){}
+    return {status:'fail'};
   })()`;
-  return (await jsEval(wc, code)) || '';
+  return (await jsEval(wc, code)) || { status: 'none' };
 }
 
 function dataUrlToBuffer(dataUrl) {
@@ -183,32 +192,50 @@ async function generate(provider, prompt, { timeoutMs = 180000, show = false, lo
     const sent = await typeAndSend(wc, cfg, cfg.wrap(String(prompt)), log);
     if (!sent.ok) return { ok: false, error: sent.error };
 
-    // Cho anh render: kiem tra dinh ky co anh chua; song song soi text tu choi/het quota
+    // Cho anh render + TRICH BYTES ngay khi co, thu nhieu cach. Song song soi tu choi/het quota.
     const deadline = Date.now() + timeoutMs;
-    let src = '';
+    let sawImage = false;      // da tung thay the <img> chua (de phan biet "khong render" vs "trich fail")
+    let failStreak = 0;        // so lan lien tiep co anh nhung trich khong duoc
     while (Date.now() < deadline) {
-      await delay(2500);
-      src = await findImageSrc(wc, cfg);
-      if (src) break;
-      const txt = await lastText(wc);
-      if (hasAny(txt, cfg.refusePhrases)) {
-        log(`[${cfg.name}] ⊘ bị từ chối tạo ảnh (bộ lọc nội dung).`);
-        return { ok: false, flagged: true, error: cfg.name + ' từ chối tạo ảnh (bộ lọc nội dung).' };
+      const ex = await extractBestImage(wc, cfg);
+
+      if (ex.status === 'ok') {
+        const got = dataUrlToBuffer(ex.dataUrl);
+        if (got && got.buffer.length) {
+          log(`[${cfg.name}] ✓ lấy ảnh ${Math.round(got.buffer.length / 1024)}KB (${got.mimeType}) bằng: ${ex.method}${ex.mime ? ' [' + ex.mime + ']' : ''}.`);
+          return { ok: true, buffer: got.buffer, mimeType: got.mimeType };
+        }
+        // dataUrl hong -> coi nhu fail, thu lai
+        sawImage = true; failStreak++;
+      } else if (ex.status === 'pending') {
+        sawImage = true; failStreak = 0; // anh dang load -> cho them, khong tinh fail
+        log(`[${cfg.name}] ảnh đang tải, chờ thêm...`);
+      } else if (ex.status === 'fail') {
+        sawImage = true; failStreak++;
+        log(`[${cfg.name}] có ảnh nhưng trích bytes chưa được (thử lại ${failStreak}/4)...`);
+        if (failStreak >= 4) {
+          return { ok: false, error: 'Không lấy được bytes ảnh từ ' + cfg.name + ' sau khi thử mọi cách (CORS/định dạng).' };
+        }
+      } else {
+        // chua co anh -> soi text tu choi / het quota
+        const txt = await lastText(wc);
+        if (hasAny(txt, cfg.refusePhrases)) {
+          log(`[${cfg.name}] ⊘ bị từ chối tạo ảnh (bộ lọc nội dung).`);
+          return { ok: false, flagged: true, error: cfg.name + ' từ chối tạo ảnh (bộ lọc nội dung).' };
+        }
+        if (hasAny(txt, cfg.quotaPhrases)) {
+          log(`[${cfg.name}] ⚠️ báo hết quota/giới hạn.`);
+          return { ok: false, quota: true, error: cfg.name + ' hết quota/giới hạn ngày.' };
+        }
       }
-      if (hasAny(txt, cfg.quotaPhrases)) {
-        log(`[${cfg.name}] ⚠️ báo hết quota/giới hạn.`);
-        return { ok: false, quota: true, error: cfg.name + ' hết quota/giới hạn ngày.' };
-      }
+      await delay(1800); // cho 1.8s roi thu lai (retry)
     }
-    if (!src) return { ok: false, error: cfg.name + ' không thấy ảnh sau ' + Math.round(timeoutMs / 1000) + 's (giao diện có thể đổi, hoặc chưa render).' };
-
-    log(`[${cfg.name}] tìm thấy ảnh, đang tải bytes...`);
-    const dataUrl = await fetchImageDataUrl(wc, src);
-    const got = dataUrlToBuffer(dataUrl);
-    if (!got || !got.buffer.length) return { ok: false, error: 'Không lấy được bytes ảnh từ ' + cfg.name + ' (CORS/định dạng).' };
-
-    log(`[${cfg.name}] ✓ lấy ảnh ${Math.round(got.buffer.length / 1024)}KB (${got.mimeType}).`);
-    return { ok: true, buffer: got.buffer, mimeType: got.mimeType };
+    return {
+      ok: false,
+      error: cfg.name + (sawImage
+        ? ' có ảnh nhưng không lấy được bytes sau ' + Math.round(timeoutMs / 1000) + 's.'
+        : ' không thấy ảnh sau ' + Math.round(timeoutMs / 1000) + 's (giao diện có thể đổi, hoặc chưa render).'),
+    };
   } catch (e) {
     return { ok: false, error: cfg.name + ' lỗi: ' + e.message };
   } finally {
@@ -216,4 +243,4 @@ async function generate(provider, prompt, { timeoutMs = 180000, show = false, lo
   }
 }
 
-module.exports = { generate, PROVIDERS };
+module.exports = { generate, PROVIDERS, dataUrlToBuffer };

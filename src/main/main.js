@@ -14,6 +14,7 @@ const storyMemory = require('./story-memory');
 const conflictTree = require('./conflict-tree');
 const sheets = require('./sheets');
 const webai = require('./webai-electron');
+const claudeCleanup = require('./claude-cleanup');
 const updater = require('./updater');
 
 let mainWindow = null;
@@ -82,6 +83,7 @@ ipcMain.handle('settings:get', () => {
     story: {
       niches: (s.story && s.story.niches) || storyWriter.DEFAULT_NICHES,
       skillCommand: (s.story && s.story.skillCommand) || storyWriter.DEFAULT_SKILL_COMMAND,
+      cleanupClaudeChats: !(s.story && s.story.cleanupClaudeChats === false), // mac dinh bat
     },
     image: {
       cfAccountId: dec(img.cfAccountId),
@@ -132,12 +134,13 @@ ipcMain.handle('settings:saveSheets', (_e, { webhookUrl }) => {
   return { ok: true };
 });
 // Tuy bien: sua danh sach ngach + cau lenh goi skill (Cach 1 gon, nhung sua duoc)
-ipcMain.handle('settings:saveStory', (_e, { niches, skillCommand }) => {
+ipcMain.handle('settings:saveStory', (_e, { niches, skillCommand, cleanupClaudeChats }) => {
   requireAuth();
   const s = loadSettings();
   s.story = s.story || {};
   if (Array.isArray(niches)) s.story.niches = niches;
   if (typeof skillCommand === 'string' && skillCommand.trim()) s.story.skillCommand = skillCommand;
+  if (typeof cleanupClaudeChats === 'boolean') s.story.cleanupClaudeChats = cleanupClaudeChats;
   saveSettings(s);
   return { ok: true };
 });
@@ -178,6 +181,21 @@ ipcMain.handle('story:write', async (_e, { niche, count }) => {
     db.jobs.unshift({ at: new Date().toISOString(), niche, count: result.rows.length, failed: result.failed.length });
     db.jobs = db.jobs.slice(0, 500);
     store.write('jobs.json', db);
+
+    // TU DON CHAT CLAUDE: chi sau khi da day Sheet THANH CONG (khong mat du lieu).
+    // Mac dinh bat; loi don chat KHONG lam sap ket qua viet bai.
+    const cleanupOn = !(s.story && s.story.cleanupClaudeChats === false);
+    if (cleanupOn && result.rows.length) {
+      try {
+        const showWin = !!(s.image && s.image.source && s.image.source.showWindow);
+        await claudeCleanup.cleanupRecent(result.rows.length, {
+          show: showWin,
+          log: (m) => mainWindow.webContents.send('story:progress', { message: m }),
+        });
+      } catch (e) {
+        mainWindow.webContents.send('story:progress', { message: '⚠️ Không dọn được chat Claude: ' + e.message + ' (bài vẫn xong).' });
+      }
+    }
 
     return { ok: true, written: result.rows.length, failed: result.failed };
   } catch (e) {

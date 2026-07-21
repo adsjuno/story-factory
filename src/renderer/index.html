@@ -252,6 +252,9 @@
         <div class="lbl big">🧠 Câu lệnh gọi skill — tùy biến (nâng cao)</div>
         <p class="hint">Câu lệnh phần mềm gửi cho Claude. Giữ nguyên <code>{NICHE}</code> (sẽ thay bằng tên ngách) và các nhãn <code>===...===</code> để phần mềm bóc tách đúng. Chỉ sửa khi bạn hiểu rõ.</p>
         <textarea id="skillCmd" class="in area mono" rows="10"></textarea>
+        <div style="margin:10px 0">
+          <label><input type="checkbox" id="cleanupChats" checked> 🧹 Tự dọn (xoá) lịch sử chat Claude sau khi bài đã đẩy lên Sheet — giữ list chat gọn (bài đã lưu Sheet, không mất dữ liệu)</label>
+        </div>
         <div class="row">
           <button id="saveStoryBtn" class="btn btn-primary">Lưu ngách & câu lệnh</button>
         </div>

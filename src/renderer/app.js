@@ -209,6 +209,7 @@ async function loadSettings(){
   // ngach -> text
   $('nichesText').value=(r.story.niches||[]).map(n=>n.code+' | '+n.label).join('\n');
   $('skillCmd').value=r.story.skillCommand||'';
+  $('cleanupChats').checked=r.story.cleanupClaudeChats!==false;
   // Anh & Luu tru
   const im=r.image||{};
   $('cfAccountId').value=im.cfAccountId||'';
@@ -368,7 +369,7 @@ $('saveStoryBtn').onclick=async()=>{
     return {code:m[0].trim(),label:m.slice(1).join('|').trim()};
   }).filter(Boolean);
   const skillCommand=$('skillCmd').value;
-  const r=await api.saveStory({niches,skillCommand});
+  const r=await api.saveStory({niches,skillCommand,cleanupClaudeChats:$('cleanupChats').checked});
   if(r.ok){msg($('storyMsg'),'Đã lưu ngách & câu lệnh',true);await loadNiches();}
   else msg($('storyMsg'),r.error||'Lỗi',false);
 };
