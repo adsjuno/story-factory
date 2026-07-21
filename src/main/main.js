@@ -91,6 +91,11 @@ ipcMain.handle('settings:get', () => {
       r2Endpoint: img.r2Endpoint || '',
       r2Bucket: img.r2Bucket || 'story-factory',
       r2PublicDomain: img.r2PublicDomain || 'https://cdn-story.jovaaqua.com',
+      source: {
+        order: (img.source && Array.isArray(img.source.order) && img.source.order.length) ? img.source.order : ['gemini', 'chatgpt', 'cloudflare'],
+        enabled: (img.source && img.source.enabled) || { gemini: true, chatgpt: true, cloudflare: false },
+        showWindow: !!(img.source && img.source.showWindow),
+      },
     },
   };
 });
@@ -108,6 +113,13 @@ ipcMain.handle('settings:saveImage', (_e, payload) => {
   s.image.r2Endpoint = String(p.r2Endpoint || '').trim();
   s.image.r2Bucket = String(p.r2Bucket || '').trim() || 'story-factory';
   s.image.r2PublicDomain = String(p.r2PublicDomain || '').trim().replace(/\/+$/, '');
+  // Nguon tao anh (thu tu + bat/tat + hien cua so)
+  if (p.source && typeof p.source === 'object') {
+    s.image.source = s.image.source || {};
+    if (Array.isArray(p.source.order)) s.image.source.order = p.source.order;
+    if (p.source.enabled && typeof p.source.enabled === 'object') s.image.source.enabled = p.source.enabled;
+    s.image.source.showWindow = !!p.source.showWindow;
+  }
   saveSettings(s);
   return { ok: true };
 });

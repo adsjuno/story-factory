@@ -17,6 +17,7 @@
 const store = require('./store');
 const webai = require('./webai-electron');
 const imageGen = require('./image-gen');
+const imageRouter = require('./image-router');
 const storyDna = require('./story-dna');
 
 // ---- Cac NGACH mac dinh (page target). Nguoi dung sua duoc trong Cai dat. ----
@@ -272,6 +273,7 @@ function getImageConfig() {
   try { s = store.read('settings.json'); } catch (_) { s = {}; }
   const img = s.image || {};
   const dec = (v) => { try { return store.decryptSecret(v); } catch (_) { return ''; } };
+  const src = img.source || {};
   return {
     cfAccountId: dec(img.cfAccountId),
     cfApiToken: dec(img.cfApiToken),
@@ -280,12 +282,21 @@ function getImageConfig() {
     r2Endpoint: (img.r2Endpoint || '').trim(),
     r2Bucket: (img.r2Bucket || '').trim(),
     r2PublicDomain: (img.r2PublicDomain || '').trim(),
+    // Nguon tao anh + thu tu uu tien + bat/tat + hien cua so
+    source: {
+      order: Array.isArray(src.order) && src.order.length ? src.order : imageRouter.DEFAULT_ORDER,
+      enabled: src.enabled || imageRouter.DEFAULT_ENABLED,
+      showWindow: !!src.showWindow,
+    },
   };
 }
 
+// "San sang" = co R2 + it nhat 1 nguon anh duoc bat. (Nguon web con can dang nhap,
+// nhung do kiem tra o luc tao; thieu login -> anh loi -> need_image, khong sap bai.)
 function imageConfigReady(cfg) {
-  return !!(cfg.cfAccountId && cfg.cfApiToken && cfg.r2Endpoint && cfg.r2AccessKeyId
-            && cfg.r2SecretAccessKey && cfg.r2Bucket && cfg.r2PublicDomain);
+  const r2 = !!(cfg.r2Endpoint && cfg.r2AccessKeyId && cfg.r2SecretAccessKey && cfg.r2Bucket && cfg.r2PublicDomain);
+  const anySource = imageRouter.orderedSources(cfg).length > 0;
+  return r2 && anySource;
 }
 
 // Nuoc dang chay (mac dinh US). Nguoi dung chon trong Cai dat -> Story DNA.
@@ -383,7 +394,7 @@ async function generateArticleImages(storyId, s, onProgress = () => {}) {
     if (madeAny) { onProgress({ message: 'Đợi 5 giây trước khi tạo ảnh tiếp (tránh giới hạn Cloudflare)...' }); await delay(5000); }
     madeAny = true;
     if (j.kind === 'thumb' && j.fallback) onProgress({ message: 'ℹ️ Skill chưa xuất THUMB_PROMPT — dùng tạm web_p1_prompt cho thumbnail ngang.' });
-    const r = await imageGen.createAndUpload({ prompt: j.prompt, storyId, kind: j.kind, cfg }, logger);
+    const r = await imageRouter.createAndUpload({ prompt: j.prompt, storyId, kind: j.kind, cfg }, logger);
     if (r.ok) {
       okCount++;
       if (j.kind === 'fb') result.fbImageUrl = r.url;
@@ -422,7 +433,11 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
     onProgress({ message: `🧬 DNA (${country}): ${pick.combo.hero_name} — ${pick.combo.icon_object}${conflictNote}` });
   }
   const dna = pick.poolEmpty ? null : { combo: pick.combo, country };
-  const dnaComboJson = dna ? JSON.stringify(Object.assign({ country }, pick.combo)) : '';
+  // Cot 22: JSON gon, du truc ten ro rang (theme=ngach, conflict_id=case,...) + ma nuoc
+  const dnaComboJson = dna ? storyDna.comboToSheetJson(pick.combo, country, nicheLabel) : '';
+  if (dna && (!dnaComboJson || dnaComboJson.length < 20)) {
+    onProgress({ message: '⚠️ Cảnh báo: có DNA nhưng story_dna_combo rỗng — kiểm tra story-dna.js.' });
+  }
 
   const prompt = buildPrompt(nicheLabel, dna);
   let lastErr = null;
@@ -451,7 +466,10 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
       at: new Date().toISOString(), niche: nicheLabel, attempt,
       ok: missing.length === 0, missing, found, warnings,
       rawLength: String(res.text || '').length,
-      country, dnaCombo: dna ? Object.assign({ country }, pick.combo) : null,
+      country,
+      dnaCombo: dnaComboJson || null,                 // JSON that se ghi cot 22 (de verify)
+      dnaComboParsed: dnaComboJson ? JSON.parse(dnaComboJson) : null,
+      dnaConflictBranch: pick.conflictBranch || '',
       dnaTries: pick.tries, dnaFellBack: pick.fellBack,
       error: missing.length ? 'Thiếu khuôn' : '',
     });

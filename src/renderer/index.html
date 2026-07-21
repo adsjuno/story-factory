@@ -195,8 +195,33 @@
       </div>
 
       <div class="card">
-        <div class="lbl big">🖼️ Ảnh & Lưu trữ (Cloudflare Workers AI + R2)</div>
-        <p class="hint">Phần mềm tạo ảnh bằng <b>Cloudflare Workers AI</b> (model FLUX 2 klein-9b) rồi lưu lên R2. Key được mã hoá, lưu trên máy này. Để trống nếu chưa dùng ảnh — bài vẫn đẩy dạng chữ.</p>
+        <div class="lbl big">🖼️ Ảnh & Lưu trữ</div>
+        <p class="hint">Tạo ảnh MIỄN PHÍ bằng cách điều khiển cửa sổ Gemini/ChatGPT (đăng nhập tài khoản của bạn, không tốn API). Ảnh lưu lên R2. Cloudflare API là nguồn trả tiền, giữ lại phòng khi cần.</p>
+
+        <div class="lbl">Nguồn tạo ảnh</div>
+        <p class="hint">Thứ tự thử: Nguồn chính trước, hết quota/lỗi thì tự chuyển nguồn còn lại đang bật.</p>
+        <label class="lbl">Nguồn chính</label>
+        <select id="imgPrimary" class="in">
+          <option value="gemini">Gemini (web, miễn phí)</option>
+          <option value="chatgpt">ChatGPT (web, miễn phí)</option>
+          <option value="cloudflare">Cloudflare API (trả tiền)</option>
+        </select>
+        <div class="row" style="gap:16px;flex-wrap:wrap;margin:8px 0">
+          <label><input type="checkbox" id="srcGemini" checked> Bật Gemini</label>
+          <label><input type="checkbox" id="srcChatgpt" checked> Bật ChatGPT</label>
+          <label><input type="checkbox" id="srcCloudflare"> Bật Cloudflare API</label>
+          <label><input type="checkbox" id="imgShowWindow"> Hiện cửa sổ khi tạo (gỡ lỗi)</label>
+        </div>
+        <div class="lbl">Đăng nhập nguồn ảnh (1 lần, giống đăng nhập Claude)</div>
+        <div class="row">
+          <button id="geminiLoginBtn" class="btn btn-ghost">Đăng nhập Gemini</button>
+          <button id="chatgptLoginBtn" class="btn btn-ghost">Đăng nhập ChatGPT</button>
+        </div>
+        <div id="imgLoginMsg" class="msg"></div>
+
+        <hr style="border:none;border-top:1px solid #2a2f3a;margin:14px 0">
+
+        <p class="hint">Cloudflare Workers AI (chỉ cần khi bật nguồn Cloudflare API). Key mã hoá, lưu trên máy này.</p>
         <label class="lbl">Cloudflare Account ID</label>
         <input id="cfAccountId" class="in" type="password" placeholder="Account ID (trang dash.cloudflare.com, cột bên phải)">
         <label class="lbl">Cloudflare Workers AI API Token</label>

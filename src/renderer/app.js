@@ -218,7 +218,27 @@ async function loadSettings(){
   $('r2Endpoint').value=im.r2Endpoint||'';
   $('r2Bucket').value=im.r2Bucket||'story-factory';
   $('r2PublicDomain').value=im.r2PublicDomain||'https://cdn-story.jovaaqua.com';
+  // Nguon tao anh
+  const src=im.source||{};
+  const order=(src.order&&src.order.length)?src.order:['gemini','chatgpt','cloudflare'];
+  $('imgPrimary').value=order[0]||'gemini';
+  const en=src.enabled||{gemini:true,chatgpt:true,cloudflare:false};
+  $('srcGemini').checked=en.gemini!==false;
+  $('srcChatgpt').checked=en.chatgpt!==false;
+  $('srcCloudflare').checked=!!en.cloudflare;
+  $('imgShowWindow').checked=!!src.showWindow;
 }
+
+$('geminiLoginBtn').onclick=async()=>{
+  msg($('imgLoginMsg'),'Đang mở cửa sổ Gemini... đăng nhập Google xong hãy đóng cửa sổ.',true);
+  const r=await api.aiLogin({provider:'gemini'});
+  msg($('imgLoginMsg'),r.ok?(r.message||'Đã lưu phiên Gemini'):(r.error||'Lỗi'),r.ok);
+};
+$('chatgptLoginBtn').onclick=async()=>{
+  msg($('imgLoginMsg'),'Đang mở cửa sổ ChatGPT... đăng nhập xong hãy đóng cửa sổ.',true);
+  const r=await api.aiLogin({provider:'chatgpt'});
+  msg($('imgLoginMsg'),r.ok?(r.message||'Đã lưu phiên ChatGPT'):(r.error||'Lỗi'),r.ok);
+};
 
 // ---------- STORY DNA ----------
 let dnaAxes=[];
@@ -310,6 +330,10 @@ function bindDna(){
 
 $('saveImageBtn').onclick=async()=>{
   msg($('imageMsg'),'Đang lưu...',true);
+  // Nguon: nguon chinh dau tien, con lai theo thu tu mac dinh
+  const primary=$('imgPrimary').value;
+  const rest=['gemini','chatgpt','cloudflare'].filter(x=>x!==primary);
+  const order=[primary,...rest];
   const r=await api.saveImage({
     cfAccountId:$('cfAccountId').value.trim(),
     cfApiToken:$('cfApiToken').value.trim(),
@@ -318,6 +342,11 @@ $('saveImageBtn').onclick=async()=>{
     r2Endpoint:$('r2Endpoint').value.trim(),
     r2Bucket:$('r2Bucket').value.trim(),
     r2PublicDomain:$('r2PublicDomain').value.trim(),
+    source:{
+      order,
+      enabled:{gemini:$('srcGemini').checked,chatgpt:$('srcChatgpt').checked,cloudflare:$('srcCloudflare').checked},
+      showWindow:$('imgShowWindow').checked,
+    },
   });
   msg($('imageMsg'),r.ok?'Đã lưu key ảnh & R2':(r.error||'Lỗi'),r.ok);
 };

@@ -170,6 +170,30 @@ function buildDnaBlock(combo, country) {
   return lines.join('\n');
 }
 
+// Chuyen to hop -> JSON GON, du truc, ten ro rang de ghi cot 22 story_dna_combo.
+// theme = ten ngach (page target). conflict_id = case conflict da chon.
+function comboToSheetJson(combo, country, theme) {
+  const c = combo || {};
+  return JSON.stringify({
+    country: String(country || DEFAULT_COUNTRY).toUpperCase(),
+    theme: theme || '',
+    conflict_id: c.conflict || '',
+    hero_name: c.hero_name || '',
+    villain_name: c.villain_name || '',
+    villain_type: c.villain_type || '',
+    occupation: c.occupation || '',
+    location: c.location || '',
+    icon_object: c.icon_object || '',
+    twist: c.twist || '',
+    justice: c.justice_type || '',
+    ending: c.ending || '',
+    opening: c.opening_scene || '',
+    relationship: c.relationship || '',
+    humiliation: c.humiliation_type || '',
+    emotion: c.dominant_emotion || '',
+  });
+}
+
 // Ghi so 1 bai da chot to hop (goi sau khi bai viet thanh cong)
 function remember({ storyId, country, niche, combo }) {
   memory.add({ storyId, country, niche, combo });
@@ -178,5 +202,5 @@ function remember({ storyId, country, niche, combo }) {
 module.exports = {
   AXES, AXIS_KEYS, DEFAULT_COUNTRY,
   listCountries, getPool, savePool,
-  randomCombo, pickCombo, buildDnaBlock, remember,
+  randomCombo, pickCombo, buildDnaBlock, remember, comboToSheetJson,
 };
