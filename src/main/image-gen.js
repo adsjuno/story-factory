@@ -26,9 +26,10 @@ const path = require('path');
 
 const CF_MODEL = '@cf/black-forest-labs/flux-2-klein-9b';
 
-// Kich thuoc theo tung loai anh: fb vuong, anh web ngang
+// Kich thuoc theo tung loai anh: fb vuong; thumbnail web + 3 anh web ngang
 const SIZE_BY_KIND = {
   fb: { width: 1024, height: 1024 },
+  thumb: { width: 1280, height: 720 },   // thumbnail web NGANG rieng (toi uu CTR)
   p1: { width: 1280, height: 720 },
   p2: { width: 1280, height: 720 },
   p3: { width: 1280, height: 720 },

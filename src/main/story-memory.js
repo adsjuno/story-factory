@@ -81,6 +81,14 @@ function isDuplicate(combo, country, niche) {
     return { dup: true, reason: `bộ (icon_object + twist + ending) đã dùng trong ${COMBO_WINDOW} bài gần nhất của ngách này` };
   }
 
+  // 3) conflict (case tu cay ngach) khong lap trong 20 bai gan nhat CUNG NGACH
+  if (combo.conflict) {
+    const hitC = recent.find((e) => e.combo && e.combo.conflict === combo.conflict);
+    if (hitC) {
+      return { dup: true, reason: `case conflict đã dùng trong ${COMBO_WINDOW} bài gần nhất của ngách này` };
+    }
+  }
+
   return { dup: false, reason: '' };
 }
 

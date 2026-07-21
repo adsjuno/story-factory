@@ -247,6 +247,36 @@ async function loadDnaPool(country){
     const arr=pool[ta.dataset.key]||[];
     ta.value=Array.isArray(arr)?arr.join('\n'):'';
   });
+  await loadConflictBranches(country);
+}
+
+// ---- CAY CONFLICT ----
+async function loadConflictBranches(country){
+  const r=await api.conflictGet({country});
+  const sel=$('conflictBranch');
+  if(!r||!r.ok||!(r.branches||[]).length){
+    sel.innerHTML='<option value="">(nước này chưa có cây conflict)</option>';
+    $('conflictAxes').innerHTML='';
+    return;
+  }
+  sel.innerHTML=r.branches.map(b=>'<option value="'+esc(b)+'">'+esc(b)+'</option>').join('');
+  await loadConflictBranch(country,sel.value);
+}
+async function loadConflictBranch(country,branch){
+  const r=await api.conflictGetBranch({country,branch});
+  const box=$('conflictAxes');
+  if(!r||!r.ok){box.innerHTML='';return;}
+  const data=r.data||{};
+  const keys=Object.keys(data);
+  if(!keys.length){box.innerHTML='<div class="hint">(nhánh rỗng)</div>';return;}
+  box.innerHTML=keys.map(k=>
+    '<label class="lbl">'+esc(k)+'</label>'
+    +'<textarea class="in area mono conflict-axis" data-key="'+esc(k)+'" rows="4" placeholder="mỗi dòng 1 case"></textarea>'
+  ).join('');
+  box.querySelectorAll('.conflict-axis').forEach(ta=>{
+    const arr=data[ta.dataset.key]||[];
+    ta.value=Array.isArray(arr)?arr.join('\n'):'';
+  });
 }
 function bindDna(){
   const es=$('dnaEditCountry'); if(es)es.onchange=()=>loadDnaPool(es.value);
@@ -263,6 +293,18 @@ function bindDna(){
     const r=await api.dnaSavePool({country,pool});
     if(r.ok){msg($('dnaPoolMsg'),'Đã lưu pool cho '+country,true);await loadDna();}
     else msg($('dnaPoolMsg'),r.error||'Lỗi',false);
+  };
+  const cb=$('conflictBranch'); if(cb)cb.onchange=()=>loadConflictBranch($('dnaEditCountry').value,cb.value);
+  const cs=$('conflictSaveBtn'); if(cs)cs.onclick=async()=>{
+    const country=$('dnaEditCountry').value;
+    const branch=$('conflictBranch').value;
+    if(!branch){msg($('conflictMsg'),'Nước này chưa có cây conflict',false);return;}
+    const data={};
+    document.querySelectorAll('.conflict-axis').forEach(ta=>{
+      data[ta.dataset.key]=ta.value.split(/\n/).map(s=>s.trim()).filter(Boolean);
+    });
+    const r=await api.conflictSaveBranch({country,branch,data});
+    msg($('conflictMsg'),r.ok?('Đã lưu cây ngách '+branch):(r.error||'Lỗi'),r.ok);
   };
 }
 

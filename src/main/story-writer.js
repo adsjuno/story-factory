@@ -65,6 +65,8 @@ QUAN TRỌNG — xuất kết quả theo ĐÚNG khuôn nhãn dưới đây để
 <câu CTA kiểu "Type YES...", KHÔNG kèm link>
 ===FB_IMAGE_PROMPT===
 <Prompt ảnh mồi Facebook, TIẾNG ANH, theo công thức Human Conflict 3 lớp: khuôn mặt nhân vật chính là trung tâm, kẻ gây bất công, người chứng kiến, và một vật biểu tượng phụ. KHÔNG spoil twist/reveal. Kết thúc BẮT BUỘC bằng đúng câu: Square 1:1, restrained emotion, natural facial expressions, believable body language, not theatrical, no text, no watermark>
+===THUMB_PROMPT===
+<Prompt ảnh THUMBNAIL WEB NGANG (16:9), TIẾNG ANH, tối ưu CTR. Cùng phong cách candid/documentary và "cú tát" cảm xúc như ảnh FB nhưng BỐ CỤC NGANG: khoảnh khắc cao trào nhất, khuôn mặt nhân vật rõ, có khoảng trống hai bên cho bố cục ngang. KHÔNG spoil twist. Kết thúc BẮT BUỘC bằng: Horizontal 16:9, candid documentary photo, natural available light, authentic skin texture, restrained emotion, not cinematic, no text, no watermark>
 ===WEB_P1_PROMPT===
 <Prompt ảnh minh hoạ Part 1, TIẾNG ANH, đúng ngữ cảnh Part 1, cinematic, 16:9 aspect ratio, no text>
 ===WEB_P2_PROMPT===
@@ -86,7 +88,7 @@ function delay(ms) { return new Promise((r) => setTimeout(r, ms)); }
 const KNOWN_KEYS = [
   'WEB_TITLE', 'WEB_SLUG', 'WEB_BODY',
   'FB_CAPTION_A', 'FB_CAPTION_B', 'FB_CTA',
-  'FB_IMAGE_PROMPT', 'WEB_P1_PROMPT', 'WEB_P2_PROMPT', 'WEB_P3_PROMPT',
+  'FB_IMAGE_PROMPT', 'THUMB_PROMPT', 'WEB_P1_PROMPT', 'WEB_P2_PROMPT', 'WEB_P3_PROMPT',
   'DEDUP_CONFIG', 'STORY_DNA', 'KPI_SCORES', 'END',
   'WEB_IMAGE_PROMPT', 'REVEAL_TYPE', // ten cu
 ];
@@ -304,7 +306,8 @@ function getSkillTemplate(country) {
   const perCountry = s.dna && s.dna.skillByCountry && s.dna.skillByCountry[String(country).toUpperCase()];
   if (perCountry && String(perCountry).trim()) return perCountry;
   const saved = s.story && s.story.skillCommand;
-  const usable = saved && saved.includes('WEB_P1_PROMPT') && saved.includes('STORY_DNA');
+  // Bo sung THUMB_PROMPT: template cu thieu nhan moi -> tu dung DEFAULT moi
+  const usable = saved && saved.includes('WEB_P1_PROMPT') && saved.includes('STORY_DNA') && saved.includes('THUMB_PROMPT');
   return usable ? saved : DEFAULT_SKILL_COMMAND;
 }
 
@@ -363,29 +366,34 @@ async function generateArticleImages(storyId, s, onProgress = () => {}) {
     return result;
   }
   const logger = (m) => onProgress({ message: m });
+  // 5 anh/bai: fb (vuong) + thumb (ngang, RIENG) + 3 anh web (ngang).
+  // Thumbnail dung khoi ===THUMB_PROMPT=== cua skill; neu bai cu chua co -> fallback web_p1_prompt.
   const jobs = [
     { kind: 'fb', prompt: s.FB_IMAGE_PROMPT },
+    { kind: 'thumb', prompt: s.THUMB_PROMPT || s.WEB_P1_PROMPT, fallback: !s.THUMB_PROMPT },
     { kind: 'p1', prompt: s.WEB_P1_PROMPT },
     { kind: 'p2', prompt: s.WEB_P2_PROMPT },
     { kind: 'p3', prompt: s.WEB_P3_PROMPT },
   ];
   let okCount = 0;
-  let madeAny = false; // da bat dau tao it nhat 1 anh chua -> de gian cach 8s giua CAC LAN tao
+  let madeAny = false; // da bat dau tao it nhat 1 anh chua -> de gian cach giua CAC LAN tao
   for (const j of jobs) {
     if (!j.prompt) { result.errors.push(`${j.kind}: thiếu prompt`); continue; }
     // TUAN TU: gian cach vai giay giua 2 lan tao anh (tranh gioi han tan suat Cloudflare)
     if (madeAny) { onProgress({ message: 'Đợi 5 giây trước khi tạo ảnh tiếp (tránh giới hạn Cloudflare)...' }); await delay(5000); }
     madeAny = true;
+    if (j.kind === 'thumb' && j.fallback) onProgress({ message: 'ℹ️ Skill chưa xuất THUMB_PROMPT — dùng tạm web_p1_prompt cho thumbnail ngang.' });
     const r = await imageGen.createAndUpload({ prompt: j.prompt, storyId, kind: j.kind, cfg }, logger);
     if (r.ok) {
       okCount++;
-      if (j.kind === 'fb') { result.fbImageUrl = r.url; result.thumbnailUrl = r.url; }
+      if (j.kind === 'fb') result.fbImageUrl = r.url;
+      else if (j.kind === 'thumb') result.thumbnailUrl = r.url;   // thumbnail NGANG rieng
       else result.webUrls[j.kind] = r.url;
     } else {
       result.errors.push(`${j.kind}: ${r.error}`);
     }
   }
-  result.allOk = okCount === jobs.length;
+  result.allOk = okCount === jobs.length;   // du 5 anh
   return result;
 }
 
@@ -398,16 +406,20 @@ function isComplete(s) {
  * Viet 1 bai. Mo 1 phien Claude, gui prompt goi skill, nhan ve, tach 16 cot.
  * Thu lai toi da 2 lan neu Claude tra sai khuon.
  */
-async function writeOne(nicheLabel, onProgress = () => {}) {
+async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
   const engine = 'claude'; // skill manh nhat o Claude (dung theo y anh Thang)
 
-  // STORY DNA: App gan to hop TRUOC (pool nuoc dang chay, da loc trung) roi nhet vao dau prompt.
+  // STORY DNA: App gan to hop TRUOC (pool nuoc dang chay, da loc trung) + case conflict
+  // TU DUNG CAY NGACH (theo nicheCode A/B/C/D/E) roi nhet vao dau prompt.
   const country = getRunningCountry();
-  const pick = storyDna.pickCombo(country, nicheLabel);
+  const pick = storyDna.pickCombo(country, nicheLabel, nicheCode);
   if (pick.poolEmpty) {
     onProgress({ message: `ℹ️ Pool DNA của nước ${country} đang rỗng — chạy không có DNA (bài vẫn viết bình thường).` });
   } else {
-    onProgress({ message: `🧬 DNA (${country}): ${pick.combo.hero_name} — ${pick.combo.icon_object}${pick.fellBack ? ' [không tránh hết trùng sau nhiều lần thử]' : ` [chọn sau ${pick.tries} lần random]`}` });
+    const conflictNote = pick.combo.conflict
+      ? ` | conflict[${pick.conflictBranch}]: ${String(pick.combo.conflict).slice(0, 60)}...`
+      : ' | (ngách chưa có cây conflict — dùng humiliation_type)';
+    onProgress({ message: `🧬 DNA (${country}): ${pick.combo.hero_name} — ${pick.combo.icon_object}${conflictNote}` });
   }
   const dna = pick.poolEmpty ? null : { combo: pick.combo, country };
   const dnaComboJson = dna ? JSON.stringify(Object.assign({ country }, pick.combo)) : '';
@@ -509,13 +521,14 @@ async function writeBatch({ niche, count }, onProgress = () => {}) {
   const niches = getNiches();
   const found = niches.find((n) => n.code === niche || n.label === niche);
   const nicheLabel = found ? found.label : (niche || niches[0].label);
+  const nicheCode = found ? found.code : String(niche || '').toUpperCase();
   const total = Math.max(1, Math.min(50, parseInt(count, 10) || 1)); // tran an toan 50 bai/lan
 
   const rows = [];
   const failed = [];
   for (let i = 0; i < total; i++) {
     onProgress({ message: `Bài ${i + 1}/${total} — ngách "${nicheLabel}"...`, done: i, total });
-    const r = await writeOne(nicheLabel, onProgress);
+    const r = await writeOne(nicheLabel, nicheCode, onProgress);
     if (r.ok) rows.push(r.row);
     else failed.push({ index: i + 1, error: r.error });
   }
@@ -542,6 +555,7 @@ module.exports = {
   checkLeakedLabels,
   cleanBlock,
   isComplete,
+  generateArticleImages,
   normalizeJson,
   applyImagePlaceholders,
   buildRow,

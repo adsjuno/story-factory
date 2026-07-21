@@ -13,6 +13,7 @@
 
 const store = require('./store');
 const memory = require('./story-memory');
+const conflictTree = require('./conflict-tree');
 
 let BUNDLED = {};
 try { BUNDLED = require('./story-dna-pool.json'); } catch (_) { BUNDLED = {}; }
@@ -92,31 +93,50 @@ function randomCombo(pool) {
   return combo;
 }
 
+// Gan conflict (case tu cay ngach) vao 1 combo. nicheCode = A/B/C/D/E.
+// Ngach khong co trong cay -> combo.conflict = '' (fallback humiliation_type o prompt).
+function attachConflict(combo, country, nicheCode) {
+  const c = { ...combo };
+  let conflictBranch = '';
+  if (nicheCode) {
+    const pc = conflictTree.pickConflict(country, nicheCode);
+    if (pc) { c.conflict = pc.text; conflictBranch = pc.branch; }
+  }
+  if (c.conflict === undefined) c.conflict = '';
+  return { combo: c, conflictBranch };
+}
+
 /**
- * Chon 1 to hop DA LOC TRUNG cho (country, niche).
+ * Chon 1 to hop DA LOC TRUNG cho (country, niche). Neu co nicheCode thi random
+ * them 1 case conflict TU DUNG cay ngach do (loc trung ca conflict).
  * Random toi khi khong dung so chong trung; het luot thi chot cai cuoi (fellBack=true).
- * @returns {{combo, country, tries, fellBack, poolEmpty, lastReason}}
+ * @returns {{combo, country, tries, fellBack, poolEmpty, lastReason, conflictBranch, hasConflict}}
  */
-function pickCombo(country, niche, { maxTries = 80 } = {}) {
+function pickCombo(country, niche, nicheCode, { maxTries = 80 } = {}) {
   const c = String(country || DEFAULT_COUNTRY).toUpperCase();
   const pool = getPool(c);
   const poolEmpty = !poolHasContent(pool);
-  let combo = randomCombo(pool);
+
+  const make = () => attachConflict(randomCombo(pool), c, nicheCode);
+  let r = make();
+  let combo = r.combo;
+  let conflictBranch = r.conflictBranch;
   let tries = 1;
   let lastReason = '';
 
-  if (poolEmpty) return { combo, country: c, tries, fellBack: false, poolEmpty, lastReason: 'Pool rỗng' };
+  if (poolEmpty) return { combo, country: c, tries, fellBack: false, poolEmpty, lastReason: 'Pool rỗng', conflictBranch, hasConflict: !!combo.conflict };
 
   let dupCheck = memory.isDuplicate(combo, c, niche);
   while (dupCheck.dup && tries < maxTries) {
     lastReason = dupCheck.reason;
-    combo = randomCombo(pool);
+    r = make();
+    combo = r.combo; conflictBranch = r.conflictBranch;
     tries++;
     dupCheck = memory.isDuplicate(combo, c, niche);
   }
   const fellBack = dupCheck.dup; // van trung sau maxTries -> danh phai chot
   if (fellBack) lastReason = dupCheck.reason;
-  return { combo, country: c, tries, fellBack, poolEmpty, lastReason };
+  return { combo, country: c, tries, fellBack, poolEmpty, lastReason, conflictBranch, hasConflict: !!combo.conflict };
 }
 
 /**
@@ -124,7 +144,7 @@ function pickCombo(country, niche, { maxTries = 80 } = {}) {
  */
 function buildDnaBlock(combo, country) {
   const g = (k) => (combo && combo[k]) ? combo[k] : '(bất kỳ)';
-  return [
+  const lines = [
     `[STORY DNA — quốc gia ${String(country || DEFAULT_COUNTRY).toUpperCase()}]`,
     'BẮT BUỘC dùng ĐÚNG các yếu tố sau (không đổi tên nhân vật, không đổi vật biểu tượng):',
     `- hero_name = ${g('hero_name')}`,
@@ -140,9 +160,14 @@ function buildDnaBlock(combo, country) {
     `- justice = ${g('justice_type')}`,
     `- ending = ${g('ending')}`,
     `- emotion = ${g('dominant_emotion')}`,
-    'Skill kể câu chuyện xoay quanh đúng tổ hợp này. Giữ nguyên toàn bộ khuôn xuất ===...=== như hướng dẫn bên dưới.',
-    '',
-  ].join('\n');
+  ];
+  if (combo && combo.conflict) {
+    lines.push(`- conflict = ${combo.conflict}`);
+    lines.push('  (BẮT BUỘC kể câu chuyện đúng theo tình huống conflict này của ngách.)');
+  }
+  lines.push('Skill kể câu chuyện xoay quanh đúng tổ hợp này. Giữ nguyên toàn bộ khuôn xuất ===...=== như hướng dẫn bên dưới.');
+  lines.push('');
+  return lines.join('\n');
 }
 
 // Ghi so 1 bai da chot to hop (goi sau khi bai viet thanh cong)

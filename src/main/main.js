@@ -11,6 +11,7 @@ const supabase = require('./supabase');
 const storyWriter = require('./story-writer');
 const storyDna = require('./story-dna');
 const storyMemory = require('./story-memory');
+const conflictTree = require('./conflict-tree');
 const sheets = require('./sheets');
 const webai = require('./webai-electron');
 const updater = require('./updater');
@@ -234,4 +235,18 @@ ipcMain.handle('dna:setRunning', (_e, { country }) => {
   s.dna.runningCountry = String(country || storyDna.DEFAULT_COUNTRY).toUpperCase();
   saveSettings(s);
   return { ok: true, running: s.dna.runningCountry };
+});
+
+// ---------------- IPC: Conflict tree (theo nuoc + ngach) ----------------
+ipcMain.handle('conflict:get', (_e, { country }) => {
+  requireAuth();
+  return { ok: true, country: String(country || storyDna.DEFAULT_COUNTRY).toUpperCase(), branches: conflictTree.listBranches(country) };
+});
+ipcMain.handle('conflict:getBranch', (_e, { country, branch }) => {
+  requireAuth();
+  return { ok: true, data: conflictTree.getBranch(country, branch) };
+});
+ipcMain.handle('conflict:saveBranch', (_e, { country, branch, data }) => {
+  requireAuth();
+  return conflictTree.saveBranch(country, branch, data);
 });

@@ -54,6 +54,9 @@ const api = {
   dnaGetPool: (p) => call('dna:getPool', p),
   dnaSavePool: (p) => call('dna:savePool', p),
   dnaSetRunning: (p) => call('dna:setRunning', p),
+  conflictGet: (p) => call('conflict:get', p),
+  conflictGetBranch: (p) => call('conflict:getBranch', p),
+  conflictSaveBranch: (p) => call('conflict:saveBranch', p),
   onProgress: (cb) => {
     const h = (_e, data) => cb(data);
     ipcRenderer.on('story:progress', h);

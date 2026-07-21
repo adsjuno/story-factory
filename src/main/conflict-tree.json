@@ -1,0 +1,131 @@
+{
+  "US": {
+    "A_me_gia": {
+      "A1_bo_roi": [
+        "the adult child puts the elderly mother in a nursing home against her will to free up the house",
+        "the child leaves the mother at a cheap motel during a family trip, too ashamed to bring her along",
+        "the mother is not invited to her own grandchild's birthday party",
+        "the child changes the locks while the mother is out, forcing her to move",
+        "the mother is left alone at the hospital after surgery, no family comes",
+        "the child stops visiting entirely after getting wealthy, screens her calls",
+        "the mother is dropped off at a senior center and 'forgotten' for the holidays"
+      ],
+      "A2_cuop_tai_san": [
+        "the child pressures the mother to sell her longtime family home",
+        "the child tricks the mother into signing away the house deed",
+        "the child quietly drains the mother's pension/retirement savings",
+        "the child takes the mother's late husband's life insurance money",
+        "the child sells the mother's car without asking",
+        "the child forges documents to gain power of attorney over her finances",
+        "the child convinces the mother to 'invest' her savings, then keeps it"
+      ],
+      "A3_lam_nhuc": [
+        "the mother is told to eat in the kitchen, not at the family table",
+        "the child won't let the mother hold or babysit the grandchild",
+        "the mother is made to sleep in the garage or basement when visiting",
+        "the mother is not allowed to attend the child's fancy wedding",
+        "the child introduces the mother to friends as 'the help' or nanny",
+        "the mother's homemade food is thrown out in front of her",
+        "the mother is publicly scolded for her old clothes at an upscale event"
+      ],
+      "A4_loi_dung": [
+        "the mother is used as free full-time babysitter with no thanks",
+        "the mother cooks and cleans daily for the child's family, taken for granted",
+        "the mother is left to care for the child's pets and home while they vacation",
+        "the mother runs the child's shop/business for free while they take credit",
+        "the mother gives up her own life to nurse the family, then is discarded",
+        "the child only calls the mother when they need money or a favor"
+      ],
+      "A5_hoi_han": [
+        "the mother passes away and the child finds letters revealing her sacrifices",
+        "the mother quietly disappears/moves away and the child realizes too late",
+        "the mother becomes successful or admired by others, shaming the child",
+        "a stranger or community helps the mother, exposing the child's neglect",
+        "a will/letter reveals the mother secretly paid for the child's success"
+      ]
+    },
+    "B_veteran": {
+      "B_cases": [
+        "no one at the event recognizes the veteran's service, treating him as a nobody",
+        "the veteran is refused a military/senior discount and mocked for asking",
+        "the veteran is asked to leave or turned away from a restaurant for his appearance",
+        "a security guard/staff searches or profiles the veteran humiliatingly",
+        "the veteran can't afford his medication and is dismissed by family",
+        "the veteran's war medals are sold or thrown away by a relative",
+        "the veteran's own son/grandson is ashamed of him in front of friends",
+        "a young person mocks the veteran's service or patriotism to his face",
+        "a former comrade or superior betrayed or forgot him",
+        "the veteran is overlooked at a memorial or ceremony that should honor him",
+        "the veteran is called a liar about his service until proof appears",
+        "the veteran is seated at the back or excluded at a family celebration",
+        "a wealthy relative belittles the veteran's modest military pension",
+        "the veteran is denied entry to an event because he 'doesn't fit in'",
+        "the veteran quietly does a humble job and is looked down on for it"
+      ]
+    },
+    "C_co_dau": {
+      "C_villain_source": [
+        "a cold, controlling mother-in-law who treats the bride as staff",
+        "a jealous, cruel sister-in-law who sabotages the bride",
+        "a snobbish brother-in-law who mocks the bride's humble background",
+        "a dismissive father-in-law who never accepts her",
+        "a weak husband who won't defend his wife against his family",
+        "a manipulative sister-in-law spreading lies about the bride"
+      ],
+      "C_situation": [
+        "at the wedding itself, the bride is publicly humiliated by the in-laws",
+        "on the honeymoon or first family trip, she's excluded and belittled",
+        "when she announces her pregnancy, the family reacts with contempt",
+        "over family property/inheritance, they treat her as an outsider gold-digger",
+        "she's handed servant tasks (apron, serving) in front of guests",
+        "she's judged for her job, clothes, or family and made to feel unworthy",
+        "she's blamed for something she didn't do to turn the husband against her"
+      ]
+    },
+    "D_vo_phan_boi": {
+      "D_evidence_modern": [
+        "a home security camera (Ring/doorbell) captures the truth",
+        "GPS location history on a phone reveals where he really was",
+        "text messages discovered on a synced device or shared account",
+        "an Apple AirTag she finds reveals his movements",
+        "credit card and bank statements expose hidden spending",
+        "a DNA test reveals a family secret",
+        "the smart home (Alexa) recorded a conversation",
+        "a shared cloud photo library auto-uploaded incriminating images",
+        "the car's built-in GPS/trip log shows a pattern",
+        "a fitness tracker's data contradicts his alibi",
+        "an email receipt for a gift or hotel she never received",
+        "a voicemail or call log that doesn't match his story"
+      ],
+      "D_wife_response": [
+        "she quietly gathers 14 months of evidence before acting",
+        "she secretly refinances/protects the house and assets first",
+        "she retains her own lawyer before he suspects anything",
+        "she stays calm and lets the truth reveal itself publicly",
+        "she documents everything methodically, the way she always kept the books"
+      ]
+    },
+    "E_ngheo_vs_giau": {
+      "E_occasion": [
+        "at a lavish family wedding where the poor relative is treated as an embarrassment",
+        "at a funeral where the wealthy side fights over inheritance and excludes them",
+        "at a milestone birthday party where they're seated at the back",
+        "at Thanksgiving dinner where their humble contribution is mocked",
+        "at Christmas where their handmade gifts are ridiculed next to expensive ones",
+        "at a summer BBQ/pool party where they're made to feel out of place",
+        "at a family reunion where relatives brag and look down on them",
+        "at a graduation where the wealthy relatives take credit or ignore them",
+        "at an upscale restaurant where their clothes/manners are judged",
+        "at a country club event where they're treated as if they don't belong"
+      ],
+      "E_reveal": [
+        "the 'poor' relative turns out to be quietly wealthy or accomplished",
+        "the poor relative was secretly the one funding the family all along",
+        "a powerful outsider reveals the poor relative's hidden good deeds",
+        "the wealthy relatives' fortune turns out to be fake or crumbling",
+        "the poor relative's child/grandchild achieves something that shames them",
+        "an old document reveals the poor relative's true sacrifice for the family"
+      ]
+    }
+  }
+}

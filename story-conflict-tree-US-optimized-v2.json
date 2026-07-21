@@ -1,0 +1,3938 @@
+{
+  "_meta": {
+    "muc_dich": "Cay conflict chia theo tung ngach A-E. App random conflict THEO dung ngach dang chon (khong random lung tung). Moi ngach co nhanh rieng.",
+    "cach_dung": "Khi chon ngach A (Me gia), engine random 1 case trong nhom A1-A5. Ngach B random trong B1-B10. Moi case la mot 'humiliation/conflict cu the' de AI ke.",
+    "nuoc": "US",
+    "schema_version": "2.0",
+    "compatibility": "Original topic keys are preserved. A structured conflict_catalog is added for reliable app use.",
+    "rule": "Never select conflict by free random across themes. Select theme -> subgroup -> conflict item."
+  },
+  "A_me_gia": {
+    "A1_bo_roi": [
+      "the adult child puts the elderly mother in a nursing home against her will to free up the house",
+      "the child leaves the mother at a cheap motel during a family trip, too ashamed to bring her along",
+      "the mother is not invited to her own grandchild's birthday party",
+      "the child changes the locks while the mother is out, forcing her to move",
+      "the mother is left alone at the hospital after surgery, no family comes",
+      "the child stops visiting entirely after getting wealthy, screens her calls",
+      "the mother is dropped off at a senior center and 'forgotten' for the holidays"
+    ],
+    "A2_cuop_tai_san": [
+      "the child pressures the mother to sell her longtime family home",
+      "the child tricks the mother into signing away the house deed",
+      "the child quietly drains the mother's pension/retirement savings",
+      "the child takes the mother's late husband's life insurance money",
+      "the child sells the mother's car without asking",
+      "the child forges documents to gain power of attorney over her finances",
+      "the child convinces the mother to 'invest' her savings, then keeps it"
+    ],
+    "A3_lam_nhuc": [
+      "the mother is told to eat in the kitchen, not at the family table",
+      "the child won't let the mother hold or babysit the grandchild",
+      "the mother is made to sleep in the garage or basement when visiting",
+      "the mother is not allowed to attend the child's fancy wedding",
+      "the child introduces the mother to friends as 'the help' or nanny",
+      "the mother's homemade food is thrown out in front of her",
+      "the mother is publicly scolded for her old clothes at an upscale event"
+    ],
+    "A4_loi_dung": [
+      "the mother is used as free full-time babysitter with no thanks",
+      "the mother cooks and cleans daily for the child's family, taken for granted",
+      "the mother is left to care for the child's pets and home while they vacation",
+      "the mother runs the child's shop/business for free while they take credit",
+      "the mother gives up her own life to nurse the family, then is discarded",
+      "the child only calls the mother when they need money or a favor"
+    ],
+    "A5_hoi_han": [
+      "the mother passes away and the child finds letters revealing her sacrifices",
+      "the mother quietly disappears/moves away and the child realizes too late",
+      "the mother becomes successful or admired by others, shaming the child",
+      "a stranger or community helps the mother, exposing the child's neglect",
+      "a will/letter reveals the mother secretly paid for the child's success"
+    ]
+  },
+  "B_veteran": {
+    "B_cases": [
+      "no one at the event recognizes the veteran's service, treating him as a nobody",
+      "the veteran is refused a military/senior discount and mocked for asking",
+      "the veteran is asked to leave or turned away from a restaurant for his appearance",
+      "a security guard/staff searches or profiles the veteran humiliatingly",
+      "the veteran can't afford his medication and is dismissed by family",
+      "the veteran's war medals are sold or thrown away by a relative",
+      "the veteran's own son/grandson is ashamed of him in front of friends",
+      "a young person mocks the veteran's service or patriotism to his face",
+      "a former comrade or superior betrayed or forgot him",
+      "the veteran is overlooked at a memorial or ceremony that should honor him",
+      "the veteran is called a liar about his service until proof appears",
+      "the veteran is seated at the back or excluded at a family celebration",
+      "a wealthy relative belittles the veteran's modest military pension",
+      "the veteran is denied entry to an event because he 'doesn't fit in'",
+      "the veteran quietly does a humble job and is looked down on for it"
+    ]
+  },
+  "C_co_dau": {
+    "C_villain_source": [
+      "a cold, controlling mother-in-law who treats the bride as staff",
+      "a jealous, cruel sister-in-law who sabotages the bride",
+      "a snobbish brother-in-law who mocks the bride's humble background",
+      "a dismissive father-in-law who never accepts her",
+      "a weak husband who won't defend his wife against his family",
+      "a manipulative sister-in-law spreading lies about the bride"
+    ],
+    "C_situation": [
+      "at the wedding itself, the bride is publicly humiliated by the in-laws",
+      "on the honeymoon or first family trip, she's excluded and belittled",
+      "when she announces her pregnancy, the family reacts with contempt",
+      "over family property/inheritance, they treat her as an outsider gold-digger",
+      "she's handed servant tasks (apron, serving) in front of guests",
+      "she's judged for her job, clothes, or family and made to feel unworthy",
+      "she's blamed for something she didn't do to turn the husband against her"
+    ]
+  },
+  "D_vo_phan_boi": {
+    "D_evidence_modern": [
+      "a home security camera (Ring/doorbell) captures the truth",
+      "GPS location history on a phone reveals where he really was",
+      "text messages discovered on a synced device or shared account",
+      "an Apple AirTag she finds reveals his movements",
+      "credit card and bank statements expose hidden spending",
+      "a DNA test reveals a family secret",
+      "the smart home (Alexa) recorded a conversation",
+      "a shared cloud photo library auto-uploaded incriminating images",
+      "the car's built-in GPS/trip log shows a pattern",
+      "a fitness tracker's data contradicts his alibi",
+      "an email receipt for a gift or hotel she never received",
+      "a voicemail or call log that doesn't match his story"
+    ],
+    "D_wife_response": [
+      "she quietly gathers 14 months of evidence before acting",
+      "she secretly refinances/protects the house and assets first",
+      "she retains her own lawyer before he suspects anything",
+      "she stays calm and lets the truth reveal itself publicly",
+      "she documents everything methodically, the way she always kept the books"
+    ]
+  },
+  "E_ngheo_vs_giau": {
+    "E_occasion": [
+      "at a lavish family wedding where the poor relative is treated as an embarrassment",
+      "at a funeral where the wealthy side fights over inheritance and excludes them",
+      "at a milestone birthday party where they're seated at the back",
+      "at Thanksgiving dinner where their humble contribution is mocked",
+      "at Christmas where their handmade gifts are ridiculed next to expensive ones",
+      "at a summer BBQ/pool party where they're made to feel out of place",
+      "at a family reunion where relatives brag and look down on them",
+      "at a graduation where the wealthy relatives take credit or ignore them",
+      "at an upscale restaurant where their clothes/manners are judged",
+      "at a country club event where they're treated as if they don't belong"
+    ],
+    "E_reveal": [
+      "the 'poor' relative turns out to be quietly wealthy or accomplished",
+      "the poor relative was secretly the one funding the family all along",
+      "a powerful outsider reveals the poor relative's hidden good deeds",
+      "the wealthy relatives' fortune turns out to be fake or crumbling",
+      "the poor relative's child/grandchild achieves something that shames them",
+      "an old document reveals the poor relative's true sacrifice for the family"
+    ]
+  },
+  "conflict_catalog": [
+    {
+      "id": "A1_bo_roi-01",
+      "theme": "A_me_gia",
+      "subgroup": "A1_bo_roi",
+      "conflict": "the adult child puts the elderly mother in a nursing home against her will to free up the house",
+      "tags": [
+        "abandonment",
+        "family",
+        "elder neglect"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A1_bo_roi-02",
+      "theme": "A_me_gia",
+      "subgroup": "A1_bo_roi",
+      "conflict": "the child leaves the mother at a cheap motel during a family trip, too ashamed to bring her along",
+      "tags": [
+        "abandonment",
+        "family",
+        "elder neglect"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A1_bo_roi-03",
+      "theme": "A_me_gia",
+      "subgroup": "A1_bo_roi",
+      "conflict": "the mother is not invited to her own grandchild's birthday party",
+      "tags": [
+        "abandonment",
+        "family",
+        "elder neglect"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A1_bo_roi-04",
+      "theme": "A_me_gia",
+      "subgroup": "A1_bo_roi",
+      "conflict": "the child changes the locks while the mother is out, forcing her to move",
+      "tags": [
+        "abandonment",
+        "family",
+        "elder neglect"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A1_bo_roi-05",
+      "theme": "A_me_gia",
+      "subgroup": "A1_bo_roi",
+      "conflict": "the mother is left alone at the hospital after surgery, no family comes",
+      "tags": [
+        "abandonment",
+        "family",
+        "elder neglect"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A1_bo_roi-06",
+      "theme": "A_me_gia",
+      "subgroup": "A1_bo_roi",
+      "conflict": "the child stops visiting entirely after getting wealthy, screens her calls",
+      "tags": [
+        "abandonment",
+        "family",
+        "elder neglect"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A1_bo_roi-07",
+      "theme": "A_me_gia",
+      "subgroup": "A1_bo_roi",
+      "conflict": "the mother is dropped off at a senior center and 'forgotten' for the holidays",
+      "tags": [
+        "abandonment",
+        "family",
+        "elder neglect"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A2_cuop_tai_san-01",
+      "theme": "A_me_gia",
+      "subgroup": "A2_cuop_tai_san",
+      "conflict": "the child pressures the mother to sell her longtime family home",
+      "tags": [
+        "financial abuse",
+        "property",
+        "deception"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A2_cuop_tai_san-02",
+      "theme": "A_me_gia",
+      "subgroup": "A2_cuop_tai_san",
+      "conflict": "the child tricks the mother into signing away the house deed",
+      "tags": [
+        "financial abuse",
+        "property",
+        "deception"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A2_cuop_tai_san-03",
+      "theme": "A_me_gia",
+      "subgroup": "A2_cuop_tai_san",
+      "conflict": "the child quietly drains the mother's pension/retirement savings",
+      "tags": [
+        "financial abuse",
+        "property",
+        "deception"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A2_cuop_tai_san-04",
+      "theme": "A_me_gia",
+      "subgroup": "A2_cuop_tai_san",
+      "conflict": "the child takes the mother's late husband's life insurance money",
+      "tags": [
+        "financial abuse",
+        "property",
+        "deception"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A2_cuop_tai_san-05",
+      "theme": "A_me_gia",
+      "subgroup": "A2_cuop_tai_san",
+      "conflict": "the child sells the mother's car without asking",
+      "tags": [
+        "financial abuse",
+        "property",
+        "deception"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A2_cuop_tai_san-06",
+      "theme": "A_me_gia",
+      "subgroup": "A2_cuop_tai_san",
+      "conflict": "the child forges documents to gain power of attorney over her finances",
+      "tags": [
+        "financial abuse",
+        "property",
+        "deception"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A2_cuop_tai_san-07",
+      "theme": "A_me_gia",
+      "subgroup": "A2_cuop_tai_san",
+      "conflict": "the child convinces the mother to 'invest' her savings, then keeps it",
+      "tags": [
+        "financial abuse",
+        "property",
+        "deception"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A3_lam_nhuc-01",
+      "theme": "A_me_gia",
+      "subgroup": "A3_lam_nhuc",
+      "conflict": "the mother is told to eat in the kitchen, not at the family table",
+      "tags": [
+        "public humiliation",
+        "class shame",
+        "family"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A3_lam_nhuc-02",
+      "theme": "A_me_gia",
+      "subgroup": "A3_lam_nhuc",
+      "conflict": "the child won't let the mother hold or babysit the grandchild",
+      "tags": [
+        "public humiliation",
+        "class shame",
+        "family"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A3_lam_nhuc-03",
+      "theme": "A_me_gia",
+      "subgroup": "A3_lam_nhuc",
+      "conflict": "the mother is made to sleep in the garage or basement when visiting",
+      "tags": [
+        "public humiliation",
+        "class shame",
+        "family"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A3_lam_nhuc-04",
+      "theme": "A_me_gia",
+      "subgroup": "A3_lam_nhuc",
+      "conflict": "the mother is not allowed to attend the child's fancy wedding",
+      "tags": [
+        "public humiliation",
+        "class shame",
+        "family"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A3_lam_nhuc-05",
+      "theme": "A_me_gia",
+      "subgroup": "A3_lam_nhuc",
+      "conflict": "the child introduces the mother to friends as 'the help' or nanny",
+      "tags": [
+        "public humiliation",
+        "class shame",
+        "family"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A3_lam_nhuc-06",
+      "theme": "A_me_gia",
+      "subgroup": "A3_lam_nhuc",
+      "conflict": "the mother's homemade food is thrown out in front of her",
+      "tags": [
+        "public humiliation",
+        "class shame",
+        "family"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A3_lam_nhuc-07",
+      "theme": "A_me_gia",
+      "subgroup": "A3_lam_nhuc",
+      "conflict": "the mother is publicly scolded for her old clothes at an upscale event",
+      "tags": [
+        "public humiliation",
+        "class shame",
+        "family"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A4_loi_dung-01",
+      "theme": "A_me_gia",
+      "subgroup": "A4_loi_dung",
+      "conflict": "the mother is used as free full-time babysitter with no thanks",
+      "tags": [
+        "exploitation",
+        "caregiving",
+        "unpaid labor"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A4_loi_dung-02",
+      "theme": "A_me_gia",
+      "subgroup": "A4_loi_dung",
+      "conflict": "the mother cooks and cleans daily for the child's family, taken for granted",
+      "tags": [
+        "exploitation",
+        "caregiving",
+        "unpaid labor"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A4_loi_dung-03",
+      "theme": "A_me_gia",
+      "subgroup": "A4_loi_dung",
+      "conflict": "the mother is left to care for the child's pets and home while they vacation",
+      "tags": [
+        "exploitation",
+        "caregiving",
+        "unpaid labor"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A4_loi_dung-04",
+      "theme": "A_me_gia",
+      "subgroup": "A4_loi_dung",
+      "conflict": "the mother runs the child's shop/business for free while they take credit",
+      "tags": [
+        "exploitation",
+        "caregiving",
+        "unpaid labor"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A4_loi_dung-05",
+      "theme": "A_me_gia",
+      "subgroup": "A4_loi_dung",
+      "conflict": "the mother gives up her own life to nurse the family, then is discarded",
+      "tags": [
+        "exploitation",
+        "caregiving",
+        "unpaid labor"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A4_loi_dung-06",
+      "theme": "A_me_gia",
+      "subgroup": "A4_loi_dung",
+      "conflict": "the child only calls the mother when they need money or a favor",
+      "tags": [
+        "exploitation",
+        "caregiving",
+        "unpaid labor"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A5_hoi_han-01",
+      "theme": "A_me_gia",
+      "subgroup": "A5_hoi_han",
+      "conflict": "the mother passes away and the child finds letters revealing her sacrifices",
+      "tags": [
+        "regret",
+        "late discovery",
+        "emotional reveal"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A5_hoi_han-02",
+      "theme": "A_me_gia",
+      "subgroup": "A5_hoi_han",
+      "conflict": "the mother quietly disappears/moves away and the child realizes too late",
+      "tags": [
+        "regret",
+        "late discovery",
+        "emotional reveal"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A5_hoi_han-03",
+      "theme": "A_me_gia",
+      "subgroup": "A5_hoi_han",
+      "conflict": "the mother becomes successful or admired by others, shaming the child",
+      "tags": [
+        "regret",
+        "late discovery",
+        "emotional reveal"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A5_hoi_han-04",
+      "theme": "A_me_gia",
+      "subgroup": "A5_hoi_han",
+      "conflict": "a stranger or community helps the mother, exposing the child's neglect",
+      "tags": [
+        "regret",
+        "late discovery",
+        "emotional reveal"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A5_hoi_han-05",
+      "theme": "A_me_gia",
+      "subgroup": "A5_hoi_han",
+      "conflict": "a will/letter reveals the mother secretly paid for the child's success",
+      "tags": [
+        "regret",
+        "late discovery",
+        "emotional reveal"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-01",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "no one at the event recognizes the veteran's service, treating him as a nobody",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-02",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "the veteran is refused a military/senior discount and mocked for asking",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-03",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "the veteran is asked to leave or turned away from a restaurant for his appearance",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-04",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "a security guard/staff searches or profiles the veteran humiliatingly",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-05",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "the veteran can't afford his medication and is dismissed by family",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-06",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "the veteran's war medals are sold or thrown away by a relative",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-07",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "the veteran's own son/grandson is ashamed of him in front of friends",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-08",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "a young person mocks the veteran's service or patriotism to his face",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-09",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "a former comrade or superior betrayed or forgot him",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-10",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "the veteran is overlooked at a memorial or ceremony that should honor him",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-11",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "the veteran is called a liar about his service until proof appears",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-12",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "the veteran is seated at the back or excluded at a family celebration",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-13",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "a wealthy relative belittles the veteran's modest military pension",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-14",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "the veteran is denied entry to an event because he 'doesn't fit in'",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B_cases-15",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "the veteran quietly does a humble job and is looked down on for it",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "recognition"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "C-01-01",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a cold, controlling mother-in-law who treats the bride as staff; at the wedding itself, the bride is publicly humiliated by the in-laws",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-01-02",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a cold, controlling mother-in-law who treats the bride as staff; on the honeymoon or first family trip, she's excluded and belittled",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-01-03",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a cold, controlling mother-in-law who treats the bride as staff; when she announces her pregnancy, the family reacts with contempt",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-01-04",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a cold, controlling mother-in-law who treats the bride as staff; over family property/inheritance, they treat her as an outsider gold-digger",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-01-05",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a cold, controlling mother-in-law who treats the bride as staff; she's handed servant tasks (apron, serving) in front of guests",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-01-06",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a cold, controlling mother-in-law who treats the bride as staff; she's judged for her job, clothes, or family and made to feel unworthy",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-01-07",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a cold, controlling mother-in-law who treats the bride as staff; she's blamed for something she didn't do to turn the husband against her",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-02-01",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a jealous, cruel sister-in-law who sabotages the bride; at the wedding itself, the bride is publicly humiliated by the in-laws",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-02-02",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a jealous, cruel sister-in-law who sabotages the bride; on the honeymoon or first family trip, she's excluded and belittled",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-02-03",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a jealous, cruel sister-in-law who sabotages the bride; when she announces her pregnancy, the family reacts with contempt",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-02-04",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a jealous, cruel sister-in-law who sabotages the bride; over family property/inheritance, they treat her as an outsider gold-digger",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-02-05",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a jealous, cruel sister-in-law who sabotages the bride; she's handed servant tasks (apron, serving) in front of guests",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-02-06",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a jealous, cruel sister-in-law who sabotages the bride; she's judged for her job, clothes, or family and made to feel unworthy",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-02-07",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a jealous, cruel sister-in-law who sabotages the bride; she's blamed for something she didn't do to turn the husband against her",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-03-01",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a snobbish brother-in-law who mocks the bride's humble background; at the wedding itself, the bride is publicly humiliated by the in-laws",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-03-02",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a snobbish brother-in-law who mocks the bride's humble background; on the honeymoon or first family trip, she's excluded and belittled",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-03-03",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a snobbish brother-in-law who mocks the bride's humble background; when she announces her pregnancy, the family reacts with contempt",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-03-04",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a snobbish brother-in-law who mocks the bride's humble background; over family property/inheritance, they treat her as an outsider gold-digger",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-03-05",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a snobbish brother-in-law who mocks the bride's humble background; she's handed servant tasks (apron, serving) in front of guests",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-03-06",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a snobbish brother-in-law who mocks the bride's humble background; she's judged for her job, clothes, or family and made to feel unworthy",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-03-07",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a snobbish brother-in-law who mocks the bride's humble background; she's blamed for something she didn't do to turn the husband against her",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-04-01",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a dismissive father-in-law who never accepts her; at the wedding itself, the bride is publicly humiliated by the in-laws",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-04-02",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a dismissive father-in-law who never accepts her; on the honeymoon or first family trip, she's excluded and belittled",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-04-03",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a dismissive father-in-law who never accepts her; when she announces her pregnancy, the family reacts with contempt",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-04-04",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a dismissive father-in-law who never accepts her; over family property/inheritance, they treat her as an outsider gold-digger",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-04-05",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a dismissive father-in-law who never accepts her; she's handed servant tasks (apron, serving) in front of guests",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-04-06",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a dismissive father-in-law who never accepts her; she's judged for her job, clothes, or family and made to feel unworthy",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-04-07",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a dismissive father-in-law who never accepts her; she's blamed for something she didn't do to turn the husband against her",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-05-01",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a weak husband who won't defend his wife against his family; at the wedding itself, the bride is publicly humiliated by the in-laws",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-05-02",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a weak husband who won't defend his wife against his family; on the honeymoon or first family trip, she's excluded and belittled",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-05-03",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a weak husband who won't defend his wife against his family; when she announces her pregnancy, the family reacts with contempt",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-05-04",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a weak husband who won't defend his wife against his family; over family property/inheritance, they treat her as an outsider gold-digger",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-05-05",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a weak husband who won't defend his wife against his family; she's handed servant tasks (apron, serving) in front of guests",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-05-06",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a weak husband who won't defend his wife against his family; she's judged for her job, clothes, or family and made to feel unworthy",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-05-07",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a weak husband who won't defend his wife against his family; she's blamed for something she didn't do to turn the husband against her",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-06-01",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a manipulative sister-in-law spreading lies about the bride; at the wedding itself, the bride is publicly humiliated by the in-laws",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-06-02",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a manipulative sister-in-law spreading lies about the bride; on the honeymoon or first family trip, she's excluded and belittled",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-06-03",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a manipulative sister-in-law spreading lies about the bride; when she announces her pregnancy, the family reacts with contempt",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-06-04",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a manipulative sister-in-law spreading lies about the bride; over family property/inheritance, they treat her as an outsider gold-digger",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-06-05",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a manipulative sister-in-law spreading lies about the bride; she's handed servant tasks (apron, serving) in front of guests",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-06-06",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a manipulative sister-in-law spreading lies about the bride; she's judged for her job, clothes, or family and made to feel unworthy",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "C-06-07",
+      "theme": "C_co_dau",
+      "subgroup": "C_combination",
+      "conflict": "a manipulative sister-in-law spreading lies about the bride; she's blamed for something she didn't do to turn the husband against her",
+      "tags": [
+        "new bride",
+        "in-laws",
+        "marriage",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [
+        "hero_age:24-39"
+      ],
+      "avoid_with": [
+        "elderly hero"
+      ]
+    },
+    {
+      "id": "D-01-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a home security camera (Ring/doorbell) captures the truth; she quietly gathers 14 months of evidence before acting",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-01-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a home security camera (Ring/doorbell) captures the truth; she secretly refinances/protects the house and assets first",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-01-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a home security camera (Ring/doorbell) captures the truth; she retains her own lawyer before he suspects anything",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-01-04",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a home security camera (Ring/doorbell) captures the truth; she stays calm and lets the truth reveal itself publicly",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-01-05",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a home security camera (Ring/doorbell) captures the truth; she documents everything methodically, the way she always kept the books",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-02-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "GPS location history on a phone reveals where he really was; she quietly gathers 14 months of evidence before acting",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-02-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "GPS location history on a phone reveals where he really was; she secretly refinances/protects the house and assets first",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-02-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "GPS location history on a phone reveals where he really was; she retains her own lawyer before he suspects anything",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-02-04",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "GPS location history on a phone reveals where he really was; she stays calm and lets the truth reveal itself publicly",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-02-05",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "GPS location history on a phone reveals where he really was; she documents everything methodically, the way she always kept the books",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-03-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "text messages discovered on a synced device or shared account; she quietly gathers 14 months of evidence before acting",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-03-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "text messages discovered on a synced device or shared account; she secretly refinances/protects the house and assets first",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-03-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "text messages discovered on a synced device or shared account; she retains her own lawyer before he suspects anything",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-03-04",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "text messages discovered on a synced device or shared account; she stays calm and lets the truth reveal itself publicly",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-03-05",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "text messages discovered on a synced device or shared account; she documents everything methodically, the way she always kept the books",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-04-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "an Apple AirTag she finds reveals his movements; she quietly gathers 14 months of evidence before acting",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-04-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "an Apple AirTag she finds reveals his movements; she secretly refinances/protects the house and assets first",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-04-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "an Apple AirTag she finds reveals his movements; she retains her own lawyer before he suspects anything",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-04-04",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "an Apple AirTag she finds reveals his movements; she stays calm and lets the truth reveal itself publicly",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-04-05",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "an Apple AirTag she finds reveals his movements; she documents everything methodically, the way she always kept the books",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-05-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "credit card and bank statements expose hidden spending; she quietly gathers 14 months of evidence before acting",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-05-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "credit card and bank statements expose hidden spending; she secretly refinances/protects the house and assets first",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-05-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "credit card and bank statements expose hidden spending; she retains her own lawyer before he suspects anything",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-05-04",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "credit card and bank statements expose hidden spending; she stays calm and lets the truth reveal itself publicly",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-05-05",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "credit card and bank statements expose hidden spending; she documents everything methodically, the way she always kept the books",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-06-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a DNA test reveals a family secret; she quietly gathers 14 months of evidence before acting",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-06-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a DNA test reveals a family secret; she secretly refinances/protects the house and assets first",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-06-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a DNA test reveals a family secret; she retains her own lawyer before he suspects anything",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-06-04",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a DNA test reveals a family secret; she stays calm and lets the truth reveal itself publicly",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-06-05",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a DNA test reveals a family secret; she documents everything methodically, the way she always kept the books",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-07-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "the smart home (Alexa) recorded a conversation; she quietly gathers 14 months of evidence before acting",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-07-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "the smart home (Alexa) recorded a conversation; she secretly refinances/protects the house and assets first",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-07-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "the smart home (Alexa) recorded a conversation; she retains her own lawyer before he suspects anything",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-07-04",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "the smart home (Alexa) recorded a conversation; she stays calm and lets the truth reveal itself publicly",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-07-05",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "the smart home (Alexa) recorded a conversation; she documents everything methodically, the way she always kept the books",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-08-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a shared cloud photo library auto-uploaded incriminating images; she quietly gathers 14 months of evidence before acting",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-08-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a shared cloud photo library auto-uploaded incriminating images; she secretly refinances/protects the house and assets first",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-08-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a shared cloud photo library auto-uploaded incriminating images; she retains her own lawyer before he suspects anything",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-08-04",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a shared cloud photo library auto-uploaded incriminating images; she stays calm and lets the truth reveal itself publicly",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-08-05",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a shared cloud photo library auto-uploaded incriminating images; she documents everything methodically, the way she always kept the books",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-09-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "the car's built-in GPS/trip log shows a pattern; she quietly gathers 14 months of evidence before acting",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-09-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "the car's built-in GPS/trip log shows a pattern; she secretly refinances/protects the house and assets first",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-09-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "the car's built-in GPS/trip log shows a pattern; she retains her own lawyer before he suspects anything",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-09-04",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "the car's built-in GPS/trip log shows a pattern; she stays calm and lets the truth reveal itself publicly",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-09-05",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "the car's built-in GPS/trip log shows a pattern; she documents everything methodically, the way she always kept the books",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-10-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a fitness tracker's data contradicts his alibi; she quietly gathers 14 months of evidence before acting",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-10-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a fitness tracker's data contradicts his alibi; she secretly refinances/protects the house and assets first",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-10-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a fitness tracker's data contradicts his alibi; she retains her own lawyer before he suspects anything",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-10-04",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a fitness tracker's data contradicts his alibi; she stays calm and lets the truth reveal itself publicly",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-10-05",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a fitness tracker's data contradicts his alibi; she documents everything methodically, the way she always kept the books",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-11-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "an email receipt for a gift or hotel she never received; she quietly gathers 14 months of evidence before acting",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-11-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "an email receipt for a gift or hotel she never received; she secretly refinances/protects the house and assets first",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-11-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "an email receipt for a gift or hotel she never received; she retains her own lawyer before he suspects anything",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-11-04",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "an email receipt for a gift or hotel she never received; she stays calm and lets the truth reveal itself publicly",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-11-05",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "an email receipt for a gift or hotel she never received; she documents everything methodically, the way she always kept the books",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-12-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a voicemail or call log that doesn't match his story; she quietly gathers 14 months of evidence before acting",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-12-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a voicemail or call log that doesn't match his story; she secretly refinances/protects the house and assets first",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-12-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a voicemail or call log that doesn't match his story; she retains her own lawyer before he suspects anything",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-12-04",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a voicemail or call log that doesn't match his story; she stays calm and lets the truth reveal itself publicly",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "D-12-05",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_evidence_response",
+      "conflict": "a voicemail or call log that doesn't match his story; she documents everything methodically, the way she always kept the books",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "strategy",
+        "marriage"
+      ],
+      "severity": 3,
+      "requires": [
+        "evidence_source"
+      ],
+      "avoid_with": [
+        "instant confrontation without proof"
+      ]
+    },
+    {
+      "id": "E-01-01",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a lavish family wedding where the poor relative is treated as an embarrassment; the 'poor' relative turns out to be quietly wealthy or accomplished",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 0.45,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-01-02",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a lavish family wedding where the poor relative is treated as an embarrassment; the poor relative was secretly the one funding the family all along",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-01-03",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a lavish family wedding where the poor relative is treated as an embarrassment; a powerful outsider reveals the poor relative's hidden good deeds",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-01-04",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a lavish family wedding where the poor relative is treated as an embarrassment; the wealthy relatives' fortune turns out to be fake or crumbling",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-01-05",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a lavish family wedding where the poor relative is treated as an embarrassment; the poor relative's child/grandchild achieves something that shames them",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-01-06",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a lavish family wedding where the poor relative is treated as an embarrassment; an old document reveals the poor relative's true sacrifice for the family",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-02-01",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a funeral where the wealthy side fights over inheritance and excludes them; the 'poor' relative turns out to be quietly wealthy or accomplished",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 0.45,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-02-02",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a funeral where the wealthy side fights over inheritance and excludes them; the poor relative was secretly the one funding the family all along",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-02-03",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a funeral where the wealthy side fights over inheritance and excludes them; a powerful outsider reveals the poor relative's hidden good deeds",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-02-04",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a funeral where the wealthy side fights over inheritance and excludes them; the wealthy relatives' fortune turns out to be fake or crumbling",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-02-05",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a funeral where the wealthy side fights over inheritance and excludes them; the poor relative's child/grandchild achieves something that shames them",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-02-06",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a funeral where the wealthy side fights over inheritance and excludes them; an old document reveals the poor relative's true sacrifice for the family",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-03-01",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a milestone birthday party where they're seated at the back; the 'poor' relative turns out to be quietly wealthy or accomplished",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 0.45,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-03-02",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a milestone birthday party where they're seated at the back; the poor relative was secretly the one funding the family all along",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-03-03",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a milestone birthday party where they're seated at the back; a powerful outsider reveals the poor relative's hidden good deeds",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-03-04",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a milestone birthday party where they're seated at the back; the wealthy relatives' fortune turns out to be fake or crumbling",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-03-05",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a milestone birthday party where they're seated at the back; the poor relative's child/grandchild achieves something that shames them",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-03-06",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a milestone birthday party where they're seated at the back; an old document reveals the poor relative's true sacrifice for the family",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-04-01",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at Thanksgiving dinner where their humble contribution is mocked; the 'poor' relative turns out to be quietly wealthy or accomplished",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 0.45,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-04-02",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at Thanksgiving dinner where their humble contribution is mocked; the poor relative was secretly the one funding the family all along",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-04-03",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at Thanksgiving dinner where their humble contribution is mocked; a powerful outsider reveals the poor relative's hidden good deeds",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-04-04",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at Thanksgiving dinner where their humble contribution is mocked; the wealthy relatives' fortune turns out to be fake or crumbling",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-04-05",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at Thanksgiving dinner where their humble contribution is mocked; the poor relative's child/grandchild achieves something that shames them",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-04-06",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at Thanksgiving dinner where their humble contribution is mocked; an old document reveals the poor relative's true sacrifice for the family",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-05-01",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at Christmas where their handmade gifts are ridiculed next to expensive ones; the 'poor' relative turns out to be quietly wealthy or accomplished",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 0.45,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-05-02",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at Christmas where their handmade gifts are ridiculed next to expensive ones; the poor relative was secretly the one funding the family all along",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-05-03",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at Christmas where their handmade gifts are ridiculed next to expensive ones; a powerful outsider reveals the poor relative's hidden good deeds",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-05-04",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at Christmas where their handmade gifts are ridiculed next to expensive ones; the wealthy relatives' fortune turns out to be fake or crumbling",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-05-05",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at Christmas where their handmade gifts are ridiculed next to expensive ones; the poor relative's child/grandchild achieves something that shames them",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-05-06",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at Christmas where their handmade gifts are ridiculed next to expensive ones; an old document reveals the poor relative's true sacrifice for the family",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-06-01",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a summer BBQ/pool party where they're made to feel out of place; the 'poor' relative turns out to be quietly wealthy or accomplished",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 0.45,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-06-02",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a summer BBQ/pool party where they're made to feel out of place; the poor relative was secretly the one funding the family all along",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-06-03",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a summer BBQ/pool party where they're made to feel out of place; a powerful outsider reveals the poor relative's hidden good deeds",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-06-04",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a summer BBQ/pool party where they're made to feel out of place; the wealthy relatives' fortune turns out to be fake or crumbling",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-06-05",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a summer BBQ/pool party where they're made to feel out of place; the poor relative's child/grandchild achieves something that shames them",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-06-06",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a summer BBQ/pool party where they're made to feel out of place; an old document reveals the poor relative's true sacrifice for the family",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-07-01",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a family reunion where relatives brag and look down on them; the 'poor' relative turns out to be quietly wealthy or accomplished",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 0.45,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-07-02",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a family reunion where relatives brag and look down on them; the poor relative was secretly the one funding the family all along",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-07-03",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a family reunion where relatives brag and look down on them; a powerful outsider reveals the poor relative's hidden good deeds",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-07-04",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a family reunion where relatives brag and look down on them; the wealthy relatives' fortune turns out to be fake or crumbling",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-07-05",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a family reunion where relatives brag and look down on them; the poor relative's child/grandchild achieves something that shames them",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-07-06",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a family reunion where relatives brag and look down on them; an old document reveals the poor relative's true sacrifice for the family",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-08-01",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a graduation where the wealthy relatives take credit or ignore them; the 'poor' relative turns out to be quietly wealthy or accomplished",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 0.45,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-08-02",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a graduation where the wealthy relatives take credit or ignore them; the poor relative was secretly the one funding the family all along",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-08-03",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a graduation where the wealthy relatives take credit or ignore them; a powerful outsider reveals the poor relative's hidden good deeds",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-08-04",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a graduation where the wealthy relatives take credit or ignore them; the wealthy relatives' fortune turns out to be fake or crumbling",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-08-05",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a graduation where the wealthy relatives take credit or ignore them; the poor relative's child/grandchild achieves something that shames them",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-08-06",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a graduation where the wealthy relatives take credit or ignore them; an old document reveals the poor relative's true sacrifice for the family",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-09-01",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at an upscale restaurant where their clothes/manners are judged; the 'poor' relative turns out to be quietly wealthy or accomplished",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 0.45,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-09-02",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at an upscale restaurant where their clothes/manners are judged; the poor relative was secretly the one funding the family all along",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-09-03",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at an upscale restaurant where their clothes/manners are judged; a powerful outsider reveals the poor relative's hidden good deeds",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-09-04",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at an upscale restaurant where their clothes/manners are judged; the wealthy relatives' fortune turns out to be fake or crumbling",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-09-05",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at an upscale restaurant where their clothes/manners are judged; the poor relative's child/grandchild achieves something that shames them",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-09-06",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at an upscale restaurant where their clothes/manners are judged; an old document reveals the poor relative's true sacrifice for the family",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-10-01",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a country club event where they're treated as if they don't belong; the 'poor' relative turns out to be quietly wealthy or accomplished",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 0.45,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-10-02",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a country club event where they're treated as if they don't belong; the poor relative was secretly the one funding the family all along",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-10-03",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a country club event where they're treated as if they don't belong; a powerful outsider reveals the poor relative's hidden good deeds",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-10-04",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a country club event where they're treated as if they don't belong; the wealthy relatives' fortune turns out to be fake or crumbling",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-10-05",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a country club event where they're treated as if they don't belong; the poor relative's child/grandchild achieves something that shames them",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-10-06",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_occasion_reveal",
+      "conflict": "at a country club event where they're treated as if they don't belong; an old document reveals the poor relative's true sacrifice for the family",
+      "tags": [
+        "class contrast",
+        "family",
+        "dignity",
+        "reveal"
+      ],
+      "severity": 3,
+      "weight": 1.0,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A-NEW-08",
+      "theme": "A_me_gia",
+      "subgroup": "A1_bo_roi",
+      "conflict": "the daughter leaves her mother off the emergency-contact list at the assisted-living facility",
+      "tags": [
+        "abandonment",
+        "elder neglect"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A-NEW-08",
+      "theme": "A_me_gia",
+      "subgroup": "A2_cuop_tai_san",
+      "conflict": "the son redirects the mother's Social Security deposits into an account she cannot access",
+      "tags": [
+        "financial abuse",
+        "deception"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A-NEW-08",
+      "theme": "A_me_gia",
+      "subgroup": "A3_lam_nhuc",
+      "conflict": "the mother is cropped out of the family photograph before it is posted online",
+      "tags": [
+        "public humiliation",
+        "family image"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "A-NEW-07",
+      "theme": "A_me_gia",
+      "subgroup": "A4_loi_dung",
+      "conflict": "the family expects the mother to provide daily childcare while charging her rent for a spare room",
+      "tags": [
+        "exploitation",
+        "caregiving"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B-NEW-16",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "the veteran is accused of wearing medals he did not earn during a public ceremony",
+      "tags": [
+        "veteran",
+        "stolen valor accusation"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B-NEW-17",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "the veteran's reserved parking space is taken and staff tell him to stop making trouble",
+      "tags": [
+        "veteran",
+        "disrespect",
+        "public humiliation"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "B-NEW-18",
+      "theme": "B_veteran",
+      "subgroup": "B_cases",
+      "conflict": "a family member hides his service history because it clashes with their polished social image",
+      "tags": [
+        "veteran",
+        "family shame"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "C-NEW-01",
+      "theme": "C_co_dau",
+      "subgroup": "C_cases",
+      "conflict": "the bride's homemade wedding contribution is removed and replaced without telling her",
+      "tags": [
+        "new bride",
+        "wedding",
+        "class shame"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "C-NEW-02",
+      "theme": "C_co_dau",
+      "subgroup": "C_cases",
+      "conflict": "the mother-in-law gives the bride a separate list of household rules in front of the family",
+      "tags": [
+        "new bride",
+        "control",
+        "humiliation"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "C-NEW-03",
+      "theme": "C_co_dau",
+      "subgroup": "C_cases",
+      "conflict": "the husband's family excludes the bride from a major medical decision involving her own spouse",
+      "tags": [
+        "new bride",
+        "marriage",
+        "exclusion"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "D-NEW-01",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_cases",
+      "conflict": "the wife discovers a second lease and utility bills tied to another household",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "double life"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "D-NEW-02",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_cases",
+      "conflict": "the husband's calendar sync reveals recurring appointments under a false business label",
+      "tags": [
+        "betrayal",
+        "evidence",
+        "digital trail"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "D-NEW-03",
+      "theme": "D_vo_phan_boi",
+      "subgroup": "D_cases",
+      "conflict": "a school emergency form lists another woman as the child's parent",
+      "tags": [
+        "betrayal",
+        "family secret",
+        "document evidence"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-NEW-01",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_cases",
+      "conflict": "wealthy relatives mock the poor uncle's old truck, not knowing he used it for years of volunteer disaster relief",
+      "tags": [
+        "class contrast",
+        "service",
+        "dignity"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-NEW-02",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_cases",
+      "conflict": "the poor aunt is seated near the kitchen at a reunion despite having raised two of the successful relatives",
+      "tags": [
+        "class contrast",
+        "family sacrifice"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "E-NEW-03",
+      "theme": "E_ngheo_vs_giau",
+      "subgroup": "E_cases",
+      "conflict": "the handmade gift is laughed at until its history is explained by the oldest family member",
+      "tags": [
+        "class contrast",
+        "symbolic object",
+        "reveal"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    }
+  ],
+  "selection_policy": {
+    "theme_first": true,
+    "subgroup_rotation": true,
+    "recent_conflict_cooldown_days": 21,
+    "recent_subgroup_cooldown_count": 3,
+    "severity_distribution": {
+      "2": 0.15,
+      "3": 0.6,
+      "4": 0.25
+    },
+    "max_same_tag_overlap_with_recent_story": 2,
+    "rules": [
+      "Do not use the same conflict_id during cooldown.",
+      "Do not repeat the same subgroup more than twice in the last five stories of one theme.",
+      "For theme E, secretly-wealthy reveal weight must remain below 0.20 of published stories.",
+      "For theme D, evidence must be concrete and discoverable before confrontation.",
+      "For theme C, conflict must remain centered on marriage/in-law power, not generic workplace drama."
+    ]
+  },
+  "theme_weights_default": {
+    "A_me_gia": 0.24,
+    "B_veteran": 0.22,
+    "C_co_dau": 0.18,
+    "D_vo_phan_boi": 0.18,
+    "E_ngheo_vs_giau": 0.18
+  }
+}
