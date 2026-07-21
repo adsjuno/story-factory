@@ -14,6 +14,7 @@
 const store = require('./store');
 const memory = require('./story-memory');
 const conflictTree = require('./conflict-tree');
+const nameGender = require('./name-gender');
 
 let BUNDLED = {};
 try { BUNDLED = require('./story-dna-pool.json'); } catch (_) { BUNDLED = {}; }
@@ -86,6 +87,73 @@ function pickOne(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+// ---------------- VALIDATE TUONG THICH DNA (truoc khi goi AI) ----------------
+// Tu vai (chuoi mo ta) suy ra gioi: 'F' | 'M' | 'U' (luong tinh/khong ro/mau thuan).
+const ROLE_FEMALE = /\b(mother|grandmother|grandma|bride|wife|widow(?!er)|aunt|sister|daughter|granddaughter|niece|daughter-in-law|mother-in-law|fiancee)\b/i;
+const ROLE_MALE = /\b(father|grandfather|grandpa|husband|widower|uncle|brother|son|grandson|nephew|son-in-law|father-in-law)\b/i;
+function roleGender(phrase) {
+  const f = ROLE_FEMALE.test(phrase), m = ROLE_MALE.test(phrase);
+  if (f && m) return 'U';   // mau thuan (vd "grandson's fiancee") -> khong rang buoc
+  if (f) return 'F';
+  if (m) return 'M';
+  return 'U';
+}
+
+// Quan he co hop NGACH khong (theme <-> relationship).
+const NICHE_REL = {
+  A: { inc: /\b(mother|elderly parent|grandparent|grandmother|stepparent)\b/i, exc: /\b(father|bride|veteran|widow|widower|boss|employee|sibling)\b/i },
+  B: { inc: /\bveteran\b/i, exc: null },
+  C: { inc: /\b(bride|mother-in-law|father-in-law|new husband)\b/i, exc: null },
+  D: { inc: /\b(widow|widower|spouse)\b/i, exc: null },
+  E: { inc: /\b(sibling|aunt|uncle|niece|nephew|grandparent|grandchild|parent|in-law|relative|family|stepparent|stepchild)\b/i, exc: /\b(veteran|bride)\b/i },
+};
+function nicheRelationshipOk(code, rel) {
+  const r = NICHE_REL[String(code || '').toUpperCase()];
+  if (!r) return true;                       // ngach la / khong co ma -> khong rang buoc theme
+  if (r.exc && r.exc.test(rel)) return false;
+  return r.inc.test(rel);
+}
+
+/**
+ * Kiem tra 1 to hop DNA co TUONG THICH khong (truoc khi cho AI viet):
+ *  1) relationship khop theme (ngach).
+ *  2) villain_type khong mau thuan gioi voi vai phan dien trong relationship.
+ *  3) hero_name khop gioi vai chinh (neu vai ro gioi) - tranh ten luong tinh.
+ *  4) villain_name khop gioi vai phan dien (neu ro gioi) - tranh ten luong tinh.
+ * @returns {ok:boolean, reason:string}
+ */
+function validateCombo(combo, nicheCode) {
+  const rel = String(combo.relationship || '');
+  if (!nicheRelationshipOk(nicheCode, rel)) {
+    return { ok: false, reason: `relationship "${rel}" không hợp ngách ${nicheCode}` };
+  }
+  const parts = rel.split(/\s+and\s+/i);
+  const heroPart = parts[0] || '';
+  const villainPart = parts.slice(1).join(' and ') || '';
+
+  const heroG = roleGender(heroPart);
+  const relVG = roleGender(villainPart);
+  const typeVG = roleGender(String(combo.villain_type || ''));
+
+  // 2) villain_type mau thuan gioi voi relationship villain
+  if (relVG !== 'U' && typeVG !== 'U' && relVG !== typeVG) {
+    return { ok: false, reason: `villain_type (${typeVG}) mâu thuẫn vai phản diện trong relationship (${relVG})` };
+  }
+  const villainG = relVG !== 'U' ? relVG : typeVG;
+
+  // 3) hero_name khop gioi vai chinh
+  if (heroG !== 'U') {
+    const g = nameGender.gender(combo.hero_name);
+    if (g !== heroG) return { ok: false, reason: `hero_name "${combo.hero_name}" (${g}) không khớp vai "${heroPart.trim()}" (${heroG})` };
+  }
+  // 4) villain_name khop gioi vai phan dien
+  if (villainG !== 'U') {
+    const g = nameGender.gender(combo.villain_name);
+    if (g !== villainG) return { ok: false, reason: `villain_name "${combo.villain_name}" (${g}) không khớp vai phản diện (${villainG})` };
+  }
+  return { ok: true, reason: '' };
+}
+
 // Random 1 to hop day du 12 truc tu pool 1 nuoc
 function randomCombo(pool) {
   const combo = {};
@@ -112,7 +180,7 @@ function attachConflict(combo, country, nicheCode) {
  * Random toi khi khong dung so chong trung; het luot thi chot cai cuoi (fellBack=true).
  * @returns {{combo, country, tries, fellBack, poolEmpty, lastReason, conflictBranch, hasConflict}}
  */
-function pickCombo(country, niche, nicheCode, { maxTries = 80 } = {}) {
+function pickCombo(country, niche, nicheCode, { maxTries = 800 } = {}) {
   const c = String(country || DEFAULT_COUNTRY).toUpperCase();
   const pool = getPool(c);
   const poolEmpty = !poolHasContent(pool);
@@ -122,21 +190,33 @@ function pickCombo(country, niche, nicheCode, { maxTries = 80 } = {}) {
   let combo = r.combo;
   let conflictBranch = r.conflictBranch;
   let tries = 1;
+  let regen = 0;         // so lan random lai vi KHONG TUONG THICH (khong tinh trung lap)
   let lastReason = '';
 
-  if (poolEmpty) return { combo, country: c, tries, fellBack: false, poolEmpty, lastReason: 'Pool rỗng', conflictBranch, hasConflict: !!combo.conflict };
+  if (poolEmpty) return { combo, country: c, tries, regen, fellBack: false, poolEmpty, lastReason: 'Pool rỗng', conflictBranch, hasConflict: !!combo.conflict };
 
-  let dupCheck = memory.isDuplicate(combo, c, niche);
-  while (dupCheck.dup && tries < maxTries) {
-    lastReason = dupCheck.reason;
+  // Xau: KHONG tuong thich HOAC trung lap -> random lai.
+  // Kiem tra tuong thich TRUOC (khong doc file) de reject nhanh; hop le moi soi so chong trung (doc file).
+  const isBad = (cmb) => {
+    const v = validateCombo(cmb, nicheCode);
+    if (!v.ok) return { bad: true, reason: v.reason, invalid: true };
+    const d = memory.isDuplicate(cmb, c, niche);
+    if (d.dup) return { bad: true, reason: d.reason, invalid: false };
+    return { bad: false };
+  };
+
+  let check = isBad(combo);
+  while (check.bad && tries < maxTries) {
+    lastReason = check.reason;
+    if (check.invalid) regen++;
     r = make();
     combo = r.combo; conflictBranch = r.conflictBranch;
     tries++;
-    dupCheck = memory.isDuplicate(combo, c, niche);
+    check = isBad(combo);
   }
-  const fellBack = dupCheck.dup; // van trung sau maxTries -> danh phai chot
-  if (fellBack) lastReason = dupCheck.reason;
-  return { combo, country: c, tries, fellBack, poolEmpty, lastReason, conflictBranch, hasConflict: !!combo.conflict };
+  const fellBack = check.bad;   // sau maxTries van xau -> danh phai chot
+  if (fellBack) lastReason = check.reason;
+  return { combo, country: c, tries, regen, fellBack, poolEmpty, lastReason, conflictBranch, hasConflict: !!combo.conflict, valid: !check.bad };
 }
 
 /**
@@ -180,16 +260,15 @@ function comboToSheetJson(combo, country, theme) {
     conflict_id: c.conflict || '',
     hero_name: c.hero_name || '',
     villain_name: c.villain_name || '',
-    villain_type: c.villain_type || '',
     occupation: c.occupation || '',
     location: c.location || '',
     icon_object: c.icon_object || '',
+    opening_scene: c.opening_scene || '',
+    relationship: c.relationship || '',
+    humiliation: c.humiliation_type || '',
     twist: c.twist || '',
     justice: c.justice_type || '',
     ending: c.ending || '',
-    opening: c.opening_scene || '',
-    relationship: c.relationship || '',
-    humiliation: c.humiliation_type || '',
     emotion: c.dominant_emotion || '',
   });
 }
@@ -203,4 +282,5 @@ module.exports = {
   AXES, AXIS_KEYS, DEFAULT_COUNTRY,
   listCountries, getPool, savePool,
   randomCombo, pickCombo, buildDnaBlock, remember, comboToSheetJson,
+  validateCombo, roleGender, nicheRelationshipOk,
 };

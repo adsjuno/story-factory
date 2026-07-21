@@ -30,17 +30,18 @@ const DEFAULT_NICHES = [
 ];
 
 // Cac COT xuat ra Google Sheet (22 cot) - PHAI khop HEADER trong Apps Script (docs/GOOGLE-SHEETS-SETUP.md)
-// Cot 22 story_dna_combo = to hop DNA App gan san (JSON, kem ma quoc gia).
+//  S(19)=dedup_config  T(20)=reveal_config  U(21)=kpi_scores  V(22)=story_dna (bo DNA day du)
 const SHEET_COLUMNS = [
   'story_id', 'timestamp', 'status', 'page_target', 'web_title', 'web_slug', 'web_body',
   'fb_caption_a', 'fb_caption_b', 'fb_cta', 'fb_comment_link', 'web_url',
   'fb_image_url', 'thumbnail_url', 'fb_image_prompt', 'web_p1_prompt', 'web_p2_prompt', 'web_p3_prompt',
-  'dedup_config', 'story_dna', 'kpi_scores', 'story_dna_combo',
+  'dedup_config', 'reveal_config', 'kpi_scores', 'story_dna',
 ];
 
-// ---- Khuon JSON mac dinh cho 3 cot JSON (dam bao du khoa ke ca khi Claude tra thieu) ----
+// ---- Khuon JSON mac dinh cho cac cot JSON (dam bao du khoa ke ca khi Claude tra thieu) ----
 const DEDUP_TEMPLATE = { victim: '', villain: '', theme: '', emotion: '', justice: '', object: '', setting: '', ending: '' };
-const STORY_DNA_TEMPLATE = { reveal: '', reveal_source: '', object: '', justice: '' };
+// reveal_config (cot T) - truoc day dat nham ten story_dna
+const REVEAL_TEMPLATE = { reveal: '', reveal_source: '', object: '', justice: '' };
 const KPI_TEMPLATE = { hook: 0, facebook_ctr: 0, justice: 0, empathy: 0, novelty: 0, american: 0, final: 0 };
 
 // Cau lenh goi skill - MAC DINH (Cach 1). Nguoi dung sua duoc trong Cai dat (tuy bien).
@@ -247,6 +248,21 @@ function normalizeJson(text, template, numeric = false) {
   return JSON.stringify(out);
 }
 
+// KPI ve thang 0-100. Neu skill tra thang 10 (moi diem <=10) -> tu nhan 10.
+function normalizeKpi(text) {
+  const parsed = JSON.parse(normalizeJson(text, KPI_TEMPLATE, true)); // -> so
+  const keys = Object.keys(KPI_TEMPLATE);
+  const max = Math.max(0, ...keys.map((k) => Number(parsed[k]) || 0));
+  const scale = (max > 0 && max <= 10) ? 10 : 1;   // thang 10 -> x10; da 0-100 -> giu
+  const out = {};
+  for (const k of keys) {
+    let v = Math.round((Number(parsed[k]) || 0) * scale);
+    if (v < 0) v = 0; if (v > 100) v = 100;
+    out[k] = v;
+  }
+  return JSON.stringify(out);
+}
+
 // Thay placeholder {{IMG_Px}} trong web_body:
 //  - co link  -> thay bang link that (giu the <img>)
 //  - khong co -> xoa CA the <img ...{{IMG_Px}}...> (tranh de lai src rong / token tho)
@@ -356,11 +372,11 @@ function buildRow(nicheLabel, s, extra = {}) {
     web_p1_prompt: s.WEB_P1_PROMPT || '',
     web_p2_prompt: s.WEB_P2_PROMPT || '',
     web_p3_prompt: s.WEB_P3_PROMPT || '',
-    dedup_config: normalizeJson(s.DEDUP_CONFIG, DEDUP_TEMPLATE),
-    story_dna: normalizeJson(s.STORY_DNA, STORY_DNA_TEMPLATE),
-    kpi_scores: normalizeJson(s.KPI_SCORES, KPI_TEMPLATE, true),
-    // Cot 22: to hop DNA App gan san (JSON, kem ma quoc gia)
-    story_dna_combo: extra.dnaCombo != null ? extra.dnaCombo : '',
+    dedup_config: normalizeJson(s.DEDUP_CONFIG, DEDUP_TEMPLATE),                 // cot S (19)
+    reveal_config: normalizeJson(s.STORY_DNA, REVEAL_TEMPLATE),                  // cot T (20) - reveal/reveal_source/object/justice
+    kpi_scores: normalizeKpi(s.KPI_SCORES),                                       // cot U (21) - thang 0-100
+    // cot V (22): bo DNA day du (JSON) App gan san
+    story_dna: extra.dnaCombo != null ? extra.dnaCombo : '',
   };
   return SHEET_COLUMNS.map((c) => (map[c] != null ? map[c] : ''));
 }
@@ -430,13 +446,19 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
     const conflictNote = pick.combo.conflict
       ? ` | conflict[${pick.conflictBranch}]: ${String(pick.combo.conflict).slice(0, 60)}...`
       : ' | (ngách chưa có cây conflict — dùng humiliation_type)';
-    onProgress({ message: `🧬 DNA (${country}): ${pick.combo.hero_name} — ${pick.combo.icon_object}${conflictNote}` });
+    onProgress({ message: `🧬 DNA (${country}): ${pick.combo.hero_name} — ${pick.combo.villain_name} — ${pick.combo.icon_object}${conflictNote}` });
+    if (pick.regen > 0) {
+      onProgress({ message: `↻ DNA random lại ${pick.regen} lần cho tương thích (relationship↔theme + giới tính tên khớp vai).` });
+    }
+    if (pick.fellBack && !pick.valid) {
+      onProgress({ message: `⚠️ Sau ${pick.tries} lần vẫn chưa có tổ hợp hoàn toàn hợp lệ (${pick.lastReason}) — dùng tổ hợp gần nhất.` });
+    }
   }
   const dna = pick.poolEmpty ? null : { combo: pick.combo, country };
   // Cot 22: JSON gon, du truc ten ro rang (theme=ngach, conflict_id=case,...) + ma nuoc
   const dnaComboJson = dna ? storyDna.comboToSheetJson(pick.combo, country, nicheLabel) : '';
   if (dna && (!dnaComboJson || dnaComboJson.length < 20)) {
-    onProgress({ message: '⚠️ Cảnh báo: có DNA nhưng story_dna_combo rỗng — kiểm tra story-dna.js.' });
+    onProgress({ message: '⚠️ Cảnh báo: có DNA nhưng cột story_dna rỗng — kiểm tra story-dna.js.' });
   }
 
   const prompt = buildPrompt(nicheLabel, dna);
@@ -575,9 +597,10 @@ module.exports = {
   isComplete,
   generateArticleImages,
   normalizeJson,
+  normalizeKpi,
   applyImagePlaceholders,
   buildRow,
   DEDUP_TEMPLATE,
-  STORY_DNA_TEMPLATE,
+  REVEAL_TEMPLATE,
   KPI_TEMPLATE,
 };

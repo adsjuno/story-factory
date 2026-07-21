@@ -26,10 +26,10 @@ Phần mềm ghi mỗi bài thành **1 dòng, 22 cột** qua Google Apps Script 
 | P | web_p1_prompt | Prompt ảnh Part 1 | Tạo lại ảnh nếu cần |
 | Q | web_p2_prompt | Prompt ảnh Part 2 | Tạo lại ảnh nếu cần |
 | R | web_p3_prompt | Prompt ảnh Part 3 | Tạo lại ảnh nếu cần |
-| S | dedup_config | JSON chống lặp | Sổ cái |
-| T | story_dna | JSON ADN truyện (reveal...) | Chống lặp reveal |
-| U | kpi_scores | JSON điểm KPI (số) | Kiểm tra chất lượng |
-| V | story_dna_combo | JSON tổ hợp DNA App gán sẵn (kèm mã quốc gia) | Chống trùng lặp giữa các bài |
+| S | dedup_config | JSON chống lặp (victim/villain/theme/emotion/justice/object/setting/ending) | Sổ cái |
+| T | reveal_config | JSON reveal (reveal/reveal_source/object/justice) | Chống lặp reveal |
+| U | kpi_scores | JSON điểm KPI thang 0-100 | Kiểm tra chất lượng |
+| V | story_dna | JSON bộ DNA đầy đủ (country/theme/conflict_id/hero_name/villain_name/...) | Chống trùng + soi tổ hợp |
 
 ## Các bước
 
@@ -43,7 +43,7 @@ function doPost(e) {
   var HEADER = ['story_id','timestamp','status','page_target','web_title','web_slug','web_body',
     'fb_caption_a','fb_caption_b','fb_cta','fb_comment_link','web_url',
     'fb_image_url','thumbnail_url','fb_image_prompt','web_p1_prompt','web_p2_prompt','web_p3_prompt',
-    'dedup_config','story_dna','kpi_scores','story_dna_combo'];
+    'dedup_config','reveal_config','kpi_scores','story_dna'];
   try {
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(HEADER);
