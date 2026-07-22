@@ -79,8 +79,10 @@
       </div>
 
       <div class="card">
-        <label class="lbl">Ngách (page)</label>
-        <select id="nicheSel" class="in"></select>
+        <!-- Ô "Ngách (page)" A-E ĐÃ ẨN: page/category/subcategory giờ do lớp Nguồn đầu vào
+             quyết định. Giữ select (ẩn) để code xử lý ngách cũ vẫn chạy làm FALLBACK. -->
+        <label class="lbl hidden">Ngách (page)</label>
+        <select id="nicheSel" class="in hidden"></select>
 
         <label class="lbl">Số bài viết liên tiếp</label>
         <input id="countInput" class="in" type="number" min="1" max="50" value="1">

@@ -11,7 +11,7 @@ Phần mềm ghi mỗi bài thành **1 dòng, 22 cột** qua Google Apps Script 
 | A | story_id | Mã bài `ST` + 8 số (ST00000001) | Khoá định danh, đặt tên ảnh |
 | B | timestamp | Ngày giờ tạo | Sắp xếp |
 | C | status | new / need_image / **draft_test** / posted_web / posted_fb / done | Biết bài nào chưa đăng / cần tạo lại ảnh. ⚠️ `draft_test` = bài chạy Test nhanh, **n8n KHÔNG được đăng** |
-| D | page_target | Ngách/page | Đăng đúng page |
+| D | page_target | **Định danh page**, dạng `P01 — Grandparent Stories`. n8n route bằng cách lấy mã `P01` ở đầu chuỗi (vd `page_target.split(' ')[0]`). Nếu lớp category lỗi → ghi `FALLBACK — <tên ngách cũ>` để nhận ra ngay | Đăng đúng page |
 | E | web_title | Tiêu đề web (SEO) | Tiêu đề WordPress |
 | F | web_slug | Đường dẫn URL | Link web |
 | G | web_body | Bài web HTML gộp 3 Part (đã chèn link ảnh) | Nội dung WordPress |
@@ -93,5 +93,8 @@ function doPost(e) {
 
 - Sửa code Apps Script sau này: **Deploy → Manage deployments → ✏️ Edit → Version: New version → Deploy** (URL giữ nguyên).
 - Cột L (web_url) và K (fb_comment_link) để n8n điền sau khi đăng — phần mềm để trống/[LINK].
-- Ảnh: phần mềm tạo bằng **Cloudflare Workers AI** (model FLUX 2 klein-9b) + up Cloudflare R2 (Cài đặt → **Ảnh & Lưu trữ**). Ảnh FB 1024×1024, ảnh web 1280×720. Nếu chưa cấu hình hoặc tạo ảnh lỗi, bài vẫn được đẩy: cột ảnh để trống, `status = need_image` để chạy lại sau, các cột `*_prompt` vẫn giữ để tạo lại.
-- Model FLUX 2 có **bộ lọc nội dung** riêng, đôi khi từ chối ảnh drama nặng (code 3030). Gặp lỗi này phần mềm bỏ qua ảnh đó và đánh dấu `need_image` — không tự thử lại để lách bộ lọc.
+- **Ảnh (mặc định MIỄN PHÍ qua điều khiển cửa sổ):** phần mềm tạo ảnh bằng **Gemini** (nguồn chính) → hết quota/lỗi thì tự chuyển **ChatGPT** (dự phòng); cả hai điều khiển cửa sổ web bằng tài khoản bạn đăng nhập, **không tốn API**. **Cloudflare Workers AI** (FLUX 2 klein-9b) chỉ là nguồn trả tiền để dự phòng và **mặc định TẮT**. Chọn nguồn + đăng nhập tại **Cài đặt → 🖼️ Ảnh & Lưu trữ**.
+- Mỗi bài tạo **5 ảnh**: fb vuông 1024×1024, thumbnail web ngang 1280×720, và 3 ảnh web 1280×720. Tất cả lưu lên **Cloudflare R2**.
+- Nếu chưa cấu hình hoặc tạo ảnh lỗi, bài vẫn được đẩy: cột ảnh để trống, `status = need_image` để chạy lại sau, các cột `*_prompt` vẫn giữ để tạo lại.
+- Các nguồn ảnh đều có **bộ lọc nội dung** riêng, đôi khi từ chối ảnh drama nặng (Cloudflare báo code 3030). Gặp lỗi này phần mềm bỏ qua ảnh đó và đánh dấu `need_image` — không tự thử lại để lách bộ lọc.
+- Chế độ **⚡ Test nhanh** bỏ qua toàn bộ tạo ảnh và ghi `status = draft_test` — n8n **phải lọc bỏ** các dòng này.

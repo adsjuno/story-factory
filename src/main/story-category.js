@@ -240,6 +240,7 @@ function chooseInput({ country = DEFAULT_COUNTRY, pageId = '', categoryId = '', 
 
   return {
     page_profile_id: page ? page.page_profile_id : '',
+    page_name: page ? (page.name || '') : '',
     category_id: cat ? cat.category_id : '',
     category_name: cat ? (cat.name_en || cat.name_vi || '') : '',
     subcategory_id: sub ? sub.subcategory_id : '',

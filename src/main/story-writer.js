@@ -373,7 +373,9 @@ function buildRow(nicheLabel, s, extra = {}) {
     story_id: extra.storyId || '',
     timestamp: now,
     status: extra.status || 'new',                   // n8n nhin cot nay biet bai chua dang / can tao lai anh
-    page_target: nicheLabel,
+    // Cot D: dinh danh PAGE tu lop category, dang "P01 — Grandparent Stories"
+    // (n8n route bang cach lay ma P01 o dau chuoi). Khi lop category loi -> "FALLBACK — <ngach cu>".
+    page_target: extra.pageTarget || nicheLabel,
     web_title: s.WEB_TITLE || '',
     web_slug: s.WEB_SLUG || '',
     web_body: extra.webBody != null ? extra.webBody : (s.WEB_BODY || ''),
@@ -482,6 +484,13 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
     onProgress({ message: '⚠️ Lỗi lớp category: ' + e.message + ' — chạy theo ngách cũ.' });
     input = null;
   }
+
+  // Cot D page_target: lay tu PAGE PROFILE (khong con lay tu o ngach A-E).
+  // chooseInput loi -> chay theo ngach cu -> danh dau FALLBACK de nhan ra ngay.
+  const pageTarget = (input && input.page_profile_id)
+    ? `${input.page_profile_id} — ${input.page_name || ''}`.trim().replace(/\s+—\s*$/, '')
+    : `FALLBACK — ${nicheLabel}`;
+  if (!input) onProgress({ message: `⚠️ Chạy nhánh FALLBACK (ngách cũ) — page_target sẽ ghi "${pageTarget}".` });
 
   const pick = storyDna.pickCombo(country, nicheLabel, nicheCode, { input });
   if (input && input.category_id) {
@@ -596,7 +605,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
       const webBody = applyImagePlaceholders(s.WEB_BODY || '', imgs.webUrls);
 
       const row = buildRow(nicheLabel, s, {
-        storyId, status, webBody,
+        storyId, status, webBody, pageTarget,
         fbImageUrl: imgs.fbImageUrl,
         thumbnailUrl: imgs.thumbnailUrl,
         dnaCombo: dnaComboJson,
