@@ -46,9 +46,11 @@ const REVEAL_TEMPLATE = { reveal: '', reveal_source: '', object: '', justice: ''
 const KPI_TEMPLATE = { hook: 0, facebook_ctr: 0, justice: 0, empathy: 0, novelty: 0, american: 0, final: 0 };
 
 // Cau lenh goi skill - MAC DINH (Cach 1). Nguoi dung sua duoc trong Cai dat (tuy bien).
-// {NICHE} se duoc thay bang ten ngach. Skill tu chay pipeline 11 buoc.
+// {NICHE} duoc thay bang "<category_name> — <subcategory_name>" tu LOP DAU VAO
+// (KHONG con la ngach A-E cu) -> Claude chi nhan MOT nguon chi dan ve chu de,
+// khong mau thuan voi khoi MANDATORY STORY INPUT. Skill tu chay pipeline 11 buoc.
 const DEFAULT_SKILL_COMMAND =
-  `/story-us-senior-viral viết truyện Mỹ 55+ cho ngách "{NICHE}".
+  `/story-us-senior-viral viết truyện Mỹ 55+ theo chủ đề "{NICHE}".
 
 Chạy đầy đủ pipeline tự động (tự sinh idea, 20 hook, chấm KPI, đóng vai độc giả 55-75 chọn hook, viết caption A/B, viết bài web Part 1/2/3, 7 reviewer, adaptive threshold). Chống lặp với các bài đã sinh.
 
@@ -356,9 +358,11 @@ function getSkillTemplate(country) {
 
 // Dung prompt cuoi = KHOI DNA (bat buoc dung to hop) + cau lenh goi skill.
 // @param dna { combo, country } da chon san (co the null -> khong nhet DNA)
-function buildPrompt(nicheLabel, dna) {
+// @param topicLabel chu de gui cho Claude: "<category_name> — <subcategory_name>"
+//   (khi lop category loi -> fallback ve ten ngach cu)
+function buildPrompt(topicLabel, dna) {
   const country = (dna && dna.country) || getRunningCountry();
-  const tmpl = getSkillTemplate(country).replace(/\{NICHE\}/g, nicheLabel);
+  const tmpl = getSkillTemplate(country).replace(/\{NICHE\}/g, topicLabel);
   if (dna && dna.combo) {
     return storyDna.buildDnaBlock(dna.combo, country) + '\n' + tmpl;
   }
@@ -492,7 +496,18 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
     : `FALLBACK — ${nicheLabel}`;
   if (!input) onProgress({ message: `⚠️ Chạy nhánh FALLBACK (ngách cũ) — page_target sẽ ghi "${pageTarget}".` });
 
-  const pick = storyDna.pickCombo(country, nicheLabel, nicheCode, { input });
+  // ① Chu de gui Claude = category + subcategory (KHONG con ngach A-E) -> khong mau thuan
+  //    voi khoi MANDATORY STORY INPUT.
+  const topicLabel = (input && input.category_name)
+    ? `${input.category_name} — ${input.subcategory_name || ''}`.trim().replace(/\s+—\s*$/, '')
+    : nicheLabel;
+
+  // ② Khoa so chong trung theo CATEGORY (khong con theo ngach A-E) -> cooldown
+  //    icon+twist+ending / conflict duoc tinh RIENG cho tung category.
+  //    Fallback (khong co input) van dung ten ngach cu de khong vo themeCodeOf.
+  const dedupKey = (input && input.category_id) ? input.category_id : nicheLabel;
+
+  const pick = storyDna.pickCombo(country, dedupKey, nicheCode, { input });
   if (input && input.category_id) {
     // CHI log category/subcategory/conflict CUOI CUNG (sau validate), khong log candidate bi loai
     onProgress({ message: `🗂️ ${input.page_profile_id} → ${input.category_name} (${input.category_id}) / ${input.subcategory_name} (${input.subcategory_id})${input.status_dynamic ? ' | status: ' + input.status_dynamic : ''}` });
@@ -519,7 +534,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
     onProgress({ message: '⚠️ Cảnh báo: có DNA nhưng cột story_dna rỗng — kiểm tra story-dna.js.' });
   }
 
-  const basePrompt = buildPrompt(nicheLabel, dna)
+  const basePrompt = buildPrompt(topicLabel, dna)
     + '\n\n[YÊU CẦU ĐỘ DÀI] web_body PHẢI dài 2200-2800 từ tiếng Anh (đếm từ). Viết đầy đủ 3 phần, thêm hồi tưởng, đối thoại, chi tiết cảm xúc. TUYỆT ĐỐI không viết ngắn dưới 2000 từ.';
   let prompt = basePrompt;
   let lastErr = null;
@@ -615,7 +630,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
       // TEST NHANH -> KHONG ghi, de khong lam ban cooldown cua bai that
       // (ten/icon/conflict/subcategory khong bi danh dau la "da dung").
       if (dna && !fastTest) {
-        try { storyDna.remember({ storyId, country, niche: nicheLabel, combo: pick.combo }); }
+        try { storyDna.remember({ storyId, country, niche: dedupKey, combo: pick.combo }); }
         catch (_) { /* ghi so hong khong lam sap bai */ }
       } else if (fastTest) {
         onProgress({ message: 'ℹ️ Test nhanh: KHÔNG ghi sổ chống trùng (cooldown bài thật giữ nguyên).' });

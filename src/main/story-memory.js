@@ -188,8 +188,31 @@ function usageCountByPage(country, pageId, field, value, n = 50) {
   return recentByPage(country, pageId, n).filter((e) => e.combo[field] === value).length;
 }
 
+/**
+ * MIGRATE khoa 'niche': truoc day luu ten ngach A-E ("Mẹ già – con bạc bẽo"),
+ * tu v1.10.2 doi sang category_id ("CAT01") de cooldown tinh RIENG theo category.
+ *
+ * Cach an toan: BACKFILL tu chinh du lieu da co — ban ghi nao da co combo.category_id
+ * (bai tu v1.9.0 tro di) thi gan lai niche = category_id. Ban ghi cu hon khong co
+ * category_id -> giu nguyen, se tu het han theo cooldown. Idempotent: chay lai khong doi gi.
+ * @returns {migrated, skipped}
+ */
+function migrateNicheKeys() {
+  let migrated = 0, skipped = 0;
+  try {
+    const db = readDb();
+    for (const e of db.entries) {
+      const cid = e.combo && e.combo.category_id;
+      if (cid && e.niche !== cid) { e.niche = cid; migrated++; }
+      else if (!cid) skipped++;
+    }
+    if (migrated) writeDb(db);
+  } catch (_) { /* migrate hong khong duoc lam sap app */ }
+  return { migrated, skipped };
+}
+
 module.exports = {
-  all, recentByCountry, recentByCountryNiche, isDuplicate, add, stats,
+  all, recentByCountry, recentByCountryNiche, isDuplicate, add, stats, migrateNicheKeys,
   daysSinceField, daysSinceSignature, recentWithinDays, rateRecent,
   recentByPage, subcategoryUsedRecently, categoryStreak, usageCountByPage,
   HERO_WINDOW, COMBO_WINDOW, FILE,

@@ -43,6 +43,11 @@ function createWindow() {
 
 app.whenReady().then(() => {
   store.init(app.getPath('userData'));
+  // Doi khoa so chong trung tu ngach A-E sang category_id (backfill 1 lan, idempotent)
+  try {
+    const m = storyMemory.migrateNicheKeys();
+    if (m.migrated) console.log(`[migrate] Đã đổi khoá chống trùng sang category_id cho ${m.migrated} bản ghi (bỏ qua ${m.skipped} bản ghi cũ không có category_id — sẽ tự hết hạn theo cooldown).`);
+  } catch (_) {}
   createWindow();
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 });
