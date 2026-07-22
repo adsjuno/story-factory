@@ -49,15 +49,13 @@ function subcatById(subId) {
 function mapOf(subId) { return (MAP.subcategory_map || {})[subId] || null; }
 function statusDynamics() { return MAP.status_dynamics || []; }
 function legacyThemeCategories(theme) { return (MAP.legacy_theme_to_categories || {})[theme] || []; }
-// Nguoc lai: category nay chay duoc voi nhung legacy_theme nao (tru E - E la status_dynamic)
-function legacyThemesForCategory(catId) {
-  const m = MAP.legacy_theme_to_categories || {};
-  const out = [];
-  for (const [theme, cats] of Object.entries(m)) {
-    if (theme === 'E_ngheo_vs_giau') continue;
-    if (Array.isArray(cats) && cats.includes(catId)) out.push(theme);
-  }
-  return out;
+// legacy_theme_to_categories CHI dung de VALIDATE (theme nay co hop le voi category nay khong).
+// TUYET DOI khong dung de suy nguoc ra theme cho subcategory de rong.
+function isThemeValidForCategory(theme, catId) {
+  if (!theme || !catId) return true;                        // rong = khong rang buoc gi de validate
+  const cats = legacyThemeCategories(theme);
+  if (!cats.length) return true;                            // map khong khai bao -> khong ket luan
+  return cats.includes(catId);
 }
 
 // ---------------- weighted random trong TAP DA HOP LE ----------------
@@ -221,22 +219,24 @@ function chooseInput({ country = DEFAULT_COUNTRY, pageId = '', categoryId = '', 
   if (!sub) sub = subcatsOf(cat.category_id)[0] || null;
 
   const m = sub ? mapOf(sub.subcategory_id) : null;
-  let ids = sub ? conflictIdsFor(sub.subcategory_id) : [];
+  const ownIds = sub ? conflictIdsFor(sub.subcategory_id) : [];
+  let ids = ownIds;
+  let conflict_scope = 'subcategory';
   if (ids.length < 3) {                                   // PHASE 6: it qua -> mo rong cap category
     const catIds = conflictIdsForCategory(cat.category_id);
-    if (catIds.length > ids.length) { ids = catIds; notes.push('conflict mở rộng cấp category'); }
+    if (catIds.length > ids.length) { ids = catIds; conflict_scope = 'category'; notes.push('conflict mở rộng cấp category'); }
   }
 
   // PHASE 3: legacy_theme + status_dynamic
+  // Data moi: moi subcategory co TOI DA 1 legacy_theme; 33 sub de RONG.
+  // Rong thi legacy_theme = '' -> loc conflict THUAN theo conflict_ids (khong suy nguoc theme).
   const legacy = (sub && sub.legacy_themes) || (m && m.legacy_themes) || [];
-  let nonE = legacy.filter((t) => t !== 'E_ngheo_vs_giau');
-  // Subcategory khong khai legacy_themes -> suy tu legacy_theme_to_categories (data co san),
-  // KHONG de rong vi theme rong -> catalog rong -> conflict rong.
-  if (!nonE.length) nonE = legacyThemesForCategory(cat ? cat.category_id : '');
-  if (!nonE.length) nonE = ['A_me_gia'];                  // mac dinh trung tinh, co trong catalog
-  const legacy_theme = nonE[Math.floor(Math.random() * nonE.length)];
-  const status_dynamic = legacy.includes('E_ngheo_vs_giau')
-    ? (statusDynamics()[Math.floor(Math.random() * statusDynamics().length)] || '') : '';
+  const legacy_theme = legacy.filter((t) => t && t !== 'E_ngheo_vs_giau')[0] || '';
+  if (legacy_theme && !isThemeValidForCategory(legacy_theme, cat ? cat.category_id : '')) {
+    notes.push('cảnh báo data: ' + legacy_theme + ' không khai cho ' + (cat ? cat.category_id : '?'));
+  }
+  // status_dynamic doc THANG tu subcategory (truong moi), ap xuyen category, khong loc conflict.
+  const status_dynamic = (sub && sub.status_dynamic) || (m && m.status_dynamic) || '';
 
   return {
     page_profile_id: page ? page.page_profile_id : '',
@@ -247,6 +247,8 @@ function chooseInput({ country = DEFAULT_COUNTRY, pageId = '', categoryId = '', 
     subcategory_name: sub ? (sub.name_en || '') : '',
     conflict_premise: sub ? (sub.conflict_premise || '') : '',
     conflict_ids: ids,
+    conflict_ids_own: ownIds,
+    conflict_scope,
     legacy_theme,
     status_dynamic,
     reveal_affinity: (sub && sub.reveal_affinity) || (m && m.reveal_affinity) || [],
@@ -260,6 +262,6 @@ module.exports = {
   chooseInput, chooseCategory, chooseSubcategory,
   pickAutoPage, randomEligibleCategory, recentUsage,
   allCategories, categoryById, allPages, pageById, subcatsOf, subcatById,
-  conflictIdsFor, conflictIdsForCategory, statusDynamics, legacyThemeCategories,
+  conflictIdsFor, conflictIdsForCategory, statusDynamics, legacyThemeCategories, isThemeValidForCategory,
   DEFAULT_COUNTRY,
 };

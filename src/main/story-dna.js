@@ -355,13 +355,23 @@ function compatOk(bp, extra) {
  *   (moi cai deu bi cooldown) thi TU DONG bo rang buoc nay -> khong bao gio null/crash.
  */
 function chooseConflict(country, theme, conf, wr, allowIds) {
-  let catalog = (conf.conflict_catalog || []).filter((x) => x.theme === theme);
+  const all = conf.conflict_catalog || [];
+  let catalog = null;
+  // (b) UU TIEN conflict_ids cua SUBCATEGORY truoc — subcategory moi la thu quyet dinh noi dung.
+  //     legacy_theme chi la thuoc tinh PHU: chi dung de loc THEM trong tap do, va chi khi
+  //     loc xong VAN CON DU ung vien (>=3). Neu loc theo theme lam can kiet -> bo qua theme.
   if (allowIds && allowIds.length) {
     const allow = new Set(allowIds);
-    const narrowed = catalog.filter((x) => allow.has(x.id));
-    // chi thu hep khi con du ung vien; het thi giu nguyen catalog theme (fallback)
-    if (narrowed.length) catalog = narrowed;
+    catalog = all.filter((x) => allow.has(x.id));
+    // theme RONG (subcategory khong khai legacy_theme) -> KHONG loc theme, thuan conflict_ids
+    if (catalog.length && theme) {
+      const byTheme = catalog.filter((x) => x.theme === theme);
+      if (byTheme.length >= 3) catalog = byTheme;
+    }
   }
+  // Khong co conflict_ids (hoac rong) -> quay ve loc theo theme nhu cu.
+  // Theme cung rong -> khong con rang buoc nao: lay toan catalog (khong bao gio tra ve null).
+  if (!catalog || !catalog.length) catalog = theme ? all.filter((x) => x.theme === theme) : all.slice();
   if (!catalog.length) return null;
   const sp = conf.selection_policy || {};
   const cooldown = sp.recent_conflict_cooldown_days || 21;
@@ -387,7 +397,7 @@ function chooseConflict(country, theme, conf, wr, allowIds) {
   // Neu tap da thu hep (conflict fidelity) ma MOI cai deu bi cooldown chan -> cooldown THANG
   // affinity/fidelity: mo lai toan bo catalog cua theme roi chon lai.
   if (!pick && allowIds && allowIds.length) {
-    const full = (conf.conflict_catalog || []).filter((x) => x.theme === theme);
+    const full = theme ? all.filter((x) => x.theme === theme) : all;
     if (full.length > catalog.length) return chooseConflict(country, theme, conf, wr, null);
   }
   if (!pick) pick = pickOne(catalog);
@@ -399,18 +409,24 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   const wr = cfg.weighted_random || {};
   const nameRules = cfg.name_rules || {};
   const plot = cfg.plot_rules || {};
-  const aff = (extra.theme_affinity && extra.theme_affinity[theme]) || {};
   const dedup = extra.dedup_policy || {};
   const hard = dedup.hard_block_days || {};
   const soft = dedup.soft_penalty_days || {};
 
-  const bp = { theme };
+  const bp = {};
 
   // 2) conflict theo theme
   // LOP DAU VAO: neu co category/subcategory -> loc conflict theo tap cua subcategory
   const cf = chooseConflict(country, theme, conf, wr, input ? input.conflict_ids : null);
   if (cf) { bp.conflict_id = cf.id; bp.conflict = cf.conflict; bp.subgroup = cf.subgroup; bp.conflict_tags = cf.tags || []; }
   else { bp.conflict_id = ''; bp.conflict = ''; bp.subgroup = ''; bp.conflict_tags = []; }
+
+  // Theme HIEU LUC cho cac buoc sau (age/relationship/affinity/compat-rules):
+  // subcategory khong khai legacy_theme -> lay theme cua CONFLICT vua chon (dong bo voi noi dung
+  // that su duoc chon), KHONG suy nguoc tu bang legacy_theme_to_categories.
+  const effTheme = theme || (cf && cf.theme) || '';
+  bp.theme = effTheme;
+  const aff = (extra.theme_affinity && extra.theme_affinity[effTheme]) || {};
 
   // LOP DAU VAO: gan category/subcategory/page + legacy_theme + status_dynamic vao blueprint
   if (input) {
@@ -420,13 +436,18 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
     bp.subcategory_id = input.subcategory_id || '';
     bp.subcategory_name = input.subcategory_name || '';
     bp.conflict_premise = input.conflict_premise || '';
-    bp.legacy_theme = input.legacy_theme || theme || '';
+    // legacy_theme cua data la su that: rong thi de rong, khong bia
+    bp.legacy_theme = input.legacy_theme || '';
+    // Conflict lay tu fallback CAP CATEGORY (khong thuoc tap rieng cua subcategory)?
+    // Khi do premise cua subcategory moi la chuan; conflict chi la tinh huong tham khao.
+    const own = input.conflict_ids_own || input.conflict_ids || [];
+    bp.conflict_scope = (bp.conflict_id && own.indexOf(bp.conflict_id) >= 0) ? 'subcategory' : 'category';
     bp.status_dynamic = input.status_dynamic || '';
   }
 
   // 3) age + relationship
-  bp.relationship = pickOne(relationshipsForTheme(pool, theme)) || '';
-  bp.hero_age = ageForTheme(extra, theme);
+  bp.relationship = pickOne(relationshipsForTheme(pool, effTheme)) || '';
+  bp.hero_age = ageForTheme(extra, effTheme);
 
   // 4) ten (cooldown + ho chung neu gia dinh gan)
   const surnames = extra.surname || [];
@@ -526,7 +547,7 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   // evidence_source (theme D can bang chung cu the)
   const EVID = ['camera', 'GPS', 'messages', 'bank records', 'DNA', 'cloud photos', 'call log'];
   const foundEv = EVID.find((k) => lc(bp.conflict).includes(lc(k)));
-  bp.evidence_source = foundEv || (theme === 'D_vo_phan_boi' ? pickOne(EVID) : '');
+  bp.evidence_source = foundEv || (effTheme === 'D_vo_phan_boi' ? pickOne(EVID) : '');
 
   // yeu cau agency (plot): ep AI cho nhan vat tu quyet o hoi cuoi + object xuat hien 3 phan
   bp.require_hero_choice = !!plot.require_hero_choice_in_final_act;
@@ -610,7 +631,13 @@ function buildDnaBlock(bp, country) {
     `- humiliation = ${g('humiliation_type')}`,
   ];
   if (bp && bp.conflict) {
-    lines.push(`- ⚠️ CONFLICT CHÍNH (BẮT BUỘC kể ĐÚNG tình huống này, KHÔNG đổi sang tình huống khác): ${bp.conflict}`);
+    // Conflict lay tu fallback cap category thi KHONG ep buoc (tranh mau thuan voi premise
+    // cua subcategory o khoi MANDATORY ben duoi) — chi coi la chat lieu tham khao.
+    if (bp.conflict_scope === 'category' && bp.conflict_premise) {
+      lines.push(`- conflict tham khảo (chỉ dùng nếu phù hợp với "Core conflict premise" bên dưới): ${bp.conflict}`);
+    } else {
+      lines.push(`- ⚠️ CONFLICT CHÍNH (BẮT BUỘC kể ĐÚNG tình huống này, KHÔNG đổi sang tình huống khác): ${bp.conflict}`);
+    }
   }
   if (bp && bp.status_dynamic) lines.push(`- status_dynamic = ${bp.status_dynamic}`);
   lines.push(`- reveal (twist) = ${g('twist')}`);
@@ -634,11 +661,16 @@ function buildDnaBlock(bp, country) {
     lines.push(`- Category: ${bp.category_name || ''} (${bp.category_id})`);
     lines.push(`- Subcategory: ${bp.subcategory_name || ''} (${bp.subcategory_id || ''})`);
     lines.push(`- Core conflict premise: ${bp.conflict_premise || bp.conflict || ''}`);
+    // status_dynamic: sac thai cang thang giai tang, ap xuyen category. CHI in khi co gia tri.
+    if (bp.status_dynamic) lines.push(`- Class/status tension: ${bp.status_dynamic}`);
     lines.push(`- Relationship: ${bp.relationship || ''}`);
     lines.push(`- Location/town/season/weather: ${ctx}`);
     lines.push(`- Reveal family: ${bp.reveal_family || ''}`);
     lines.push(`- Justice family: ${bp.justice_family || ''}`);
     lines.push('');
+    if (bp.conflict_scope === 'category') {
+      lines.push('NOTE: the reference conflict above is only a suggestion. If it does not fit the core conflict premise, ignore it and build the story from the premise.');
+    }
     lines.push('You MUST tell the selected core conflict. Do not replace it with another family conflict. You may add secondary complications only if they support the selected conflict. The final story must remain classifiable under the selected category and subcategory.');
   }
   lines.push('');

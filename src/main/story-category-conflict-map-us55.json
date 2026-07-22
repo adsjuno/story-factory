@@ -12,7 +12,9 @@
       "5. Weighted random trong eligible set (cong trong so affinity).",
       "6. Neu eligible set rong -> fallback: chon conflict least-used trong category, KHONG de null, KHONG de Claude tu phat minh."
     ],
-    "legacy_note": "5 ngach cu KHONG map 1-1 sang category. Chung tro thanh legacy_theme / hero_archetype, co the chay trong nhieu category. E_ngheo_vs_giau tro thanh status_dynamic ap xuyen."
+    "legacy_note": "5 ngach cu KHONG map 1-1 sang category. Moi subcategory chi mang TOI DA 1 legacy_theme (hero archetype chi phoi). Sub thuoc mang moi de RONG - engine KHONG duoc suy nguoc de gan theme. E_ngheo_vs_giau la truong status_dynamic rieng, ap xuyen category, KHONG dung de loc conflict.",
+    "conflict_filter_rule": "Loc conflict theo conflict_ids/fallback_tags cua SUBCATEGORY truoc. legacy_theme chi dung de loc THEM trong tap do neu con du candidate. Neu subcategory khong co legacy_theme -> khong loc theo theme, chi dung tag.",
+    "derivation_note": "Bang nay SUY RA tu data thuc te (theme cua tung subcategory), khong phai gan tay. Engine CHI dung bang nay de kiem tra hop le, TUYET DOI khong dung de SUY NGUOC gan theme cho subcategory de rong. Subcategory de rong legacy_theme => khong loc conflict theo theme, chi loc theo tag/conflict_ids."
   },
   "legacy_themes": {
     "A_me_gia": "Me gia - con bac beo (hero_archetype: elderly parent)",
@@ -34,36 +36,29 @@
       "CAT01",
       "CAT02",
       "CAT03",
+      "CAT04",
       "CAT05",
+      "CAT06",
       "CAT07",
       "CAT08",
       "CAT10",
+      "CAT11"
+    ],
+    "D_vo_phan_boi": [
+      "CAT04",
+      "CAT07",
       "CAT12"
     ],
     "B_veteran": [
-      "CAT09",
       "CAT05",
       "CAT06",
       "CAT08",
-      "CAT03",
-      "CAT10"
+      "CAT09"
     ],
     "C_co_dau": [
-      "CAT12",
-      "CAT03",
-      "CAT05",
-      "CAT02"
+      "CAT12"
     ],
-    "D_vo_phan_boi": [
-      "CAT12",
-      "CAT04",
-      "CAT07",
-      "CAT05",
-      "CAT11"
-    ],
-    "E_ngheo_vs_giau": [
-      "ALL_CATEGORIES (dung nhu status_dynamic, khong phai category)"
-    ]
+    "E_ngheo_vs_giau": "KHONG phai legacy_theme - da chuyen thanh truong status_dynamic rieng tren tung subcategory"
   },
   "subcategory_map": {
     "C01S01": {
@@ -113,7 +108,8 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C01S02": {
       "category_id": "CAT01",
@@ -127,7 +123,6 @@
         "visitation"
       ],
       "conflict_ids": [
-        "B_cases-14",
         "A-NEW-08"
       ],
       "reveal_affinity": [
@@ -137,14 +132,15 @@
       "justice_affinity": [
         "procedural",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C01S03": {
       "category_id": "CAT01",
       "name_en": "Secret Tuition Sacrifice",
       "legacy_themes": [
-        "A_me_gia",
-        "E_ngheo_vs_giau"
+        "A_me_gia"
       ],
       "fallback_tags": [
         "secret_payment",
@@ -162,32 +158,7 @@
         "A4_loi_dung-04",
         "A5_hoi_han-01",
         "A5_hoi_han-05",
-        "E-01-02",
-        "E-01-06",
-        "E-02-02",
-        "E-02-06",
-        "E-03-02",
-        "E-03-06",
-        "E-04-02",
-        "E-04-06",
-        "E-05-02",
-        "E-05-06",
-        "E-06-02",
-        "E-06-06",
-        "E-07-02",
-        "E-07-06",
-        "E-08-01",
-        "E-08-02",
-        "E-08-03",
-        "E-08-04",
-        "E-08-05",
-        "E-08-06",
-        "E-09-02",
-        "E-09-06",
-        "E-10-02",
-        "E-10-06",
-        "A-NEW-08",
-        "E-NEW-02"
+        "A-NEW-08"
       ],
       "reveal_affinity": [
         "external_public_validator",
@@ -196,7 +167,8 @@
       "justice_affinity": [
         "public_recognition",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": "poor_vs_wealthy"
     },
     "C01S04": {
       "category_id": "CAT01",
@@ -223,7 +195,8 @@
       "justice_affinity": [
         "hero_choice",
         "walk_away_dignity"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C01S05": {
       "category_id": "CAT01",
@@ -255,14 +228,14 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C01S06": {
       "category_id": "CAT01",
       "name_en": "Family History Discovered by Grandchild",
       "legacy_themes": [
-        "A_me_gia",
-        "B_veteran"
+        "A_me_gia"
       ],
       "fallback_tags": [
         "hidden_past",
@@ -283,7 +256,8 @@
       "justice_affinity": [
         "private_resolution",
         "public_recognition"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C01S07": {
       "category_id": "CAT01",
@@ -324,14 +298,14 @@
       "justice_affinity": [
         "hero_choice",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C01S08": {
       "category_id": "CAT01",
       "name_en": "Grandchild Defends Grandparent Publicly",
       "legacy_themes": [
-        "A_me_gia",
-        "E_ngheo_vs_giau"
+        "A_me_gia"
       ],
       "fallback_tags": [
         "public_defense",
@@ -355,7 +329,8 @@
       "justice_affinity": [
         "public_recognition",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": "poor_vs_wealthy"
     },
     "C02S01": {
       "category_id": "CAT02",
@@ -369,19 +344,7 @@
         "inheritance_pressure"
       ],
       "conflict_ids": [
-        "A2_cuop_tai_san-01",
-        "C-01-04",
-        "C-02-04",
-        "C-03-04",
-        "C-04-04",
-        "C-05-04",
-        "C-06-04",
-        "E-02-01",
-        "E-02-02",
-        "E-02-03",
-        "E-02-04",
-        "E-02-05",
-        "E-02-06"
+        "A2_cuop_tai_san-01"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -390,7 +353,9 @@
       "justice_affinity": [
         "procedural",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C02S02": {
       "category_id": "CAT02",
@@ -415,7 +380,8 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C02S03": {
       "category_id": "CAT02",
@@ -445,7 +411,8 @@
       "justice_affinity": [
         "procedural",
         "walk_away_dignity"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C02S04": {
       "category_id": "CAT02",
@@ -458,9 +425,7 @@
         "sibling_rivalry",
         "authority_dispute"
       ],
-      "conflict_ids": [
-        "C-NEW-03"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "document_evidence",
         "natural_consequence"
@@ -468,7 +433,9 @@
       "justice_affinity": [
         "procedural",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C02S05": {
       "category_id": "CAT02",
@@ -514,7 +481,8 @@
       "justice_affinity": [
         "hero_choice",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C02S06": {
       "category_id": "CAT02",
@@ -527,23 +495,7 @@
         "memory_loss",
         "old_promise"
       ],
-      "conflict_ids": [
-        "D-05-01",
-        "D-05-02",
-        "D-05-03",
-        "D-05-04",
-        "D-05-05",
-        "E-01-03",
-        "E-02-03",
-        "E-03-03",
-        "E-04-03",
-        "E-05-03",
-        "E-06-03",
-        "E-07-03",
-        "E-08-03",
-        "E-09-03",
-        "E-10-03"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "natural_consequence",
         "document_evidence"
@@ -551,7 +503,9 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C02S07": {
       "category_id": "CAT02",
@@ -565,19 +519,7 @@
         "caregiver_burden"
       ],
       "conflict_ids": [
-        "A5_hoi_han-01",
-        "B_cases-08",
-        "E-01-06",
-        "E-02-06",
-        "E-03-06",
-        "E-04-06",
-        "E-05-06",
-        "E-06-06",
-        "E-07-06",
-        "E-08-06",
-        "E-09-06",
-        "E-10-06",
-        "E-NEW-02"
+        "A5_hoi_han-01"
       ],
       "reveal_affinity": [
         "self_disclosure",
@@ -586,14 +528,15 @@
       "justice_affinity": [
         "hero_choice",
         "walk_away_dignity"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C02S08": {
       "category_id": "CAT02",
       "name_en": "House Promised to the Caregiver",
       "legacy_themes": [
-        "A_me_gia",
-        "E_ngheo_vs_giau"
+        "A_me_gia"
       ],
       "fallback_tags": [
         "inheritance_pressure",
@@ -607,13 +550,7 @@
         "A2_cuop_tai_san-04",
         "A2_cuop_tai_san-05",
         "A2_cuop_tai_san-06",
-        "A2_cuop_tai_san-07",
-        "E-02-01",
-        "E-02-02",
-        "E-02-03",
-        "E-02-04",
-        "E-02-05",
-        "E-02-06"
+        "A2_cuop_tai_san-07"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -622,7 +559,8 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": "caregiver_vs_inheritors"
     },
     "C03S01": {
       "category_id": "CAT03",
@@ -652,14 +590,14 @@
       "justice_affinity": [
         "hero_choice",
         "procedural"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C03S02": {
       "category_id": "CAT03",
       "name_en": "Hidden Ownership or Deed Clause",
       "legacy_themes": [
-        "A_me_gia",
-        "E_ngheo_vs_giau"
+        "A_me_gia"
       ],
       "fallback_tags": [
         "property_control",
@@ -673,13 +611,7 @@
         "A2_cuop_tai_san-04",
         "A2_cuop_tai_san-05",
         "A2_cuop_tai_san-06",
-        "A2_cuop_tai_san-07",
-        "E-02-01",
-        "E-02-02",
-        "E-02-03",
-        "E-02-04",
-        "E-02-05",
-        "E-02-06"
+        "A2_cuop_tai_san-07"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -688,7 +620,8 @@
       "justice_affinity": [
         "procedural",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": "caregiver_vs_inheritors"
     },
     "C03S03": {
       "category_id": "CAT03",
@@ -718,7 +651,8 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C03S04": {
       "category_id": "CAT03",
@@ -743,14 +677,14 @@
       "justice_affinity": [
         "hero_choice",
         "walk_away_dignity"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C03S05": {
       "category_id": "CAT03",
       "name_en": "Power of Attorney Abuse",
       "legacy_themes": [
-        "A_me_gia",
-        "D_vo_phan_boi"
+        "A_me_gia"
       ],
       "fallback_tags": [
         "power_of_attorney",
@@ -765,21 +699,40 @@
         "A2_cuop_tai_san-05",
         "A2_cuop_tai_san-06",
         "A2_cuop_tai_san-07",
-        "D-01-01",
-        "D-01-02",
-        "D-01-03",
+        "A-NEW-08"
+      ],
+      "reveal_affinity": [
+        "document_evidence",
+        "natural_consequence"
+      ],
+      "justice_affinity": [
+        "procedural",
+        "hero_choice"
+      ],
+      "status_dynamic": null
+    },
+    "C03S06": {
+      "category_id": "CAT03",
+      "name_en": "Home Has Community History",
+      "legacy_themes": [],
+      "fallback_tags": [
+        "community_history",
+        "hidden_value",
+        "legacy_revealed"
+      ],
+      "conflict_ids": [
+        "A5_hoi_han-01",
+        "A5_hoi_han-02",
+        "A5_hoi_han-03",
+        "A5_hoi_han-04",
+        "A5_hoi_han-05",
         "D-01-04",
-        "D-01-05",
         "D-02-01",
         "D-02-02",
         "D-02-03",
         "D-02-04",
         "D-02-05",
-        "D-03-01",
-        "D-03-02",
-        "D-03-03",
         "D-03-04",
-        "D-03-05",
         "D-04-01",
         "D-04-02",
         "D-04-03",
@@ -795,62 +748,12 @@
         "D-06-03",
         "D-06-04",
         "D-06-05",
-        "D-07-01",
-        "D-07-02",
-        "D-07-03",
         "D-07-04",
-        "D-07-05",
-        "D-08-01",
-        "D-08-02",
-        "D-08-03",
         "D-08-04",
-        "D-08-05",
-        "D-09-01",
-        "D-09-02",
-        "D-09-03",
         "D-09-04",
-        "D-09-05",
-        "D-10-01",
-        "D-10-02",
-        "D-10-03",
         "D-10-04",
-        "D-10-05",
-        "D-11-01",
-        "D-11-02",
-        "D-11-03",
         "D-11-04",
-        "D-11-05",
-        "D-12-01",
-        "D-12-02",
-        "D-12-03",
         "D-12-04",
-        "D-12-05",
-        "A-NEW-08",
-        "D-NEW-01",
-        "D-NEW-02",
-        "D-NEW-03"
-      ],
-      "reveal_affinity": [
-        "document_evidence",
-        "natural_consequence"
-      ],
-      "justice_affinity": [
-        "procedural",
-        "hero_choice"
-      ]
-    },
-    "C03S06": {
-      "category_id": "CAT03",
-      "name_en": "Home Has Community History",
-      "legacy_themes": [
-        "E_ngheo_vs_giau"
-      ],
-      "fallback_tags": [
-        "community_history",
-        "hidden_value",
-        "legacy_revealed"
-      ],
-      "conflict_ids": [
         "E-01-01",
         "E-01-02",
         "E-01-03",
@@ -911,6 +814,8 @@
         "E-10-04",
         "E-10-05",
         "E-10-06",
+        "B-NEW-18",
+        "D-NEW-02",
         "E-NEW-03"
       ],
       "reveal_affinity": [
@@ -920,7 +825,8 @@
       "justice_affinity": [
         "public_recognition",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": "working_class_vs_elite"
     },
     "C03S07": {
       "category_id": "CAT03",
@@ -950,14 +856,14 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C03S08": {
       "category_id": "CAT03",
       "name_en": "Chosen Heir Instead of Blood Relative",
       "legacy_themes": [
-        "A_me_gia",
-        "E_ngheo_vs_giau"
+        "A_me_gia"
       ],
       "fallback_tags": [
         "inheritance_pressure",
@@ -982,6 +888,255 @@
         "A3_lam_nhuc-07",
         "A4_loi_dung-02",
         "A4_loi_dung-05",
+        "A-NEW-08",
+        "A-NEW-07"
+      ],
+      "reveal_affinity": [
+        "document_evidence",
+        "ordinary_witness"
+      ],
+      "justice_affinity": [
+        "private_resolution",
+        "procedural"
+      ],
+      "status_dynamic": "caregiver_vs_inheritors"
+    },
+    "C04S01": {
+      "category_id": "CAT04",
+      "name_en": "Children Oppose a New Relationship",
+      "legacy_themes": [
+        "A_me_gia"
+      ],
+      "fallback_tags": [
+        "new_relationship",
+        "family_opposition",
+        "inheritance_pressure"
+      ],
+      "conflict_ids": [
+        "A1_bo_roi-01",
+        "A1_bo_roi-02",
+        "A1_bo_roi-03",
+        "A1_bo_roi-04",
+        "A1_bo_roi-05",
+        "A1_bo_roi-06",
+        "A1_bo_roi-07",
+        "A2_cuop_tai_san-01",
+        "A3_lam_nhuc-01",
+        "A3_lam_nhuc-02",
+        "A3_lam_nhuc-03",
+        "A3_lam_nhuc-04",
+        "A3_lam_nhuc-05",
+        "A3_lam_nhuc-06",
+        "A3_lam_nhuc-07",
+        "A4_loi_dung-02",
+        "A4_loi_dung-05",
+        "A-NEW-08",
+        "A-NEW-07"
+      ],
+      "reveal_affinity": [
+        "self_disclosure",
+        "ordinary_witness"
+      ],
+      "justice_affinity": [
+        "hero_choice",
+        "private_resolution"
+      ],
+      "status_dynamic": null
+    },
+    "C04S02": {
+      "category_id": "CAT04",
+      "name_en": "High-School Sweetheart Returns",
+      "legacy_themes": [],
+      "fallback_tags": [
+        "second_chance",
+        "reunion",
+        "late_life_love"
+      ],
+      "conflict_ids": [
+        "A2_cuop_tai_san-04",
+        "E-07-01",
+        "E-07-02",
+        "E-07-03",
+        "E-07-04",
+        "E-07-05",
+        "E-07-06",
+        "D-NEW-01",
+        "E-NEW-02"
+      ],
+      "reveal_affinity": [
+        "ordinary_witness",
+        "self_disclosure"
+      ],
+      "justice_affinity": [
+        "private_resolution",
+        "hero_choice"
+      ],
+      "status_dynamic": null
+    },
+    "C04S03": {
+      "category_id": "CAT04",
+      "name_en": "Romance Scam Detected by a Small Detail",
+      "legacy_themes": [
+        "D_vo_phan_boi"
+      ],
+      "fallback_tags": [
+        "romance_scam",
+        "self_rescue",
+        "deception_detected"
+      ],
+      "conflict_ids": [
+        "D-01-04",
+        "D-02-04",
+        "D-03-04",
+        "D-04-04",
+        "D-05-04",
+        "D-06-04",
+        "D-07-04",
+        "D-08-04",
+        "D-09-04",
+        "D-10-04",
+        "D-11-04",
+        "D-12-04"
+      ],
+      "reveal_affinity": [
+        "natural_consequence",
+        "self_disclosure"
+      ],
+      "justice_affinity": [
+        "hero_choice",
+        "procedural"
+      ],
+      "status_dynamic": null
+    },
+    "C04S04": {
+      "category_id": "CAT04",
+      "name_en": "Love Inside a Retirement Community",
+      "legacy_themes": [],
+      "fallback_tags": [
+        "late_life_love",
+        "social_judgment",
+        "secret_relationship"
+      ],
+      "conflict_ids": [
+        "A2_cuop_tai_san-04",
+        "A5_hoi_han-05",
+        "C-01-06",
+        "C-02-06",
+        "C-03-06",
+        "C-04-06",
+        "C-05-06",
+        "C-06-06",
+        "D-01-02",
+        "D-02-02",
+        "D-03-02",
+        "D-04-02",
+        "D-05-02",
+        "D-06-01",
+        "D-06-02",
+        "D-06-03",
+        "D-06-04",
+        "D-06-05",
+        "D-07-02",
+        "D-08-02",
+        "D-09-02",
+        "D-10-02",
+        "D-11-02",
+        "D-12-02",
+        "E-01-02",
+        "E-02-02",
+        "E-03-02",
+        "E-04-02",
+        "E-05-02",
+        "E-06-02",
+        "E-07-02",
+        "E-08-02",
+        "E-09-01",
+        "E-09-02",
+        "E-09-03",
+        "E-09-04",
+        "E-09-05",
+        "E-09-06",
+        "E-10-02",
+        "A-NEW-08",
+        "B-NEW-18",
+        "D-NEW-03"
+      ],
+      "reveal_affinity": [
+        "self_disclosure",
+        "ordinary_witness"
+      ],
+      "justice_affinity": [
+        "private_resolution",
+        "hero_choice"
+      ],
+      "status_dynamic": null
+    },
+    "C04S05": {
+      "category_id": "CAT04",
+      "name_en": "Second Marriage Exposes Family Greed",
+      "legacy_themes": [],
+      "fallback_tags": [
+        "inheritance_pressure",
+        "family_greed",
+        "new_relationship"
+      ],
+      "conflict_ids": [
+        "A1_bo_roi-01",
+        "A1_bo_roi-02",
+        "A1_bo_roi-03",
+        "A1_bo_roi-04",
+        "A1_bo_roi-05",
+        "A1_bo_roi-06",
+        "A1_bo_roi-07",
+        "A2_cuop_tai_san-01",
+        "A3_lam_nhuc-01",
+        "A3_lam_nhuc-02",
+        "A3_lam_nhuc-03",
+        "A3_lam_nhuc-04",
+        "A3_lam_nhuc-05",
+        "A3_lam_nhuc-06",
+        "A3_lam_nhuc-07",
+        "A4_loi_dung-02",
+        "A4_loi_dung-05",
+        "A5_hoi_han-01",
+        "A5_hoi_han-02",
+        "A5_hoi_han-03",
+        "A5_hoi_han-04",
+        "A5_hoi_han-05",
+        "B_cases-05",
+        "B_cases-12",
+        "C-01-02",
+        "C-01-03",
+        "C-01-04",
+        "C-01-06",
+        "C-02-02",
+        "C-02-03",
+        "C-02-04",
+        "C-02-06",
+        "C-03-02",
+        "C-03-03",
+        "C-03-04",
+        "C-03-06",
+        "C-04-02",
+        "C-04-03",
+        "C-04-04",
+        "C-04-06",
+        "C-05-01",
+        "C-05-02",
+        "C-05-03",
+        "C-05-04",
+        "C-05-05",
+        "C-05-06",
+        "C-05-07",
+        "C-06-02",
+        "C-06-03",
+        "C-06-04",
+        "C-06-06",
+        "D-06-01",
+        "D-06-02",
+        "D-06-03",
+        "D-06-04",
+        "D-06-05",
         "E-01-01",
         "E-01-02",
         "E-01-03",
@@ -1044,256 +1199,10 @@
         "E-10-06",
         "A-NEW-08",
         "A-NEW-07",
-        "E-NEW-02",
-        "E-NEW-03"
-      ],
-      "reveal_affinity": [
-        "document_evidence",
-        "ordinary_witness"
-      ],
-      "justice_affinity": [
-        "private_resolution",
-        "procedural"
-      ]
-    },
-    "C04S01": {
-      "category_id": "CAT04",
-      "name_en": "Children Oppose a New Relationship",
-      "legacy_themes": [
-        "A_me_gia"
-      ],
-      "fallback_tags": [
-        "new_relationship",
-        "family_opposition",
-        "inheritance_pressure"
-      ],
-      "conflict_ids": [
-        "A1_bo_roi-01",
-        "A1_bo_roi-02",
-        "A1_bo_roi-03",
-        "A1_bo_roi-04",
-        "A1_bo_roi-05",
-        "A1_bo_roi-06",
-        "A1_bo_roi-07",
-        "A2_cuop_tai_san-01",
-        "A3_lam_nhuc-01",
-        "A3_lam_nhuc-02",
-        "A3_lam_nhuc-03",
-        "A3_lam_nhuc-04",
-        "A3_lam_nhuc-05",
-        "A3_lam_nhuc-06",
-        "A3_lam_nhuc-07",
-        "A4_loi_dung-02",
-        "A4_loi_dung-05",
-        "A-NEW-08",
-        "A-NEW-07"
-      ],
-      "reveal_affinity": [
-        "self_disclosure",
-        "ordinary_witness"
-      ],
-      "justice_affinity": [
-        "hero_choice",
-        "private_resolution"
-      ]
-    },
-    "C04S02": {
-      "category_id": "CAT04",
-      "name_en": "High-School Sweetheart Returns",
-      "legacy_themes": [],
-      "fallback_tags": [
-        "second_chance",
-        "reunion",
-        "late_life_love"
-      ],
-      "conflict_ids": [
-        "A2_cuop_tai_san-04",
-        "E-07-01",
-        "E-07-02",
-        "E-07-03",
-        "E-07-04",
-        "E-07-05",
-        "E-07-06",
-        "D-NEW-01",
-        "E-NEW-02"
-      ],
-      "reveal_affinity": [
-        "ordinary_witness",
-        "self_disclosure"
-      ],
-      "justice_affinity": [
-        "private_resolution",
-        "hero_choice"
-      ]
-    },
-    "C04S03": {
-      "category_id": "CAT04",
-      "name_en": "Romance Scam Detected by a Small Detail",
-      "legacy_themes": [
-        "D_vo_phan_boi"
-      ],
-      "fallback_tags": [
-        "romance_scam",
-        "self_rescue",
-        "deception_detected"
-      ],
-      "conflict_ids": [
-        "D-01-04",
-        "D-02-04",
-        "D-03-04",
-        "D-04-04",
-        "D-05-04",
-        "D-06-04",
-        "D-07-04",
-        "D-08-04",
-        "D-09-04",
-        "D-10-04",
-        "D-11-04",
-        "D-12-04"
-      ],
-      "reveal_affinity": [
-        "natural_consequence",
-        "self_disclosure"
-      ],
-      "justice_affinity": [
-        "hero_choice",
-        "procedural"
-      ]
-    },
-    "C04S04": {
-      "category_id": "CAT04",
-      "name_en": "Love Inside a Retirement Community",
-      "legacy_themes": [],
-      "fallback_tags": [
-        "late_life_love",
-        "social_judgment",
-        "secret_relationship"
-      ],
-      "conflict_ids": [
-        "A2_cuop_tai_san-04",
-        "A5_hoi_han-05",
-        "C-01-06",
-        "C-02-06",
-        "C-03-06",
-        "C-04-06",
-        "C-05-06",
-        "C-06-06",
-        "D-01-02",
-        "D-02-02",
-        "D-03-02",
-        "D-04-02",
-        "D-05-02",
-        "D-06-01",
-        "D-06-02",
-        "D-06-03",
-        "D-06-04",
-        "D-06-05",
-        "D-07-02",
-        "D-08-02",
-        "D-09-02",
-        "D-10-02",
-        "D-11-02",
-        "D-12-02",
-        "E-01-02",
-        "E-02-02",
-        "E-03-02",
-        "E-04-02",
-        "E-05-02",
-        "E-06-02",
-        "E-07-02",
-        "E-08-02",
-        "E-09-01",
-        "E-09-02",
-        "E-09-03",
-        "E-09-04",
-        "E-09-05",
-        "E-09-06",
-        "E-10-02",
-        "A-NEW-08",
         "B-NEW-18",
-        "D-NEW-03"
-      ],
-      "reveal_affinity": [
-        "self_disclosure",
-        "ordinary_witness"
-      ],
-      "justice_affinity": [
-        "private_resolution",
-        "hero_choice"
-      ]
-    },
-    "C04S05": {
-      "category_id": "CAT04",
-      "name_en": "Second Marriage Exposes Family Greed",
-      "legacy_themes": [
-        "E_ngheo_vs_giau"
-      ],
-      "fallback_tags": [
-        "inheritance_pressure",
-        "family_greed",
-        "new_relationship"
-      ],
-      "conflict_ids": [
-        "E-01-01",
-        "E-01-02",
-        "E-01-03",
-        "E-01-04",
-        "E-01-05",
-        "E-01-06",
-        "E-02-01",
-        "E-02-02",
-        "E-02-03",
-        "E-02-04",
-        "E-02-05",
-        "E-02-06",
-        "E-03-01",
-        "E-03-02",
-        "E-03-03",
-        "E-03-04",
-        "E-03-05",
-        "E-03-06",
-        "E-04-01",
-        "E-04-02",
-        "E-04-03",
-        "E-04-04",
-        "E-04-05",
-        "E-04-06",
-        "E-05-01",
-        "E-05-02",
-        "E-05-03",
-        "E-05-04",
-        "E-05-05",
-        "E-05-06",
-        "E-06-01",
-        "E-06-02",
-        "E-06-03",
-        "E-06-04",
-        "E-06-05",
-        "E-06-06",
-        "E-07-01",
-        "E-07-02",
-        "E-07-03",
-        "E-07-04",
-        "E-07-05",
-        "E-07-06",
-        "E-08-01",
-        "E-08-02",
-        "E-08-03",
-        "E-08-04",
-        "E-08-05",
-        "E-08-06",
-        "E-09-01",
-        "E-09-02",
-        "E-09-03",
-        "E-09-04",
-        "E-09-05",
-        "E-09-06",
-        "E-10-01",
-        "E-10-02",
-        "E-10-03",
-        "E-10-04",
-        "E-10-05",
-        "E-10-06",
+        "C-NEW-02",
+        "C-NEW-03",
+        "D-NEW-03",
         "E-NEW-02",
         "E-NEW-03"
       ],
@@ -1304,7 +1213,8 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": "old_money_vs_new_money"
     },
     "C04S06": {
       "category_id": "CAT04",
@@ -1325,7 +1235,9 @@
       "justice_affinity": [
         "hero_choice",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C04S07": {
       "category_id": "CAT04",
@@ -1338,18 +1250,7 @@
         "investment_pressure",
         "deception_detected"
       ],
-      "conflict_ids": [
-        "A2_cuop_tai_san-01",
-        "A2_cuop_tai_san-02",
-        "A2_cuop_tai_san-03",
-        "A2_cuop_tai_san-04",
-        "A2_cuop_tai_san-05",
-        "A2_cuop_tai_san-06",
-        "A2_cuop_tai_san-07",
-        "B_cases-03",
-        "A-NEW-08",
-        "C-NEW-03"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "natural_consequence",
         "document_evidence"
@@ -1357,7 +1258,9 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C04S08": {
       "category_id": "CAT04",
@@ -1378,7 +1281,9 @@
       "justice_affinity": [
         "hero_choice",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C05S01": {
       "category_id": "CAT05",
@@ -1575,14 +1480,14 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C05S02": {
       "category_id": "CAT05",
       "name_en": "Family Recipe Was Stolen or Misattributed",
       "legacy_themes": [
-        "A_me_gia",
-        "E_ngheo_vs_giau"
+        "A_me_gia"
       ],
       "fallback_tags": [
         "credit_stolen",
@@ -1595,68 +1500,7 @@
         "A5_hoi_han-02",
         "A5_hoi_han-03",
         "A5_hoi_han-04",
-        "A5_hoi_han-05",
-        "E-01-01",
-        "E-01-02",
-        "E-01-03",
-        "E-01-04",
-        "E-01-05",
-        "E-01-06",
-        "E-02-01",
-        "E-02-02",
-        "E-02-03",
-        "E-02-04",
-        "E-02-05",
-        "E-02-06",
-        "E-03-01",
-        "E-03-02",
-        "E-03-03",
-        "E-03-04",
-        "E-03-05",
-        "E-03-06",
-        "E-04-01",
-        "E-04-02",
-        "E-04-03",
-        "E-04-04",
-        "E-04-05",
-        "E-04-06",
-        "E-05-01",
-        "E-05-02",
-        "E-05-03",
-        "E-05-04",
-        "E-05-05",
-        "E-05-06",
-        "E-06-01",
-        "E-06-02",
-        "E-06-03",
-        "E-06-04",
-        "E-06-05",
-        "E-06-06",
-        "E-07-01",
-        "E-07-02",
-        "E-07-03",
-        "E-07-04",
-        "E-07-05",
-        "E-07-06",
-        "E-08-01",
-        "E-08-02",
-        "E-08-03",
-        "E-08-04",
-        "E-08-05",
-        "E-08-06",
-        "E-09-01",
-        "E-09-02",
-        "E-09-03",
-        "E-09-04",
-        "E-09-05",
-        "E-09-06",
-        "E-10-01",
-        "E-10-02",
-        "E-10-03",
-        "E-10-04",
-        "E-10-05",
-        "E-10-06",
-        "E-NEW-03"
+        "A5_hoi_han-05"
       ],
       "reveal_affinity": [
         "external_public_validator",
@@ -1665,7 +1509,8 @@
       "justice_affinity": [
         "public_recognition",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": "working_class_vs_elite"
     },
     "C05S03": {
       "category_id": "CAT05",
@@ -1691,7 +1536,8 @@
       "justice_affinity": [
         "public_recognition",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C05S04": {
       "category_id": "CAT05",
@@ -1705,82 +1551,7 @@
         "old_promise"
       ],
       "conflict_ids": [
-        "A2_cuop_tai_san-01",
-        "C-01-04",
-        "C-02-04",
-        "C-03-04",
-        "C-04-04",
-        "C-05-04",
-        "C-06-04",
-        "D-01-01",
-        "D-01-02",
-        "D-01-03",
-        "D-01-04",
-        "D-01-05",
-        "D-02-01",
-        "D-02-02",
-        "D-02-03",
-        "D-02-04",
-        "D-02-05",
-        "D-03-01",
-        "D-03-02",
-        "D-03-03",
-        "D-03-04",
-        "D-03-05",
-        "D-04-01",
-        "D-04-02",
-        "D-04-03",
-        "D-04-04",
-        "D-04-05",
-        "D-05-01",
-        "D-05-02",
-        "D-05-03",
-        "D-05-04",
-        "D-05-05",
-        "D-06-01",
-        "D-06-02",
-        "D-06-03",
-        "D-06-04",
-        "D-06-05",
-        "D-07-01",
-        "D-07-02",
-        "D-07-03",
-        "D-07-04",
-        "D-07-05",
-        "D-08-01",
-        "D-08-02",
-        "D-08-03",
-        "D-08-04",
-        "D-08-05",
-        "D-09-01",
-        "D-09-02",
-        "D-09-03",
-        "D-09-04",
-        "D-09-05",
-        "D-10-01",
-        "D-10-02",
-        "D-10-03",
-        "D-10-04",
-        "D-10-05",
-        "D-11-01",
-        "D-11-02",
-        "D-11-03",
-        "D-11-04",
-        "D-11-05",
-        "D-12-01",
-        "D-12-02",
-        "D-12-03",
-        "D-12-04",
-        "D-12-05",
-        "E-02-01",
-        "E-02-02",
-        "E-02-03",
-        "E-02-04",
-        "E-02-05",
-        "E-02-06",
-        "D-NEW-01",
-        "D-NEW-02",
-        "D-NEW-03"
+        "A2_cuop_tai_san-01"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -1789,14 +1560,15 @@
       "justice_affinity": [
         "procedural",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C05S05": {
       "category_id": "CAT05",
       "name_en": "Cassette or Voicemail From the Dead",
       "legacy_themes": [
-        "A_me_gia",
-        "D_vo_phan_boi"
+        "A_me_gia"
       ],
       "fallback_tags": [
         "found_evidence",
@@ -1822,71 +1594,8 @@
         "A4_loi_dung-02",
         "A4_loi_dung-05",
         "A5_hoi_han-05",
-        "D-01-01",
-        "D-01-02",
-        "D-01-03",
-        "D-01-04",
-        "D-01-05",
-        "D-02-01",
-        "D-02-02",
-        "D-02-03",
-        "D-02-04",
-        "D-02-05",
-        "D-03-01",
-        "D-03-02",
-        "D-03-03",
-        "D-03-04",
-        "D-03-05",
-        "D-04-01",
-        "D-04-02",
-        "D-04-03",
-        "D-04-04",
-        "D-04-05",
-        "D-05-01",
-        "D-05-02",
-        "D-05-03",
-        "D-05-04",
-        "D-05-05",
-        "D-06-01",
-        "D-06-02",
-        "D-06-03",
-        "D-06-04",
-        "D-06-05",
-        "D-07-01",
-        "D-07-02",
-        "D-07-03",
-        "D-07-04",
-        "D-07-05",
-        "D-08-01",
-        "D-08-02",
-        "D-08-03",
-        "D-08-04",
-        "D-08-05",
-        "D-09-01",
-        "D-09-02",
-        "D-09-03",
-        "D-09-04",
-        "D-09-05",
-        "D-10-01",
-        "D-10-02",
-        "D-10-03",
-        "D-10-04",
-        "D-10-05",
-        "D-11-01",
-        "D-11-02",
-        "D-11-03",
-        "D-11-04",
-        "D-11-05",
-        "D-12-01",
-        "D-12-02",
-        "D-12-03",
-        "D-12-04",
-        "D-12-05",
         "A-NEW-08",
-        "A-NEW-07",
-        "D-NEW-01",
-        "D-NEW-02",
-        "D-NEW-03"
+        "A-NEW-07"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -1895,7 +1604,8 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C05S06": {
       "category_id": "CAT05",
@@ -2092,20 +1802,52 @@
       "justice_affinity": [
         "hero_choice",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C05S07": {
       "category_id": "CAT05",
       "name_en": "Illiterate Parent Recorded Their Life",
-      "legacy_themes": [
-        "E_ngheo_vs_giau"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "hidden_past",
         "legacy_revealed",
         "erased_contribution"
       ],
       "conflict_ids": [
+        "A5_hoi_han-01",
+        "A5_hoi_han-02",
+        "A5_hoi_han-03",
+        "A5_hoi_han-04",
+        "A5_hoi_han-05",
+        "D-01-04",
+        "D-02-01",
+        "D-02-02",
+        "D-02-03",
+        "D-02-04",
+        "D-02-05",
+        "D-03-04",
+        "D-04-01",
+        "D-04-02",
+        "D-04-03",
+        "D-04-04",
+        "D-04-05",
+        "D-05-01",
+        "D-05-02",
+        "D-05-03",
+        "D-05-04",
+        "D-05-05",
+        "D-06-01",
+        "D-06-02",
+        "D-06-03",
+        "D-06-04",
+        "D-06-05",
+        "D-07-04",
+        "D-08-04",
+        "D-09-04",
+        "D-10-04",
+        "D-11-04",
+        "D-12-04",
         "E-01-01",
         "E-01-02",
         "E-01-03",
@@ -2166,6 +1908,8 @@
         "E-10-04",
         "E-10-05",
         "E-10-06",
+        "C-NEW-01",
+        "D-NEW-02",
         "E-NEW-03"
       ],
       "reveal_affinity": [
@@ -2175,7 +1919,8 @@
       "justice_affinity": [
         "public_recognition",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": "working_class_vs_elite"
     },
     "C05S08": {
       "category_id": "CAT05",
@@ -2188,82 +1933,7 @@
         "object_returned",
         "hidden_past"
       ],
-      "conflict_ids": [
-        "D-01-01",
-        "D-01-02",
-        "D-01-03",
-        "D-01-04",
-        "D-01-05",
-        "D-02-01",
-        "D-02-02",
-        "D-02-03",
-        "D-02-04",
-        "D-02-05",
-        "D-03-01",
-        "D-03-02",
-        "D-03-03",
-        "D-03-04",
-        "D-03-05",
-        "D-04-01",
-        "D-04-02",
-        "D-04-03",
-        "D-04-04",
-        "D-04-05",
-        "D-05-01",
-        "D-05-02",
-        "D-05-03",
-        "D-05-04",
-        "D-05-05",
-        "D-06-01",
-        "D-06-02",
-        "D-06-03",
-        "D-06-04",
-        "D-06-05",
-        "D-07-01",
-        "D-07-02",
-        "D-07-03",
-        "D-07-04",
-        "D-07-05",
-        "D-08-01",
-        "D-08-02",
-        "D-08-03",
-        "D-08-04",
-        "D-08-05",
-        "D-09-01",
-        "D-09-02",
-        "D-09-03",
-        "D-09-04",
-        "D-09-05",
-        "D-10-01",
-        "D-10-02",
-        "D-10-03",
-        "D-10-04",
-        "D-10-05",
-        "D-11-01",
-        "D-11-02",
-        "D-11-03",
-        "D-11-04",
-        "D-11-05",
-        "D-12-01",
-        "D-12-02",
-        "D-12-03",
-        "D-12-04",
-        "D-12-05",
-        "E-01-03",
-        "E-02-03",
-        "E-03-03",
-        "E-04-03",
-        "E-05-03",
-        "E-06-03",
-        "E-07-03",
-        "E-08-03",
-        "E-09-03",
-        "E-10-03",
-        "D-NEW-01",
-        "D-NEW-02",
-        "D-NEW-03",
-        "E-NEW-03"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "ordinary_witness",
         "document_evidence"
@@ -2271,7 +1941,9 @@
       "justice_affinity": [
         "private_resolution",
         "public_recognition"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C06S01": {
       "category_id": "CAT06",
@@ -2293,14 +1965,14 @@
       "justice_affinity": [
         "procedural",
         "walk_away_dignity"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C06S02": {
       "category_id": "CAT06",
       "name_en": "Pushed Out Before Retirement Benefits",
-      "legacy_themes": [
-        "E_ngheo_vs_giau"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "ageism",
         "forced_out",
@@ -2317,7 +1989,9 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": "employee_vs_owner",
+      "needs_category_fallback": true
     },
     "C06S03": {
       "category_id": "CAT06",
@@ -2338,7 +2012,9 @@
       "justice_affinity": [
         "public_recognition",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C06S04": {
       "category_id": "CAT06",
@@ -2429,7 +2105,8 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C06S05": {
       "category_id": "CAT06",
@@ -2442,9 +2119,7 @@
         "ageism",
         "second_career"
       ],
-      "conflict_ids": [
-        "D-NEW-01"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "self_disclosure",
         "ordinary_witness"
@@ -2452,7 +2127,9 @@
       "justice_affinity": [
         "hero_choice",
         "walk_away_dignity"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C06S06": {
       "category_id": "CAT06",
@@ -2492,7 +2169,8 @@
       "justice_affinity": [
         "hero_choice",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C06S07": {
       "category_id": "CAT06",
@@ -2511,7 +2189,9 @@
       "justice_affinity": [
         "private_resolution",
         "public_recognition"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C06S08": {
       "category_id": "CAT06",
@@ -2592,7 +2272,8 @@
       "justice_affinity": [
         "walk_away_dignity",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C07S01": {
       "category_id": "CAT07",
@@ -2623,7 +2304,8 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C07S02": {
       "category_id": "CAT07",
@@ -2656,20 +2338,27 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C07S03": {
       "category_id": "CAT07",
       "name_en": "Fake Charity After a Disaster",
-      "legacy_themes": [
-        "E_ngheo_vs_giau"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "fake_charity",
         "community_trust",
         "deception_detected"
       ],
       "conflict_ids": [
+        "A2_cuop_tai_san-01",
+        "A2_cuop_tai_san-02",
+        "A2_cuop_tai_san-03",
+        "A2_cuop_tai_san-04",
+        "A2_cuop_tai_san-05",
+        "A2_cuop_tai_san-06",
+        "A2_cuop_tai_san-07",
+        "A5_hoi_han-04",
         "E-01-04",
         "E-02-04",
         "E-03-04",
@@ -2679,7 +2368,8 @@
         "E-07-04",
         "E-08-04",
         "E-09-04",
-        "E-10-04"
+        "E-10-04",
+        "A-NEW-08"
       ],
       "reveal_affinity": [
         "ordinary_witness",
@@ -2688,7 +2378,8 @@
       "justice_affinity": [
         "procedural",
         "public_recognition"
-      ]
+      ],
+      "status_dynamic": "working_class_vs_elite"
     },
     "C07S04": {
       "category_id": "CAT07",
@@ -2736,7 +2427,8 @@
       "justice_affinity": [
         "private_resolution",
         "procedural"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C07S05": {
       "category_id": "CAT07",
@@ -2766,7 +2458,8 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C07S06": {
       "category_id": "CAT07",
@@ -2779,24 +2472,7 @@
         "deception_detected",
         "financial_control"
       ],
-      "conflict_ids": [
-        "A2_cuop_tai_san-01",
-        "A2_cuop_tai_san-02",
-        "A2_cuop_tai_san-03",
-        "A2_cuop_tai_san-04",
-        "A2_cuop_tai_san-05",
-        "A2_cuop_tai_san-06",
-        "A2_cuop_tai_san-07",
-        "C-01-01",
-        "C-01-02",
-        "C-01-03",
-        "C-01-04",
-        "C-01-05",
-        "C-01-06",
-        "C-01-07",
-        "A-NEW-08",
-        "C-NEW-02"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "natural_consequence",
         "document_evidence"
@@ -2804,7 +2480,9 @@
       "justice_affinity": [
         "hero_choice",
         "procedural"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C07S07": {
       "category_id": "CAT07",
@@ -2834,7 +2512,8 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C07S08": {
       "category_id": "CAT07",
@@ -2882,7 +2561,8 @@
       "justice_affinity": [
         "walk_away_dignity",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C08S01": {
       "category_id": "CAT08",
@@ -2897,14 +2577,7 @@
       ],
       "conflict_ids": [
         "A1_bo_roi-04",
-        "A5_hoi_han-02",
-        "B_cases-14",
-        "D-04-01",
-        "D-04-02",
-        "D-04-03",
-        "D-04-04",
-        "D-04-05",
-        "C-NEW-01"
+        "A5_hoi_han-02"
       ],
       "reveal_affinity": [
         "self_disclosure",
@@ -2913,7 +2586,9 @@
       "justice_affinity": [
         "hero_choice",
         "procedural"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C08S02": {
       "category_id": "CAT08",
@@ -2935,7 +2610,9 @@
       "justice_affinity": [
         "public_recognition",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C08S03": {
       "category_id": "CAT08",
@@ -2954,7 +2631,9 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C08S04": {
       "category_id": "CAT08",
@@ -2980,14 +2659,13 @@
       "justice_affinity": [
         "hero_choice",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C08S05": {
       "category_id": "CAT08",
       "name_en": "Housing Denies the Pet",
-      "legacy_themes": [
-        "E_ngheo_vs_giau"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "housing_pressure",
         "pet_at_risk",
@@ -3019,7 +2697,8 @@
       "justice_affinity": [
         "procedural",
         "walk_away_dignity"
-      ]
+      ],
+      "status_dynamic": "poor_vs_wealthy"
     },
     "C08S06": {
       "category_id": "CAT08",
@@ -3065,7 +2744,8 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C08S07": {
       "category_id": "CAT08",
@@ -3086,7 +2766,9 @@
       "justice_affinity": [
         "public_recognition",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C08S08": {
       "category_id": "CAT08",
@@ -3283,7 +2965,8 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C09S01": {
       "category_id": "CAT09",
@@ -3310,14 +2993,14 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C09S02": {
       "category_id": "CAT09",
       "name_en": "Family Dismisses the Veteran's Sacrifice",
       "legacy_themes": [
-        "B_veteran",
-        "A_me_gia"
+        "B_veteran"
       ],
       "fallback_tags": [
         "service_dismissed",
@@ -3325,23 +3008,6 @@
         "hidden_past"
       ],
       "conflict_ids": [
-        "A1_bo_roi-01",
-        "A1_bo_roi-02",
-        "A1_bo_roi-03",
-        "A1_bo_roi-04",
-        "A1_bo_roi-05",
-        "A1_bo_roi-06",
-        "A1_bo_roi-07",
-        "A2_cuop_tai_san-01",
-        "A3_lam_nhuc-01",
-        "A3_lam_nhuc-02",
-        "A3_lam_nhuc-03",
-        "A3_lam_nhuc-04",
-        "A3_lam_nhuc-05",
-        "A3_lam_nhuc-06",
-        "A3_lam_nhuc-07",
-        "A4_loi_dung-02",
-        "A4_loi_dung-05",
         "B_cases-01",
         "B_cases-02",
         "B_cases-03",
@@ -3357,8 +3023,6 @@
         "B_cases-13",
         "B_cases-14",
         "B_cases-15",
-        "A-NEW-08",
-        "A-NEW-07",
         "B-NEW-17",
         "B-NEW-18"
       ],
@@ -3369,45 +3033,21 @@
       "justice_affinity": [
         "private_resolution",
         "walk_away_dignity"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C09S03": {
       "category_id": "CAT09",
       "name_en": "Cannot Afford Medication or Housing",
       "legacy_themes": [
-        "B_veteran",
-        "E_ngheo_vs_giau"
+        "B_veteran"
       ],
       "fallback_tags": [
         "financial_hardship",
         "housing_pressure",
         "impossible_choice"
       ],
-      "conflict_ids": [
-        "A1_bo_roi-01",
-        "A2_cuop_tai_san-01",
-        "A2_cuop_tai_san-02",
-        "A2_cuop_tai_san-03",
-        "A2_cuop_tai_san-04",
-        "A2_cuop_tai_san-05",
-        "A2_cuop_tai_san-06",
-        "A2_cuop_tai_san-07",
-        "D-01-02",
-        "D-02-02",
-        "D-03-02",
-        "D-04-02",
-        "D-05-02",
-        "D-06-02",
-        "D-07-02",
-        "D-08-02",
-        "D-09-02",
-        "D-10-02",
-        "D-11-02",
-        "D-12-02",
-        "A-NEW-08",
-        "C-NEW-02",
-        "D-NEW-01"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "ordinary_witness",
         "natural_consequence"
@@ -3415,7 +3055,9 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": "poor_vs_wealthy",
+      "needs_category_fallback": true
     },
     "C09S04": {
       "category_id": "CAT09",
@@ -3441,7 +3083,8 @@
       "justice_affinity": [
         "hero_choice",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C09S05": {
       "category_id": "CAT09",
@@ -3468,7 +3111,8 @@
       "justice_affinity": [
         "public_recognition",
         "procedural"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C09S06": {
       "category_id": "CAT09",
@@ -3481,24 +3125,7 @@
         "community_trust",
         "hidden_past"
       ],
-      "conflict_ids": [
-        "A5_hoi_han-04",
-        "D-05-01",
-        "D-05-02",
-        "D-05-03",
-        "D-05-04",
-        "D-05-05",
-        "E-01-03",
-        "E-02-03",
-        "E-03-03",
-        "E-04-03",
-        "E-05-03",
-        "E-06-03",
-        "E-07-03",
-        "E-08-03",
-        "E-09-03",
-        "E-10-03"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "natural_consequence",
         "ordinary_witness"
@@ -3506,7 +3133,9 @@
       "justice_affinity": [
         "private_resolution",
         "public_recognition"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C09S07": {
       "category_id": "CAT09",
@@ -3520,84 +3149,7 @@
         "dignity_choice"
       ],
       "conflict_ids": [
-        "A2_cuop_tai_san-03",
-        "A3_lam_nhuc-05",
-        "A5_hoi_han-02",
-        "A5_hoi_han-04",
-        "B_cases-15",
-        "D-01-01",
-        "D-02-01",
-        "D-03-01",
-        "D-04-01",
-        "D-05-01",
-        "D-06-01",
-        "D-07-01",
-        "D-08-01",
-        "D-09-01",
-        "D-10-01",
-        "D-11-01",
-        "D-12-01",
-        "E-01-01",
-        "E-01-02",
-        "E-01-03",
-        "E-01-04",
-        "E-01-05",
-        "E-01-06",
-        "E-02-01",
-        "E-02-02",
-        "E-02-03",
-        "E-02-04",
-        "E-02-05",
-        "E-02-06",
-        "E-03-01",
-        "E-03-02",
-        "E-03-03",
-        "E-03-04",
-        "E-03-05",
-        "E-03-06",
-        "E-04-01",
-        "E-04-02",
-        "E-04-03",
-        "E-04-04",
-        "E-04-05",
-        "E-04-06",
-        "E-05-01",
-        "E-05-02",
-        "E-05-03",
-        "E-05-04",
-        "E-05-05",
-        "E-05-06",
-        "E-06-01",
-        "E-06-02",
-        "E-06-03",
-        "E-06-04",
-        "E-06-05",
-        "E-06-06",
-        "E-07-01",
-        "E-07-02",
-        "E-07-03",
-        "E-07-04",
-        "E-07-05",
-        "E-07-06",
-        "E-08-01",
-        "E-08-02",
-        "E-08-03",
-        "E-08-04",
-        "E-08-05",
-        "E-08-06",
-        "E-09-01",
-        "E-09-02",
-        "E-09-03",
-        "E-09-04",
-        "E-09-05",
-        "E-09-06",
-        "E-10-01",
-        "E-10-02",
-        "E-10-03",
-        "E-10-04",
-        "E-10-05",
-        "E-10-06",
-        "E-NEW-01"
+        "B_cases-15"
       ],
       "reveal_affinity": [
         "ordinary_witness",
@@ -3606,7 +3158,9 @@
       "justice_affinity": [
         "hero_choice",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C09S08": {
       "category_id": "CAT09",
@@ -3620,84 +3174,7 @@
         "quiet_help"
       ],
       "conflict_ids": [
-        "A2_cuop_tai_san-03",
-        "A3_lam_nhuc-05",
-        "A5_hoi_han-02",
-        "A5_hoi_han-04",
-        "B_cases-15",
-        "D-01-01",
-        "D-02-01",
-        "D-03-01",
-        "D-04-01",
-        "D-05-01",
-        "D-06-01",
-        "D-07-01",
-        "D-08-01",
-        "D-09-01",
-        "D-10-01",
-        "D-11-01",
-        "D-12-01",
-        "E-01-01",
-        "E-01-02",
-        "E-01-03",
-        "E-01-04",
-        "E-01-05",
-        "E-01-06",
-        "E-02-01",
-        "E-02-02",
-        "E-02-03",
-        "E-02-04",
-        "E-02-05",
-        "E-02-06",
-        "E-03-01",
-        "E-03-02",
-        "E-03-03",
-        "E-03-04",
-        "E-03-05",
-        "E-03-06",
-        "E-04-01",
-        "E-04-02",
-        "E-04-03",
-        "E-04-04",
-        "E-04-05",
-        "E-04-06",
-        "E-05-01",
-        "E-05-02",
-        "E-05-03",
-        "E-05-04",
-        "E-05-05",
-        "E-05-06",
-        "E-06-01",
-        "E-06-02",
-        "E-06-03",
-        "E-06-04",
-        "E-06-05",
-        "E-06-06",
-        "E-07-01",
-        "E-07-02",
-        "E-07-03",
-        "E-07-04",
-        "E-07-05",
-        "E-07-06",
-        "E-08-01",
-        "E-08-02",
-        "E-08-03",
-        "E-08-04",
-        "E-08-05",
-        "E-08-06",
-        "E-09-01",
-        "E-09-02",
-        "E-09-03",
-        "E-09-04",
-        "E-09-05",
-        "E-09-06",
-        "E-10-01",
-        "E-10-02",
-        "E-10-03",
-        "E-10-04",
-        "E-10-05",
-        "E-10-06",
-        "E-NEW-01"
+        "B_cases-15"
       ],
       "reveal_affinity": [
         "self_disclosure",
@@ -3706,7 +3183,9 @@
       "justice_affinity": [
         "walk_away_dignity",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C10S01": {
       "category_id": "CAT10",
@@ -3748,7 +3227,8 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C10S02": {
       "category_id": "CAT10",
@@ -3770,20 +3250,37 @@
       "justice_affinity": [
         "public_recognition",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C10S03": {
       "category_id": "CAT10",
       "name_en": "Church Donation Secret",
-      "legacy_themes": [
-        "E_ngheo_vs_giau"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "quiet_help",
         "misjudged",
         "community_trust"
       ],
       "conflict_ids": [
+        "A2_cuop_tai_san-03",
+        "A3_lam_nhuc-05",
+        "A5_hoi_han-02",
+        "A5_hoi_han-04",
+        "B_cases-15",
+        "D-01-01",
+        "D-02-01",
+        "D-03-01",
+        "D-04-01",
+        "D-05-01",
+        "D-06-01",
+        "D-07-01",
+        "D-08-01",
+        "D-09-01",
+        "D-10-01",
+        "D-11-01",
+        "D-12-01",
         "E-01-01",
         "E-02-01",
         "E-03-01",
@@ -3802,14 +3299,13 @@
       "justice_affinity": [
         "private_resolution",
         "public_recognition"
-      ]
+      ],
+      "status_dynamic": "working_class_vs_elite"
     },
     "C10S04": {
       "category_id": "CAT10",
       "name_en": "Trailer Park or Neighborhood Faces Displacement",
-      "legacy_themes": [
-        "E_ngheo_vs_giau"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "displacement",
         "community",
@@ -3842,7 +3338,8 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": "rural_vs_urban"
     },
     "C10S05": {
       "category_id": "CAT10",
@@ -3883,20 +3380,25 @@
       "justice_affinity": [
         "private_resolution",
         "procedural"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C10S06": {
       "category_id": "CAT10",
       "name_en": "Town Misjudged Someone for Decades",
-      "legacy_themes": [
-        "E_ngheo_vs_giau"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "misjudged",
         "community_trust",
         "hidden_past"
       ],
       "conflict_ids": [
+        "A5_hoi_han-04",
+        "D-05-01",
+        "D-05-02",
+        "D-05-03",
+        "D-05-04",
+        "D-05-05",
         "E-01-03",
         "E-02-03",
         "E-03-03",
@@ -3915,7 +3417,8 @@
       "justice_affinity": [
         "public_recognition",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": "working_class_vs_elite"
     },
     "C10S07": {
       "category_id": "CAT10",
@@ -3957,7 +3460,8 @@
       "justice_affinity": [
         "private_resolution",
         "public_recognition"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C10S08": {
       "category_id": "CAT10",
@@ -3999,14 +3503,13 @@
       "justice_affinity": [
         "hero_choice",
         "walk_away_dignity"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C11S01": {
       "category_id": "CAT11",
       "name_en": "Returns to Work for Basic Expenses",
-      "legacy_themes": [
-        "E_ngheo_vs_giau"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "financial_hardship",
         "reentry",
@@ -4030,14 +3533,14 @@
       "justice_affinity": [
         "hero_choice",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": "poor_vs_wealthy"
     },
     "C11S02": {
       "category_id": "CAT11",
       "name_en": "Retirement Fund Mismanaged",
       "legacy_themes": [
-        "A_me_gia",
-        "D_vo_phan_boi"
+        "A_me_gia"
       ],
       "fallback_tags": [
         "financial_control",
@@ -4052,70 +3555,7 @@
         "A2_cuop_tai_san-05",
         "A2_cuop_tai_san-06",
         "A2_cuop_tai_san-07",
-        "D-01-01",
-        "D-01-02",
-        "D-01-03",
-        "D-01-04",
-        "D-01-05",
-        "D-02-01",
-        "D-02-02",
-        "D-02-03",
-        "D-02-04",
-        "D-02-05",
-        "D-03-01",
-        "D-03-02",
-        "D-03-03",
-        "D-03-04",
-        "D-03-05",
-        "D-04-01",
-        "D-04-02",
-        "D-04-03",
-        "D-04-04",
-        "D-04-05",
-        "D-05-01",
-        "D-05-02",
-        "D-05-03",
-        "D-05-04",
-        "D-05-05",
-        "D-06-01",
-        "D-06-02",
-        "D-06-03",
-        "D-06-04",
-        "D-06-05",
-        "D-07-01",
-        "D-07-02",
-        "D-07-03",
-        "D-07-04",
-        "D-07-05",
-        "D-08-01",
-        "D-08-02",
-        "D-08-03",
-        "D-08-04",
-        "D-08-05",
-        "D-09-01",
-        "D-09-02",
-        "D-09-03",
-        "D-09-04",
-        "D-09-05",
-        "D-10-01",
-        "D-10-02",
-        "D-10-03",
-        "D-10-04",
-        "D-10-05",
-        "D-11-01",
-        "D-11-02",
-        "D-11-03",
-        "D-11-04",
-        "D-11-05",
-        "D-12-01",
-        "D-12-02",
-        "D-12-03",
-        "D-12-04",
-        "D-12-05",
-        "A-NEW-08",
-        "D-NEW-01",
-        "D-NEW-02",
-        "D-NEW-03"
+        "A-NEW-08"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -4124,7 +3564,8 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C11S03": {
       "category_id": "CAT11",
@@ -4164,7 +3605,8 @@
       "justice_affinity": [
         "public_recognition",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C11S04": {
       "category_id": "CAT11",
@@ -4183,7 +3625,9 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C11S05": {
       "category_id": "CAT11",
@@ -4211,7 +3655,8 @@
       "justice_affinity": [
         "hero_choice",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C11S06": {
       "category_id": "CAT11",
@@ -4230,14 +3675,15 @@
       "justice_affinity": [
         "public_recognition",
         "private_resolution"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C11S07": {
       "category_id": "CAT11",
       "name_en": "Hides Night Work From Adult Children",
       "legacy_themes": [
-        "A_me_gia",
-        "E_ngheo_vs_giau"
+        "A_me_gia"
       ],
       "fallback_tags": [
         "financial_hardship",
@@ -4269,71 +3715,9 @@
         "A4_loi_dung-02",
         "A4_loi_dung-05",
         "A5_hoi_han-01",
-        "E-01-01",
-        "E-01-02",
-        "E-01-03",
-        "E-01-04",
-        "E-01-05",
-        "E-01-06",
-        "E-02-01",
-        "E-02-02",
-        "E-02-03",
-        "E-02-04",
-        "E-02-05",
-        "E-02-06",
-        "E-03-01",
-        "E-03-02",
-        "E-03-03",
-        "E-03-04",
-        "E-03-05",
-        "E-03-06",
-        "E-04-01",
-        "E-04-02",
-        "E-04-03",
-        "E-04-04",
-        "E-04-05",
-        "E-04-06",
-        "E-05-01",
-        "E-05-02",
-        "E-05-03",
-        "E-05-04",
-        "E-05-05",
-        "E-05-06",
-        "E-06-01",
-        "E-06-02",
-        "E-06-03",
-        "E-06-04",
-        "E-06-05",
-        "E-06-06",
-        "E-07-01",
-        "E-07-02",
-        "E-07-03",
-        "E-07-04",
-        "E-07-05",
-        "E-07-06",
-        "E-08-01",
-        "E-08-02",
-        "E-08-03",
-        "E-08-04",
-        "E-08-05",
-        "E-08-06",
-        "E-09-01",
-        "E-09-02",
-        "E-09-03",
-        "E-09-04",
-        "E-09-05",
-        "E-09-06",
-        "E-10-01",
-        "E-10-02",
-        "E-10-03",
-        "E-10-04",
-        "E-10-05",
-        "E-10-06",
         "A-NEW-08",
         "A-NEW-08",
-        "A-NEW-07",
-        "E-NEW-02",
-        "E-NEW-03"
+        "A-NEW-07"
       ],
       "reveal_affinity": [
         "self_disclosure",
@@ -4342,7 +3726,8 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": "poor_vs_wealthy"
     },
     "C11S08": {
       "category_id": "CAT11",
@@ -4424,7 +3809,8 @@
       "justice_affinity": [
         "walk_away_dignity",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C12S01": {
       "category_id": "CAT12",
@@ -4509,7 +3895,8 @@
       "justice_affinity": [
         "hero_choice",
         "procedural"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C12S02": {
       "category_id": "CAT12",
@@ -4537,14 +3924,14 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C12S03": {
       "category_id": "CAT12",
       "name_en": "Bride or Groom Humiliated by In-Laws",
       "legacy_themes": [
-        "C_co_dau",
-        "E_ngheo_vs_giau"
+        "C_co_dau"
       ],
       "fallback_tags": [
         "class_humiliation",
@@ -4594,71 +3981,8 @@
         "C-06-05",
         "C-06-06",
         "C-06-07",
-        "E-01-01",
-        "E-01-02",
-        "E-01-03",
-        "E-01-04",
-        "E-01-05",
-        "E-01-06",
-        "E-02-01",
-        "E-02-02",
-        "E-02-03",
-        "E-02-04",
-        "E-02-05",
-        "E-02-06",
-        "E-03-01",
-        "E-03-02",
-        "E-03-03",
-        "E-03-04",
-        "E-03-05",
-        "E-03-06",
-        "E-04-01",
-        "E-04-02",
-        "E-04-03",
-        "E-04-04",
-        "E-04-05",
-        "E-04-06",
-        "E-05-01",
-        "E-05-02",
-        "E-05-03",
-        "E-05-04",
-        "E-05-05",
-        "E-05-06",
-        "E-06-01",
-        "E-06-02",
-        "E-06-03",
-        "E-06-04",
-        "E-06-05",
-        "E-06-06",
-        "E-07-01",
-        "E-07-02",
-        "E-07-03",
-        "E-07-04",
-        "E-07-05",
-        "E-07-06",
-        "E-08-01",
-        "E-08-02",
-        "E-08-03",
-        "E-08-04",
-        "E-08-05",
-        "E-08-06",
-        "E-09-01",
-        "E-09-02",
-        "E-09-03",
-        "E-09-04",
-        "E-09-05",
-        "E-09-06",
-        "E-10-01",
-        "E-10-02",
-        "E-10-03",
-        "E-10-04",
-        "E-10-05",
-        "E-10-06",
         "C-NEW-01",
-        "C-NEW-02",
-        "E-NEW-01",
-        "E-NEW-02",
-        "E-NEW-03"
+        "C-NEW-02"
       ],
       "reveal_affinity": [
         "ordinary_witness",
@@ -4667,14 +3991,14 @@
       "justice_affinity": [
         "hero_choice",
         "walk_away_dignity"
-      ]
+      ],
+      "status_dynamic": "old_money_vs_new_money"
     },
     "C12S04": {
       "category_id": "CAT12",
       "name_en": "Caregiving Exposes a Bad Marriage",
       "legacy_themes": [
-        "D_vo_phan_boi",
-        "A_me_gia"
+        "D_vo_phan_boi"
       ],
       "fallback_tags": [
         "marriage_truth",
@@ -4750,7 +4074,8 @@
       "justice_affinity": [
         "walk_away_dignity",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C12S05": {
       "category_id": "CAT12",
@@ -4835,24 +4160,21 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null
     },
     "C12S06": {
       "category_id": "CAT12",
       "name_en": "Family Business Favoritism",
       "legacy_themes": [
-        "C_co_dau",
-        "E_ngheo_vs_giau"
+        "C_co_dau"
       ],
       "fallback_tags": [
         "favoritism",
         "business_dispute",
         "in_law_conflict"
       ],
-      "conflict_ids": [
-        "A4_loi_dung-04",
-        "D-NEW-02"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "document_evidence",
         "natural_consequence"
@@ -4860,14 +4182,15 @@
       "justice_affinity": [
         "procedural",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": "old_money_vs_new_money",
+      "needs_category_fallback": true
     },
     "C12S07": {
       "category_id": "CAT12",
       "name_en": "Holiday Gathering Breaks the Silence",
       "legacy_themes": [
-        "C_co_dau",
-        "E_ngheo_vs_giau"
+        "C_co_dau"
       ],
       "fallback_tags": [
         "public_confrontation",
@@ -4907,70 +4230,8 @@
         "C-06-03",
         "C-06-04",
         "C-06-06",
-        "E-01-01",
-        "E-01-02",
-        "E-01-03",
-        "E-01-04",
-        "E-01-05",
-        "E-01-06",
-        "E-02-01",
-        "E-02-02",
-        "E-02-03",
-        "E-02-04",
-        "E-02-05",
-        "E-02-06",
-        "E-03-01",
-        "E-03-02",
-        "E-03-03",
-        "E-03-04",
-        "E-03-05",
-        "E-03-06",
-        "E-04-01",
-        "E-04-02",
-        "E-04-03",
-        "E-04-04",
-        "E-04-05",
-        "E-04-06",
-        "E-05-01",
-        "E-05-02",
-        "E-05-03",
-        "E-05-04",
-        "E-05-05",
-        "E-05-06",
-        "E-06-01",
-        "E-06-02",
-        "E-06-03",
-        "E-06-04",
-        "E-06-05",
-        "E-06-06",
-        "E-07-01",
-        "E-07-02",
-        "E-07-03",
-        "E-07-04",
-        "E-07-05",
-        "E-07-06",
-        "E-08-01",
-        "E-08-02",
-        "E-08-03",
-        "E-08-04",
-        "E-08-05",
-        "E-08-06",
-        "E-09-01",
-        "E-09-02",
-        "E-09-03",
-        "E-09-04",
-        "E-09-05",
-        "E-09-06",
-        "E-10-01",
-        "E-10-02",
-        "E-10-03",
-        "E-10-04",
-        "E-10-05",
-        "E-10-06",
         "C-NEW-02",
-        "C-NEW-03",
-        "E-NEW-02",
-        "E-NEW-03"
+        "C-NEW-03"
       ],
       "reveal_affinity": [
         "self_disclosure",
@@ -4979,7 +4240,8 @@
       "justice_affinity": [
         "private_resolution",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": "poor_vs_wealthy"
     },
     "C12S08": {
       "category_id": "CAT12",
@@ -4992,69 +4254,7 @@
         "refusal",
         "revenge_declined"
       ],
-      "conflict_ids": [
-        "E-01-01",
-        "E-01-02",
-        "E-01-03",
-        "E-01-04",
-        "E-01-05",
-        "E-01-06",
-        "E-02-01",
-        "E-02-02",
-        "E-02-03",
-        "E-02-04",
-        "E-02-05",
-        "E-02-06",
-        "E-03-01",
-        "E-03-02",
-        "E-03-03",
-        "E-03-04",
-        "E-03-05",
-        "E-03-06",
-        "E-04-01",
-        "E-04-02",
-        "E-04-03",
-        "E-04-04",
-        "E-04-05",
-        "E-04-06",
-        "E-05-01",
-        "E-05-02",
-        "E-05-03",
-        "E-05-04",
-        "E-05-05",
-        "E-05-06",
-        "E-06-01",
-        "E-06-02",
-        "E-06-03",
-        "E-06-04",
-        "E-06-05",
-        "E-06-06",
-        "E-07-01",
-        "E-07-02",
-        "E-07-03",
-        "E-07-04",
-        "E-07-05",
-        "E-07-06",
-        "E-08-01",
-        "E-08-02",
-        "E-08-03",
-        "E-08-04",
-        "E-08-05",
-        "E-08-06",
-        "E-09-01",
-        "E-09-02",
-        "E-09-03",
-        "E-09-04",
-        "E-09-05",
-        "E-09-06",
-        "E-10-01",
-        "E-10-02",
-        "E-10-03",
-        "E-10-04",
-        "E-10-05",
-        "E-10-06",
-        "E-NEW-01"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "self_disclosure",
         "natural_consequence"
@@ -5062,7 +4262,9 @@
       "justice_affinity": [
         "walk_away_dignity",
         "hero_choice"
-      ]
+      ],
+      "status_dynamic": null,
+      "needs_category_fallback": true
     }
   }
 }
