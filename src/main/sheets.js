@@ -40,4 +40,40 @@ async function appendRows(webhookUrl, rows) {
   return { ok: true, written: rows.length };
 }
 
-module.exports = { appendRow, appendRows };
+/**
+ * XOA cac dong theo status (vd 'draft_test') — can Apps Script ban MOI co xu ly
+ * action='delete_status'. Ban Apps Script cu se bao loi -> tra thong bao huong dan cap nhat.
+ */
+async function deleteByStatus(webhookUrl, status) {
+  const url = String(webhookUrl || '').trim();
+  if (!/^https:\/\/script\.google(usercontent)?\.com\//i.test(url)) {
+    throw new Error('URL Google Apps Script không hợp lệ.');
+  }
+  const st = String(status || '').trim();
+  if (!st) throw new Error('Thiếu status cần xoá.');
+
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'delete_status', status: st }),
+      redirect: 'follow',
+    });
+  } catch (e) {
+    throw new Error('Không gọi được Google Apps Script: ' + e.message);
+  }
+  const txt = await res.text();
+  if (!res.ok) throw new Error('Apps Script trả lỗi HTTP ' + res.status);
+  let data = null;
+  try { data = JSON.parse(txt); } catch (_) {}
+  if (!data) throw new Error('Apps Script không trả JSON — kiểm tra deploy.');
+  if (data.ok === false) {
+    // Ban Apps Script cu chua ho tro action -> bao ro cach xu ly
+    throw new Error('Apps Script chưa hỗ trợ xoá (' + (data.error || '') + '). '
+      + 'Hãy dán bản Apps Script mới (có action delete_status) rồi Deploy → New version.');
+  }
+  return { ok: true, deleted: data.deleted != null ? data.deleted : 0 };
+}
+
+module.exports = { appendRow, appendRows, deleteByStatus };

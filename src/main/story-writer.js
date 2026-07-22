@@ -335,8 +335,9 @@ function getInputSelection() {
       pageId: i.pageId || 'P01',
       categoryId: i.categoryId || '',
       subcategoryId: i.subcategoryId || '',
+      fastTest: !!i.fastTest,
     };
-  } catch (_) { return { mode: 'auto', pageId: 'P01', categoryId: '', subcategoryId: '' }; }
+  } catch (_) { return { mode: 'auto', pageId: 'P01', categoryId: '', subcategoryId: '', fastTest: false }; }
 }
 
 // Cau lenh skill goc. Co the tuy bien chung (settings.story.skillCommand) hoac
@@ -466,10 +467,13 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
 
   // ---- LOP DAU VAO (category/subcategory) chay TRUOC Story DNA ----
   const inSel = getInputSelection();
+  const fastTest = !!inSel.fastTest;
+  if (fastTest) onProgress({ message: '⚡ TEST NHANH — bỏ qua tạo ảnh, KHÔNG ghi sổ chống trùng (status = draft_test).' });
   let input = null;
   try {
     input = storyCategory.chooseInput({
       country,
+      autoPage: inSel.mode === 'full_auto',
       pageId: inSel.pageId,
       categoryId: inSel.mode === 'category' ? inSel.categoryId : '',
       subcategoryId: inSel.mode === 'subcategory' ? inSel.subcategoryId : '',
@@ -564,27 +568,32 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
 
       // Cap story_id (bo dem local, +1 moi bai)
       const storyId = store.nextStoryId();
-      onProgress({ message: `✓ Claude xong bài ${storyId} (~${words} từ) — ngách "${nicheLabel}". Đang tạo ảnh...` });
 
-      // Tao 4 anh (fb, p1, p2, p3) -> up R2. Loi anh KHONG lam sap bai.
-      let imgs;
-      try {
-        imgs = await generateArticleImages(storyId, s, onProgress);
-      } catch (e) {
-        imgs = { fbImageUrl: '', thumbnailUrl: '', webUrls: { p1: '', p2: '', p3: '' }, allOk: false, configured: true, errors: [e.message] };
-        onProgress({ message: '⚠️ Lỗi tạo ảnh: ' + e.message + ' — vẫn đẩy bài (link ảnh để trống).' });
+      // ---- TEST NHANH: bo qua toan bo tao anh + upload R2 ----
+      let imgs, status;
+      if (fastTest) {
+        onProgress({ message: `✓ Claude xong bài ${storyId} (~${words} từ). ⚡ Test nhanh — KHÔNG tạo ảnh.` });
+        imgs = { fbImageUrl: '', thumbnailUrl: '', webUrls: { p1: '', p2: '', p3: '' }, allOk: true, configured: false, errors: [] };
+        status = 'draft_test';                 // n8n KHONG duoc dang bai test
+      } else {
+        onProgress({ message: `✓ Claude xong bài ${storyId} (~${words} từ) — ngách "${nicheLabel}". Đang tạo ảnh...` });
+        // Tao 5 anh (fb, thumb, p1, p2, p3) -> up R2. Loi anh KHONG lam sap bai.
+        try {
+          imgs = await generateArticleImages(storyId, s, onProgress);
+        } catch (e) {
+          imgs = { fbImageUrl: '', thumbnailUrl: '', webUrls: { p1: '', p2: '', p3: '' }, allOk: false, configured: true, errors: [e.message] };
+          onProgress({ message: '⚠️ Lỗi tạo ảnh: ' + e.message + ' — vẫn đẩy bài (link ảnh để trống).' });
+        }
+        status = (imgs.configured && !imgs.allOk) ? 'need_image' : 'new';
+        if (status === 'need_image') {
+          onProgress({ message: `⚠️ Bài ${storyId}: tạo ảnh chưa đủ (${imgs.errors.join('; ')}). Đẩy bài, đánh dấu need_image để chạy lại.` });
+        } else {
+          onProgress({ message: `✓ Xong bài ${storyId} — ngách "${nicheLabel}"` });
+        }
       }
 
       // Thay {{IMG_Px}} trong web_body bang link that (thieu link thi go the img)
       const webBody = applyImagePlaceholders(s.WEB_BODY || '', imgs.webUrls);
-
-      // Trang thai: neu co cau hinh anh nhung chua tao du -> 'need_image' de chay lai sau
-      const status = (imgs.configured && !imgs.allOk) ? 'need_image' : 'new';
-      if (status === 'need_image') {
-        onProgress({ message: `⚠️ Bài ${storyId}: tạo ảnh chưa đủ (${imgs.errors.join('; ')}). Đẩy bài, đánh dấu need_image để chạy lại.` });
-      } else {
-        onProgress({ message: `✓ Xong bài ${storyId} — ngách "${nicheLabel}"` });
-      }
 
       const row = buildRow(nicheLabel, s, {
         storyId, status, webBody,
@@ -593,10 +602,14 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
         dnaCombo: dnaComboJson,
       });
 
-      // GHI SO chong trung: chi ghi khi da chot bai thanh cong (tranh dot bo dem oan)
-      if (dna) {
+      // GHI SO chong trung: chi ghi khi da chot bai thanh cong (tranh dot bo dem oan).
+      // TEST NHANH -> KHONG ghi, de khong lam ban cooldown cua bai that
+      // (ten/icon/conflict/subcategory khong bi danh dau la "da dung").
+      if (dna && !fastTest) {
         try { storyDna.remember({ storyId, country, niche: nicheLabel, combo: pick.combo }); }
         catch (_) { /* ghi so hong khong lam sap bai */ }
+      } else if (fastTest) {
+        onProgress({ message: 'ℹ️ Test nhanh: KHÔNG ghi sổ chống trùng (cooldown bài thật giữ nguyên).' });
       }
 
       return { ok: true, row, raw: res.text, sections: s, storyId, status, dnaCombo: dnaComboJson };

@@ -10,7 +10,7 @@ Phần mềm ghi mỗi bài thành **1 dòng, 22 cột** qua Google Apps Script 
 |---|---|---|---|
 | A | story_id | Mã bài `ST` + 8 số (ST00000001) | Khoá định danh, đặt tên ảnh |
 | B | timestamp | Ngày giờ tạo | Sắp xếp |
-| C | status | new / need_image / posted_web / posted_fb / done | Biết bài nào chưa đăng / cần tạo lại ảnh |
+| C | status | new / need_image / **draft_test** / posted_web / posted_fb / done | Biết bài nào chưa đăng / cần tạo lại ảnh. ⚠️ `draft_test` = bài chạy Test nhanh, **n8n KHÔNG được đăng** |
 | D | page_target | Ngách/page | Đăng đúng page |
 | E | web_title | Tiêu đề web (SEO) | Tiêu đề WordPress |
 | F | web_slug | Đường dẫn URL | Link web |
@@ -51,6 +51,24 @@ function doPost(e) {
       sheet.setFrozenRows(1);
     }
     var data = JSON.parse(e.postData.contents);
+
+    // XOA cac dong theo status (dung cho nut "Xoá bài test" - status draft_test)
+    if (data.action === 'delete_status') {
+      var want = String(data.status || '').trim();
+      if (!want) throw new Error('Thiếu status cần xoá');
+      var last = sheet.getLastRow();
+      var deleted = 0;
+      if (last > 1) {
+        // cot C (3) = status. Duyet tu duoi len de khong lech chi so khi xoa.
+        var vals = sheet.getRange(2, 3, last - 1, 1).getValues();
+        for (var r = vals.length - 1; r >= 0; r--) {
+          if (String(vals[r][0]).trim() === want) { sheet.deleteRow(r + 2); deleted++; }
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({ ok: true, deleted: deleted }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     // Ho tro ca 1 dong (row) lan nhieu dong (rows)
     var rows = data.rows || (data.row ? [data.row] : null);
     if (!rows || !rows.length) throw new Error('Thiếu dữ liệu rows');

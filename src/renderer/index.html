@@ -52,18 +52,29 @@
         <label class="lbl">Cách chọn</label>
         <select id="inMode" class="in">
           <option value="auto">Auto (theo page profile)</option>
+          <option value="full_auto">🎲 Tự động hoàn toàn (engine tự xoay page P01→P10)</option>
           <option value="category">Chọn Category thủ công</option>
           <option value="subcategory">Chọn Subcategory thủ công</option>
         </select>
         <div id="inCatWrap" class="hidden">
           <label class="lbl">Category</label>
-          <select id="inCategory" class="in"></select>
+          <div class="row">
+            <select id="inCategory" class="in"></select>
+            <button id="randomCatBtn" class="btn btn-ghost btn-sm">🎲 Random category</button>
+          </div>
         </div>
         <div id="inSubWrap" class="hidden">
           <label class="lbl">Subcategory</label>
           <select id="inSubcategory" class="in"></select>
         </div>
-        <div class="row"><button id="saveInputBtn" class="btn btn-ghost btn-sm">Lưu nguồn đầu vào</button></div>
+        <div id="recentUsage" class="hint"></div>
+        <div style="margin:10px 0">
+          <label><input type="checkbox" id="fastTest"> ⚡ Test nhanh (bỏ qua tạo ảnh) — status <code>draft_test</code>, KHÔNG ghi sổ chống trùng</label>
+        </div>
+        <div class="row">
+          <button id="saveInputBtn" class="btn btn-ghost btn-sm">Lưu nguồn đầu vào</button>
+          <button id="deleteTestBtn" class="btn btn-ghost btn-sm">🗑️ Xoá bài test</button>
+        </div>
         <div id="inputMsg" class="msg"></div>
       </div>
 
@@ -215,6 +226,13 @@
           <button id="conflictSaveBtn" class="btn btn-primary">Lưu cây ngách này</button>
         </div>
         <div id="conflictMsg" class="msg"></div>
+
+        <hr style="border:none;border-top:1px solid #2a2f3a;margin:14px 0">
+
+        <div class="lbl">♻️ Reset sổ chống trùng</div>
+        <p class="hint">Xoá toàn bộ lịch sử chống trùng (tên, icon, conflict, signature, category đã dùng) để engine làm lại từ đầu. <b>KHÔNG hoàn tác được.</b> Bài đã lưu trên Google Sheet không bị ảnh hưởng.</p>
+        <div class="row"><button id="resetMemoryBtn" class="btn btn-ghost">♻️ Reset sổ chống trùng</button></div>
+        <div id="resetMemMsg" class="msg"></div>
       </div>
 
       <div class="card">

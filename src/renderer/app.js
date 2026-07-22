@@ -255,8 +255,20 @@ async function loadInputLayer(){
   $('inPage').value=cur.pageId||'P01';
   $('inMode').value=cur.mode||'auto';
   if(cur.categoryId)$('inCategory').value=cur.categoryId;
+  $('fastTest').checked=!!cur.fastTest;
   fillSubcats(cur.subcategoryId);
   applyInputMode();
+  await loadRecentUsage();
+}
+
+// Hien category/subcategory da dung gan day -> biet engine dang xoay toi dau
+async function loadRecentUsage(){
+  const r=await api.categoryRecent({n:5});
+  const box=$('recentUsage');
+  if(!r||!r.ok||!(r.recent||[]).length){ box.textContent='Gần đây: (chưa có bài nào)'; return; }
+  box.innerHTML='Gần đây: '+r.recent.map(x=>
+    '<span style="opacity:.85">'+esc(x.page_profile_id||'?')+'·'+esc(x.category_id)+'/'+esc(x.subcategory_id)+'</span>'
+  ).join(' → ');
 }
 function fillSubcats(sel){
   const cid=$('inCategory').value;
@@ -266,15 +278,28 @@ function fillSubcats(sel){
 }
 function applyInputMode(){
   const m=$('inMode').value;
-  $('inCatWrap').classList.toggle('hidden', m==='auto');
+  // full_auto: engine tu chon page + category -> an het o chon tay
+  $('inCatWrap').classList.toggle('hidden', m==='auto'||m==='full_auto');
   $('inSubWrap').classList.toggle('hidden', m!=='subcategory');
+  $('inPage').disabled = (m==='full_auto');
 }
 function bindInputLayer(){
   const m=$('inMode'); if(m)m.onchange=applyInputMode;
   const c=$('inCategory'); if(c)c.onchange=()=>fillSubcats();
   const b=$('saveInputBtn'); if(b)b.onclick=async()=>{
-    const r=await api.saveInput({mode:$('inMode').value,pageId:$('inPage').value,categoryId:$('inCategory').value,subcategoryId:$('inSubcategory').value});
+    const r=await api.saveInput({mode:$('inMode').value,pageId:$('inPage').value,categoryId:$('inCategory').value,subcategoryId:$('inSubcategory').value,fastTest:$('fastTest').checked});
     msg($('inputMsg'),r.ok?'Đã lưu nguồn đầu vào':(r.error||'Lỗi'),r.ok);
+  };
+  const rc=$('randomCatBtn'); if(rc)rc.onclick=async()=>{
+    const r=await api.categoryRandom({pageId:$('inPage').value});
+    if(r.ok){ $('inCategory').value=r.categoryId; fillSubcats(); msg($('inputMsg'),'🎲 Đã bốc: '+r.categoryId+' — '+r.categoryName,true); }
+    else msg($('inputMsg'),r.error||'Lỗi',false);
+  };
+  const dt=$('deleteTestBtn'); if(dt)dt.onclick=async()=>{
+    if(!confirm('Xoá MỌI dòng có status = draft_test khỏi Google Sheet?\n\nBài thật (new / need_image) KHÔNG bị ảnh hưởng.'))return;
+    msg($('inputMsg'),'Đang xoá bài test...',true);
+    const r=await api.deleteTestRows();
+    msg($('inputMsg'),r.ok?('🗑️ Đã xoá '+r.deleted+' dòng test'):(r.error||'Lỗi'),r.ok);
   };
 }
 
@@ -353,6 +378,12 @@ function bindDna(){
     else msg($('dnaPoolMsg'),r.error||'Lỗi',false);
   };
   const cb=$('conflictBranch'); if(cb)cb.onchange=()=>loadConflictBranch($('dnaEditCountry').value,cb.value);
+  const rm=$('resetMemoryBtn'); if(rm)rm.onclick=async()=>{
+    if(!confirm('RESET SỔ CHỐNG TRÙNG?\n\nXoá toàn bộ lịch sử đã dùng (tên, icon, conflict, signature, category).\nEngine sẽ chọn lại từ đầu như máy mới.\n\nKHÔNG HOÀN TÁC ĐƯỢC. Bài trên Google Sheet không bị ảnh hưởng.'))return;
+    if(!confirm('Xác nhận lần 2: xoá sạch sổ chống trùng?'))return;
+    const r=await api.resetMemory();
+    msg($('resetMemMsg'),r.ok?('♻️ Đã xoá '+r.cleared+' bản ghi — sổ chống trùng trống'):(r.error||'Lỗi'),r.ok);
+  };
   const cs=$('conflictSaveBtn'); if(cs)cs.onclick=async()=>{
     const country=$('dnaEditCountry').value;
     const branch=$('conflictBranch').value;

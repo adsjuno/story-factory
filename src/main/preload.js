@@ -57,6 +57,10 @@ const api = {
   // Lop dau vao category/subcategory
   categoryGet: () => call('category:get'),
   saveInput: (p) => call('settings:saveInput', p),
+  categoryRandom: (p) => call('category:random', p),
+  categoryRecent: (p) => call('category:recent', p),
+  deleteTestRows: () => call('sheets:deleteTest'),
+  resetMemory: () => call('memory:reset'),
   conflictGet: (p) => call('conflict:get', p),
   conflictGetBranch: (p) => call('conflict:getBranch', p),
   conflictSaveBranch: (p) => call('conflict:saveBranch', p),

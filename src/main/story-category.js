@@ -150,14 +150,53 @@ function conflictIdsForCategory(catId) {
 }
 
 /**
+ * TU DONG CHON PAGE (che do "full_auto"): xoay vong deu — lay page LAU NHAT chua dung
+ * (page chua dung bao gio duoc uu tien). Nho vay P01->P10 rai deu, khong don 1 page.
+ */
+function pickAutoPage(country) {
+  const pages = allPages();
+  if (!pages.length) return null;
+  const recent = memory.recentByCountry(country, 200);   // moi nhat truoc
+  let best = pages[0], bestDist = -1;
+  for (const p of pages) {
+    let d = recent.findIndex((e) => e.combo && e.combo.page_profile_id === p.page_profile_id);
+    if (d < 0) d = Number.MAX_SAFE_INTEGER;              // chua dung bao gio -> uu tien nhat
+    if (d > bestDist) { bestDist = d; best = p; }
+  }
+  return best;
+}
+
+/** Boc 1 category HOP LE (active, chua dinh streak) cho page — dung cho nut "Random category". */
+function randomEligibleCategory(country, pageId) {
+  const page = pageById(pageId) || allPages()[0] || null;
+  const r = chooseCategory(country, page, '');
+  return r.category || null;
+}
+
+/** Category/subcategory da dung trong n bai gan nhat (hien thi cho nguoi dung biet engine xoay toi dau). */
+function recentUsage(country, n = 5) {
+  return memory.recentByCountry(country, n).map((e) => ({
+    page_profile_id: (e.combo && e.combo.page_profile_id) || '',
+    category_id: (e.combo && e.combo.category_id) || '',
+    category_name: (e.combo && e.combo.category_name) || '',
+    subcategory_id: (e.combo && e.combo.subcategory_id) || '',
+    subcategory_name: (e.combo && e.combo.subcategory_name) || '',
+    at: e.at || '',
+  })).filter((x) => x.category_id);
+}
+
+/**
  * CHON DAU VAO hoan chinh. Luon tra ve doi tuong hop le (khong null).
  * @returns {page_profile_id, category_id, category_name, subcategory_id, subcategory_name,
  *           conflict_premise, conflict_ids, legacy_themes, status_dynamic, reveal_affinity,
  *           justice_affinity, fallback, notes[]}
  */
-function chooseInput({ country = DEFAULT_COUNTRY, pageId = '', categoryId = '', subcategoryId = '' } = {}) {
+function chooseInput({ country = DEFAULT_COUNTRY, pageId = '', categoryId = '', subcategoryId = '', autoPage = false } = {}) {
   const notes = [];
-  const page = pageById(pageId) || allPages()[0] || null;
+  // Che do "tu dong hoan toan": engine tu chon page (xoay vong deu)
+  let page = autoPage ? pickAutoPage(country) : null;
+  if (autoPage && page) notes.push('tự chọn page ' + page.page_profile_id);
+  if (!page) page = pageById(pageId) || allPages()[0] || null;
 
   // manual subcategory -> suy ra category cua no
   let cat = null, sub = null, forced = false;
@@ -218,6 +257,7 @@ function chooseInput({ country = DEFAULT_COUNTRY, pageId = '', categoryId = '', 
 
 module.exports = {
   chooseInput, chooseCategory, chooseSubcategory,
+  pickAutoPage, randomEligibleCategory, recentUsage,
   allCategories, categoryById, allPages, pageById, subcatsOf, subcatById,
   conflictIdsFor, conflictIdsForCategory, statusDynamics, legacyThemeCategories,
   DEFAULT_COUNTRY,

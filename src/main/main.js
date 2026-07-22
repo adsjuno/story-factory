@@ -289,13 +289,49 @@ ipcMain.handle('settings:saveInput', (_e, payload) => {
   const s = loadSettings();
   s.story = s.story || {};
   s.story.input = {
-    mode: ['auto', 'category', 'subcategory'].includes(p.mode) ? p.mode : 'auto',
+    mode: ['auto', 'category', 'subcategory', 'full_auto'].includes(p.mode) ? p.mode : 'auto',
     pageId: String(p.pageId || 'P01'),
     categoryId: String(p.categoryId || ''),
     subcategoryId: String(p.subcategoryId || ''),
+    fastTest: !!p.fastTest,
   };
   saveSettings(s);
   return { ok: true, input: s.story.input };
+});
+// Boc 1 category hop le (active + chua dinh streak) cho nut "Random category"
+ipcMain.handle('category:random', (_e, { pageId }) => {
+  requireAuth();
+  const country = loadRunningCountry();
+  const c = storyCategory.randomEligibleCategory(country, pageId || 'P01');
+  return c ? { ok: true, categoryId: c.category_id, categoryName: c.name_en } : { ok: false, error: 'Không có category hợp lệ' };
+});
+// Category/subcategory da dung gan day (de biet engine dang xoay toi dau)
+ipcMain.handle('category:recent', (_e, { n }) => {
+  requireAuth();
+  const country = loadRunningCountry();
+  return { ok: true, recent: storyCategory.recentUsage(country, Math.max(1, Math.min(10, parseInt(n, 10) || 5))) };
+});
+
+// ---------------- IPC: Don rac test ----------------
+// Xoa moi dong status=draft_test khoi Google Sheet
+ipcMain.handle('sheets:deleteTest', async () => {
+  requireAuth();
+  const s = loadSettings();
+  const url = s.sheets?.webhookUrl;
+  if (!url) return { ok: false, error: 'Chưa cấu hình Google Sheets.' };
+  try {
+    const r = await sheets.deleteByStatus(url, 'draft_test');
+    return { ok: true, deleted: r.deleted };
+  } catch (e) { return { ok: false, error: e.message }; }
+});
+// Reset so chong trung (KHONG hoan tac duoc - renderer da hoi xac nhan)
+ipcMain.handle('memory:reset', () => {
+  requireAuth();
+  try {
+    const before = storyMemory.all().length;
+    store.write(storyMemory.FILE, { entries: [] });
+    return { ok: true, cleared: before };
+  } catch (e) { return { ok: false, error: e.message }; }
 });
 
 // ---------------- IPC: Conflict tree (theo nuoc + ngach) ----------------
