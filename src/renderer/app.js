@@ -189,18 +189,34 @@ $('writeBtn').onclick=async()=>{
   if(running)return;
   const niche=$('nicheSel').value;
   const count=parseInt($('countInput').value,10)||1;
-  running=true;$('writeBtn').disabled=true;$('progBadge').classList.remove('hidden');
+  running=true;
+  // Nut Dung THAY CHO nut Bat dau trong luc chay
+  $('writeBtn').classList.add('hidden');
+  $('stopBtn').classList.remove('hidden');$('stopBtn').disabled=false;$('stopBtn').textContent='⏹ Dừng';
+  $('stopHint').classList.remove('hidden');
+  $('progBadge').classList.remove('hidden');
   $('log').innerHTML='';
   logLine('Bắt đầu viết '+count+' bài, ngách '+niche+'...');
   const off=api.onProgress(p=>{if(p&&p.message)logLine(p.message, /✓/.test(p.message)?'ok':null);});
   const r=await api.write({niche,count});
   off&&off();
-  running=false;$('writeBtn').disabled=false;$('progBadge').classList.add('hidden');
+  running=false;
+  $('stopBtn').classList.add('hidden');$('stopHint').classList.add('hidden');
+  $('writeBtn').classList.remove('hidden');$('writeBtn').disabled=false;
+  $('progBadge').classList.add('hidden');
   if(r.ok){
-    logLine('✅ Xong! Đã ghi '+r.written+' bài lên Google Sheet.'+(r.failed&&r.failed.length?' ('+r.failed.length+' bài lỗi bỏ qua)':''),'ok');
+    const push=(r.pushFailed&&r.pushFailed.length)?' ('+r.pushFailed.length+' bài đẩy Sheet lỗi)':'';
+    const head=r.stopped?'⏹ Đã dừng. Đã ghi ':'✅ Xong! Đã ghi ';
+    logLine(head+r.written+' bài lên Google Sheet.'+(r.failed&&r.failed.length?' ('+r.failed.length+' bài lỗi bỏ qua)':'')+push, r.stopped?null:'ok');
   }else{
     logLine('❌ '+ (r.error||'Lỗi không rõ'),'err');
   }
+};
+
+$('stopBtn').onclick=async()=>{
+  if(!running)return;
+  $('stopBtn').disabled=true;$('stopBtn').textContent='⏹ Đang dừng...';
+  await api.stopWrite();
 };
 
 // ---------- CAI DAT ----------

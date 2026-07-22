@@ -162,6 +162,7 @@ ipcMain.handle('settings:aiLogout', async (_e, { provider }) => {
 });
 
 // ---------------- IPC: Viet truyen ----------------
+let STOP_REQUESTED = false;   // nguoi dung bam nut Dung
 ipcMain.handle('story:niches', () => { requireAuth(); return { ok: true, niches: storyWriter.getNiches() }; });
 
 ipcMain.handle('story:write', async (_e, { niche, count }) => {
@@ -171,15 +172,26 @@ ipcMain.handle('story:write', async (_e, { niche, count }) => {
   if (!url) return { ok: false, error: 'Chưa cấu hình Google Sheets (Cài đặt → Google Sheets).' };
 
   try {
-    const result = await storyWriter.writeBatch({ niche, count }, (p) => {
+    STOP_REQUESTED = false;                 // moi lan bam "Bat dau viet" la mot luot moi
+    const result = await storyWriter.writeBatch({
+      niche,
+      count,
+      // DAY SHEET NGAY TUNG BAI (khong gom cuoi) -> crash giua chung khong mat ca loat
+      pushRow: (row) => sheets.appendRows(url, [row]),
+      shouldStop: () => STOP_REQUESTED,
+    }, (p) => {
       mainWindow.webContents.send('story:progress', p);
     });
     if (!result.rows.length) {
-      return { ok: false, error: 'Không viết được bài nào. ' + (result.failed[0] ? result.failed[0].error : '') };
+      const why = result.stopped ? 'Đã dừng trước khi có bài nào xong.' : '';
+      return { ok: false, error: 'Không viết được bài nào. ' + why + (result.failed[0] ? result.failed[0].error : '') };
     }
-    // Ghi tat ca dong len Sheet 1 lan
-    mainWindow.webContents.send('story:progress', { message: `Đang ghi ${result.rows.length} bài lên Google Sheet...` });
-    await sheets.appendRows(url, result.rows);
+    if (result.pushFailed && result.pushFailed.length) {
+      mainWindow.webContents.send('story:progress', {
+        message: `⚠️ ${result.pushFailed.length} bài đẩy Sheet lỗi: `
+          + result.pushFailed.map((x) => `${x.storyId} (${x.error})`).join('; '),
+      });
+    }
 
     // Luu lich su gon
     const db = store.read('jobs.json');
@@ -203,10 +215,20 @@ ipcMain.handle('story:write', async (_e, { niche, count }) => {
       }
     }
 
-    return { ok: true, written: result.rows.length, failed: result.failed };
+    return { ok: true, written: result.rows.length, failed: result.failed, stopped: !!result.stopped, pushFailed: result.pushFailed || [] };
   } catch (e) {
     return { ok: false, error: e.message };
+  } finally {
+    STOP_REQUESTED = false;
   }
+});
+
+// DUNG: chi bat co. writeBatch kiem tra GIUA cac bai -> bai dang viet do van chay het.
+ipcMain.handle('story:stop', () => {
+  requireAuth();
+  STOP_REQUESTED = true;
+  mainWindow.webContents.send('story:progress', { message: '⏹ Đã nhận lệnh Dừng — hoàn tất bài đang viết dở rồi dừng...' });
+  return { ok: true };
 });
 
 ipcMain.handle('sheets:test', async () => {

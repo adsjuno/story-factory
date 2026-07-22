@@ -30,10 +30,27 @@ Nhân viên bấm "Viết bài"
    → phần mềm gửi câu lệnh gọi skill "story-us-senior-viral" vào cửa sổ Claude login
    → Claude chạy pipeline 11 bước, trả về theo khuôn ===CỘT===
    → phần mềm bóc tách thành 21 cột
-   → phần mềm tự tạo 4 ảnh bằng Cloudflare Workers AI (FLUX 2 klein-9b), up lên R2,
-     chèn link ảnh vào bài, rồi đẩy tất cả lên Google Sheet
+   → phần mềm tự tạo 5 ảnh bằng Cloudflare Workers AI (FLUX 2 klein-9b), up lên R2,
+     chèn link ảnh vào bài, rồi đẩy bài đó lên Google Sheet NGAY
    → (n8n đọc Sheet → đăng WordPress + Facebook + thả link comment)
 ```
+
+**Đẩy Sheet từng bài một**, không gom đến cuối. Nếu đang chạy 10 bài mà máy tắt ở bài thứ 7
+thì 6 bài đầu đã nằm trên Sheet rồi. Bài nào đẩy lỗi thì log báo rõ và chạy tiếp bài sau.
+
+## Nút Dừng
+
+Trong lúc đang chạy, nút "Bắt đầu viết" đổi thành **⏹ Dừng**. Bấm Dừng thì:
+- Bài đang viết dở vẫn được viết cho xong rồi mới dừng (không mất công).
+- Các bài còn lại không chạy. Log ghi "Đã dừng theo yêu cầu — còn N bài chưa chạy".
+- Nếu đang tạo ảnh thì dừng luôn phần ảnh, bài đó được đánh dấu `need_image` để chạy lại sau.
+
+## Chế độ Test nhanh
+
+Test nhanh bỏ qua tạo ảnh và **không ghi vào sổ chống trùng dài hạn** (giữ sạch cooldown của
+bài thật). Nhưng các bài trong **cùng một lần bấm "Bắt đầu viết"** vẫn thấy nhau qua một
+**sổ tạm trong phiên**, nên vẫn xoay page và không lặp subcategory / vật biểu tượng /
+kiểu reveal / kiểu công lý. Sổ tạm xoá khi kết thúc lượt chạy.
 
 ## Yêu cầu QUAN TRỌNG
 

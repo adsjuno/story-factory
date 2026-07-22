@@ -15,6 +15,7 @@
 const crypto = require('crypto');
 const store = require('./store');
 const memory = require('./story-memory');
+const nameGender = require('./name-gender');
 
 const DEFAULT_COUNTRY = 'US';
 const COUNTRIES = ['US', 'ES', 'CA'];
@@ -176,89 +177,94 @@ function isReconciliationEnding(e) {
   return /reconciliation|breaks the cycle and apologizes|gathers again under new rules|apologizes publicly/i.test(e || '');
 }
 
-// ==================== LOP 1: GEOGRAPHY (location x town x season x weather) ====================
-// Nhom dia ly. town_setting 'generic' -> hop moi noi. Con lai phai giao voi geo cua location.
-const TOWN_GEO = [
-  ['rust_belt', 'prairie_plains', 'appalachian'],          // 0 factory town
-  ['appalachian'],                                          // 1 Appalachian mountain
-  ['prairie_plains', 'southern', 'appalachian', 'great_lakes', 'mountain_west'], // 2 rural farming
-  ['coastal'],                                              // 3 Gulf Coast retirement
-  ['generic'],                                              // 4 suburb outside major city
-  ['new_england', 'coastal'],                              // 5 quiet New England
-  ['desert'],                                               // 6 desert town interstate
-  ['appalachian', 'mountain_west', 'rust_belt'],           // 7 former mining
-  ['great_lakes', 'mountain_west', 'new_england'],         // 8 lakeside summer tourism
-  ['southern', 'prairie_plains'],                          // 9 Southern church town
-  ['generic'],                                              // 10 military town near Army base
-  ['rust_belt', 'great_lakes'],                            // 11 Rust Belt neighborhood
-  ['prairie_plains', 'mountain_west', 'desert'],           // 12 ranching community
-  ['generic'],                                              // 13 college town
-  ['coastal'],                                              // 14 coastal fishing town
-  ['prairie_plains', 'southern', 'great_lakes', 'generic'], // 15 suburban over farmland
-];
-const STATE_GEO = {
-  Ohio: ['great_lakes', 'rust_belt', 'appalachian', 'prairie_plains'], Iowa: ['prairie_plains'],
-  Kansas: ['prairie_plains'], Missouri: ['prairie_plains', 'southern'], Oklahoma: ['prairie_plains', 'southern'],
-  Nebraska: ['prairie_plains'], Indiana: ['great_lakes', 'rust_belt', 'prairie_plains'],
-  Kentucky: ['appalachian', 'southern'], Tennessee: ['appalachian', 'southern'], Arkansas: ['southern', 'prairie_plains'],
-  Montana: ['mountain_west', 'prairie_plains'], Wyoming: ['mountain_west', 'prairie_plains'],
-  'North Dakota': ['prairie_plains'], 'South Dakota': ['prairie_plains'], 'West Virginia': ['appalachian', 'rust_belt'],
-  Maine: ['coastal', 'new_england'], Michigan: ['great_lakes', 'rust_belt'], Wisconsin: ['great_lakes', 'prairie_plains'],
-  Minnesota: ['great_lakes', 'prairie_plains'], Alabama: ['southern', 'coastal', 'appalachian'],
-  Georgia: ['southern', 'coastal', 'appalachian'], Texas: ['prairie_plains', 'southern', 'desert', 'coastal'],
-  Pennsylvania: ['appalachian', 'rust_belt', 'great_lakes'], Illinois: ['great_lakes', 'prairie_plains', 'rust_belt'],
-  Virginia: ['appalachian', 'coastal', 'southern'], 'North Carolina': ['appalachian', 'coastal', 'southern'],
-  Mississippi: ['southern', 'coastal'], Louisiana: ['southern', 'coastal'], Idaho: ['mountain_west'],
-  Utah: ['mountain_west', 'desert'], Arizona: ['desert', 'mountain_west'], Colorado: ['mountain_west', 'prairie_plains'],
-  Florida: ['coastal', 'southern', 'tropical'], 'New Mexico': ['desert', 'mountain_west'],
-  Oregon: ['coastal', 'mountain_west'], Washington: ['coastal', 'mountain_west'], 'South Carolina': ['southern', 'coastal'],
-  Maryland: ['coastal', 'appalachian'], Delaware: ['coastal'], 'New Hampshire': ['new_england', 'appalachian'],
-  Vermont: ['new_england', 'appalachian'], Connecticut: ['new_england', 'coastal'], 'Rhode Island': ['new_england', 'coastal'],
-  Massachusetts: ['new_england', 'coastal'], 'New Jersey': ['coastal'], 'New York': ['great_lakes', 'coastal', 'appalachian', 'rust_belt'],
-  California: ['coastal', 'desert', 'mountain_west'], Nevada: ['desert', 'mountain_west'],
-  Alaska: ['coastal', 'mountain_west'], Hawaii: ['coastal', 'tropical'],
-};
-function geoOfState(loc) { return STATE_GEO[loc] || ['generic', 'prairie_plains', 'southern']; }
-function townGeoAt(idx) { return TOWN_GEO[idx] || ['generic']; }
-function townCompatLocation(townIdx, loc) {
-  const tg = townGeoAt(townIdx);
-  if (tg.includes('generic')) return true;
+// ==================== LOP 1: GEOGRAPHY v2 (data-driven) ====================
+// Nguon: story-geography-US.json (51 bang + 38 town_setting + no_snow + season/weather).
+// NGUYEN TAC: bang nay chi CAM to hop vo ly. Thieu du lieu KHONG phai la "cho qua":
+//   - town_setting khong co trong bang -> coi la ['generic'] va VAN validate
+//     (chi hop voi bang co 'generic' trong state_geo)
+//   - season la khong biet -> 'any' (khong rang buoc weather); weather khong biet -> 'any'
+//   - khong tim duoc to hop hop le -> weather_mood = '' (tha bo trong con hon mau thuan)
+const GEO = bundled('story-geography-US.json') || {};
+const GEO_TOWN = GEO.town_setting_groups || {};
+const GEO_STATE = GEO.state_geo || {};
+const GEO_SEASON_MONTH = GEO.season_month || {};
+const GEO_WEATHER_SEASON = GEO.weather_season || {};
+const GEO_NO_SNOW = GEO.no_snow_geo || [];
+const GEO_SNOW_WEATHER = GEO.snow_weather || [];
+
+function geoKey(s) { return String(s || '').trim().toLowerCase(); }
+function geoLookup(table, key) {
+  const k = geoKey(key);
+  if (!k) return null;
+  if (Object.prototype.hasOwnProperty.call(table, key)) return table[key];
+  for (const kk of Object.keys(table)) if (geoKey(kk) === k) return table[kk];
+  return null;
+}
+// Bang khong co trong bang -> 'generic' (khong biet gi ve no thi chi cho di voi town generic)
+function geoOfState(loc) { return geoLookup(GEO_STATE, loc) || ['generic']; }
+// Tu DIA LY (nang 3 diem) vs tu chung chung (1 diem). Dung de khop town viet khac chu
+// nhung cung mot vung — vd pool ghi "a Gulf Coast retirement community" con bang ghi
+// "a Gulf Coast shrimping town". KHONG khop duoc moi coi la 'generic'.
+const GEO_WORDS = new Set([
+  'coastal', 'coast', 'gulf', 'beach', 'harbor', 'island', 'ferry', 'shrimping', 'fishing',
+  'lakeside', 'lake', 'lakes', 'north-woods', 'appalachian', 'mountain', 'rockies', 'desert',
+  'high-desert', 'sun-baked', 'prairie', 'plains', 'farming', 'farm', 'farmland', 'dairy',
+  'ranching', 'delta', 'southern', 'england', 'rust', 'belt', 'steel', 'factory', 'mill',
+  'mining', 'midwestern', 'florida', 'subtropical', 'tropical', 'railroad', 'suburban',
+  'suburb', 'college', 'highway', 'truck', 'courthouse', 'border',
+]);
+const GEO_STOP = new Set(['a', 'an', 'the', 'of', 'in', 'on', 'at', 'by', 'to', 'from', 'that', 'with', 'and', 'its', 'one', 'only', 'after', 'over', 'outside', 'near', 'already', 'where', 'built', 'around']);
+function geoWords(s) {
+  return String(s || '').toLowerCase().split(/[^a-z-]+/).filter((w) => w && !GEO_STOP.has(w));
+}
+const GEO_TOWN_KEYS = Object.keys(GEO_TOWN).map((k) => ({ key: k, words: new Set(geoWords(k)) }));
+function resolveTownKey(town) {
+  const ws = geoWords(town);
+  if (!ws.length) return null;
+  let best = null, bestScore = 0;
+  for (const cand of GEO_TOWN_KEYS) {
+    let score = 0;
+    for (const w of ws) if (cand.words.has(w)) score += GEO_WORDS.has(w) ? 3 : 1;
+    if (score > bestScore) { bestScore = score; best = cand.key; }
+  }
+  // Phai co it nhat 1 tu DIA LY trung (>=3 diem) moi tin; khong thi tra null -> 'generic'
+  return bestScore >= 3 ? best : null;
+}
+// town khong co trong bang -> thu khop tu khoa -> cuoi cung moi la 'generic'.
+// 'generic' VAN duoc validate (chi hop voi bang co 'generic'), KHONG phai la "cho qua".
+function geoOfTown(town) {
+  const direct = geoLookup(GEO_TOWN, town);
+  if (direct) return direct;
+  const k = resolveTownKey(town);
+  if (k) return GEO_TOWN[k];
+  return ['generic'];
+}
+function townCompatLocation(town, loc) {
+  const tg = geoOfTown(town);
   const lg = geoOfState(loc);
   return tg.some((g) => lg.includes(g));
 }
-
-// Season -> "mua/nhiet". Weather -> "nhiet". Ghep phai hop.
-function seasonBucket(s) {
-  s = lc(s);
-  if (/christmas/.test(s)) return 'winter';
-  if (/thanksgiving|veterans day|church homecoming/.test(s)) return 'late_fall';
-  if (/mother's day|memorial day|graduation/.test(s)) return 'spring';
-  if (/independence day|father's day|county fair/.test(s)) return 'summer';
-  return 'any'; // wedding/funeral/reunion/retirement/birthday/military reunion
-}
-function weatherBucket(w) {
-  w = lc(w);
-  if (/snow|freezing|cold november/.test(w)) return 'cold';
-  if (/heatwave|humid/.test(w)) return 'hot';
-  if (/golden light|thunderstorm|autumn sunlight/.test(w)) return 'warm';
-  if (/overcast|fog/.test(w)) return 'cool';
-  return 'any';
-}
+function seasonOf(season) { return geoLookup(GEO_SEASON_MONTH, season) || 'any'; }
+function weatherSeasonsOf(weather) { return geoLookup(GEO_WEATHER_SEASON, weather) || ['any']; }
 function seasonWeatherOk(season, weather) {
-  const sb = seasonBucket(season), wb = weatherBucket(weather);
-  if (sb === 'any' || wb === 'any') return true;
-  const allow = {
-    winter: ['cold', 'cool'],
-    late_fall: ['cold', 'cool', 'warm'],
-    spring: ['cool', 'warm'],
-    summer: ['hot', 'warm'],
-  };
-  return (allow[sb] || []).includes(wb);
+  const s = seasonOf(season);
+  const ws = weatherSeasonsOf(weather);
+  if (s === 'any' || ws.includes('any')) return true;
+  return ws.includes(s);
+}
+function isSnowWeather(w) {
+  const k = geoKey(w);
+  return GEO_SNOW_WEATHER.some((x) => geoKey(x) === k);
 }
 function locationWeatherOk(loc, weather) {
   const g = geoOfState(loc);
-  const wb = weatherBucket(weather);
-  if (g.includes('tropical') && wb === 'cold') return false; // Hawaii/Florida khong snow/freezing
+  if (g.some((x) => GEO_NO_SNOW.includes(x)) && isSnowWeather(weather)) return false;
+  return true;
+}
+function geoComboOk(loc, town, season, weather) {
+  if (!townCompatLocation(town, loc)) return false;
+  if (weather && !seasonWeatherOk(season, weather)) return false;
+  if (weather && !locationWeatherOk(loc, weather)) return false;
   return true;
 }
 
@@ -293,6 +299,57 @@ function relationshipFamily(rel) {
   if (/employee|boss|founder/.test(r)) return 'work_hierarchy';
   return 'parent_vs_adult_child';
 }
+// ==================== LOP 3: GIOI TINH VAI (hero/villain phai khop conflict) ====================
+// Doc giao tu TEXT cua conflict + relationship. Chi ket luan khi co dau hieu RO RANG;
+// khong ro -> null -> tu do chon ten.
+const HERO_F = [
+  /\bthe mother\b/, /\bmother and\b/, /\band (?:her|his) mother\b/, /\bthe grandmother\b/,
+  /\bthe bride\b/, /\bthe widow\b/, /\bthe wife\b/, /\bbetrayed wife\b/, /\bthe daughter-in-law\b/,
+  /\bthe mother-in-law\b/, /\bthe aunt\b/, /\bpoor aunt\b/, /\bthe sister\b/, /\bthe grandma\b/,
+  /\bwidowed mother\b/, /\bher (?:son|daughter|husband|children)\b/,
+];
+const HERO_M = [
+  /\bthe father\b/, /\bfather and\b/, /\band (?:her|his) father\b/, /\bthe grandfather\b/,
+  /\bthe veteran\b/, /\bthe widower\b/, /\bthe husband\b/, /\bthe uncle\b/, /\bthe brother\b/,
+  /\bthe grandpa\b/, /\bhis (?:son|daughter|wife|children|service)\b/, /\bnew husband\b/,
+];
+const VILL_F = [/\bthe daughter\b/, /\bdaughter-in-law\b/, /\bthe niece\b/, /\bwealthy niece\b/, /\bthe stepdaughter\b/, /\bthe sister-in-law\b/];
+const VILL_M = [/\bthe son\b/, /\bson-in-law\b/, /\bthe nephew\b/, /\bthe stepson\b/, /\bthe brother-in-law\b/, /\byounger brother\b/];
+function matchAny(res, text) { return res.some((re) => re.test(text)); }
+/**
+ * Suy gioi tinh BAT BUOC cho hero/villain tu conflict + relationship.
+ * @returns {{hero: 'F'|'M'|null, villain: 'F'|'M'|null}}
+ */
+function requiredGenders(conflictText, relationshipText) {
+  const t = lc(String(conflictText || '') + ' || ' + String(relationshipText || ''));
+  let hero = null, villain = null;
+  const hf = matchAny(HERO_F, t), hm = matchAny(HERO_M, t);
+  if (hf && !hm) hero = 'F'; else if (hm && !hf) hero = 'M';   // ca hai cung dung -> khong ket luan
+  const vf = matchAny(VILL_F, t), vm = matchAny(VILL_M, t);
+  if (vf && !vm) villain = 'F'; else if (vm && !vf) villain = 'M';
+  return { hero, villain };
+}
+
+// ==================== LOP 4: RELATIONSHIP phai khop SUBCATEGORY ====================
+// Data khong co truong relationship_affinity -> suy tu chinh TEN + PREMISE cua subcategory
+// (va ten category) bang chinh bo phan loai relationshipFamily. Khong co dau hieu -> null (tu do).
+const REL_FAM_HINTS = [
+  [/grandchild|grandparent|grandson|granddaughter|grandmother|grandfather/, 'grandparent_vs_grandchild'],
+  [/veteran|service member|military service|stolen valor/, 'veteran_vs_civilian'],
+  [/bride|in-law|wedding party|mother-in-law/, 'bride_vs_inlaws'],
+  [/widow|widower|spouse|marriage|husband|wife|affair/, 'spouse_betrayal'],
+  [/sibling|brother|sister/, 'sibling_rivalry'],
+  [/workplace|employer|employee|coworker|boss|career|retirement benefit|fired|laid off/, 'work_hierarchy'],
+  [/aunt|uncle|niece|nephew|cousin/, 'extended_family'],
+];
+function requiredRelFamily(input) {
+  if (!input) return null;
+  const t = lc([input.subcategory_name, input.conflict_premise, input.category_name].filter(Boolean).join(' | '));
+  if (!t) return null;
+  for (const [re, fam] of REL_FAM_HINTS) if (re.test(t)) return fam;
+  return null;                                              // khong co dau hieu -> khong rang buoc
+}
+
 // Family reveal it dung (uu tien khi phai doi loai)
 const UNDERUSED_REVEAL = new Set(['document_evidence', 'self_disclosure', 'ordinary_witness', 'natural_consequence']);
 const UNDERUSED_JUSTICE = new Set(['procedural', 'hero_choice', 'walk_away_dignity', 'private_resolution']);
@@ -345,6 +402,33 @@ function compatOk(bp, extra) {
       if (!affinityMatch(bp.evidence_source || bp.conflict || '', r.require_one_of.evidence_source)) return { ok: false, reason: `${r.id}: thiếu evidence_source` };
     }
   }
+
+  // R-GEO: location x town x season x weather (LOP 1 v2, town la khong biet VAN validate)
+  if (bp.location && bp.town_setting && !townCompatLocation(bp.town_setting, bp.location)) {
+    return { ok: false, reason: `R-GEO: "${bp.town_setting}" không hợp địa lý của ${bp.location}` };
+  }
+  if (bp.weather_mood && !seasonWeatherOk(bp.season_event, bp.weather_mood)) {
+    return { ok: false, reason: `R-GEO: "${bp.weather_mood}" không hợp mùa của "${bp.season_event}"` };
+  }
+  if (bp.weather_mood && !locationWeatherOk(bp.location, bp.weather_mood)) {
+    return { ok: false, reason: `R-GEO: ${bp.location} không thể có "${bp.weather_mood}"` };
+  }
+
+  // R-GENDER: ten phai khop gioi tinh ma conflict/relationship da chi ro (LOP 3)
+  const ng = requiredGenders(bp.conflict, bp.relationship);
+  if (ng.hero && bp.hero_first && nameGender.gender(bp.hero_first) !== ng.hero) {
+    return { ok: false, reason: `R-GENDER: hero "${bp.hero_first}" không khớp giới tính ${ng.hero} mà conflict yêu cầu` };
+  }
+  if (ng.villain && bp.villain_first && nameGender.gender(bp.villain_first) !== ng.villain) {
+    return { ok: false, reason: `R-GENDER: villain "${bp.villain_first}" không khớp giới tính ${ng.villain} mà conflict yêu cầu` };
+  }
+
+  // R-REL: relationship_family phai khop subcategory (LOP 4)
+  if (bp.required_rel_family && bp.relationship
+      && relationshipFamily(bp.relationship) !== bp.required_rel_family) {
+    return { ok: false, reason: `R-REL: relationship "${bp.relationship}" không thuộc nhóm ${bp.required_rel_family} của subcategory` };
+  }
+
   return { ok: true, reason: '' };
 }
 
@@ -446,15 +530,37 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   }
 
   // 3) age + relationship
-  bp.relationship = pickOne(relationshipsForTheme(pool, effTheme)) || '';
+  // LOP 4: relationship phai khop SUBCATEGORY (vd sub ve grandchild thi khong duoc ra
+  // "mother and adult daughter"). Loc truoc khi random; het ung vien thi moi tha.
+  const relCands = relationshipsForTheme(pool, effTheme);
+  const needRelFam = requiredRelFamily(input);
+  // Subcategory THANG legacy_theme: tim trong TOAN BO pool, khong chi tap da loc theo theme
+  // (vd sub "Sibling..." trong theme A_me_gia — theme loc het quan he anh em).
+  const relFit = needRelFam ? (pool.relationship || []).filter((r) => relationshipFamily(r) === needRelFam) : [];
+  bp.relationship = pickOne(relFit.length ? relFit : relCands) || '';
+  // Pool khong co quan he nao thuoc nhom do -> bo rang buoc (khong de regen vo vong)
+  bp.required_rel_family = relFit.length ? needRelFam : '';
   bp.hero_age = ageForTheme(extra, effTheme);
 
   // 4) ten (cooldown + ho chung neu gia dinh gan)
+  // LOP 3: neu conflict/relationship chi ro gioi tinh vai thi ten PHAI khop gioi tinh do.
+  // Giu nguyen conflict, chi random lai TEN. Khong suy ra duoc gioi -> tu do chon.
+  const needG = requiredGenders(bp.conflict, bp.relationship);
+  bp.required_hero_gender = needG.hero || '';
+  bp.required_villain_gender = needG.villain || '';
+  const heroPool = needG.hero
+    ? (pool.hero_name || []).filter((n) => nameGender.gender(n) === needG.hero)
+    : (pool.hero_name || []);
+  const villainPool = needG.villain
+    ? (pool.villain_name || []).filter((n) => nameGender.gender(n) === needG.villain)
+    : (pool.villain_name || []);
+
   const surnames = extra.surname || [];
-  const heroFirst = chooseWeighted(pool.hero_name || [], { country, field: 'hero_first', hardDays: nameRules.hero_name_cooldown_days || 60, wr });
-  let villainFirst = chooseWeighted(pool.villain_name || [], { country, field: 'villain_first', hardDays: nameRules.villain_name_cooldown_days || 30, wr });
+  const heroFirst = chooseWeighted(heroPool.length ? heroPool : (pool.hero_name || []), { country, field: 'hero_first', hardDays: nameRules.hero_name_cooldown_days || 60, wr });
+  let villainFirst = chooseWeighted(villainPool.length ? villainPool : (pool.villain_name || []), { country, field: 'villain_first', hardDays: nameRules.villain_name_cooldown_days || 30, wr });
   if (villainFirst === heroFirst && nameRules.prevent_same_first_name_in_story) {
-    villainFirst = pickOne((pool.villain_name || []).filter((n) => n !== heroFirst)) || villainFirst;
+    const alt = (villainPool.length ? villainPool : (pool.villain_name || [])).filter((n) => n !== heroFirst);
+    villainFirst = pickOne(alt) || villainFirst;
   }
   const heroSurname = surnames.length ? pickOne(surnames) : '';
   const villainSurname = (nameRules.same_surname_for_close_family && isCloseFamily(bp.relationship))
@@ -466,17 +572,10 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   // 5) location + town_setting (LOP 1: town phai hop GEOGRAPHY cua location) + season + weather
   bp.location = chooseWeighted(pool.location || [], { country, field: 'location', softDays: soft.location, wr }) || '';
   const towns = extra.town_setting || [];
-  // random town cho toi khi hop geography voi location (giu location)
-  let townIdx = -1;
-  for (let k = 0; k < 40 && townIdx < 0; k++) {
-    const idx = Math.floor(Math.random() * towns.length);
-    if (townCompatLocation(idx, bp.location)) townIdx = idx;
-  }
-  if (townIdx < 0) { // khong tim thay -> chon town 'generic' bat ky
-    const gens = towns.map((_, i) => i).filter((i) => townGeoAt(i).includes('generic'));
-    townIdx = gens.length ? gens[Math.floor(Math.random() * gens.length)] : 0;
-  }
-  bp.town_setting = towns[townIdx] || '';
+  // LOP 1 v2: chi lay town HOP geography voi location (giu nguyen location).
+  // town la khong biet -> 'generic' -> van phai giao voi state_geo, KHONG duoc cho qua.
+  const townCands = towns.filter((t) => townCompatLocation(t, bp.location));
+  bp.town_setting = townCands.length ? pickOne(townCands) : '';
   // season: uu tien theme preferred_events
   bp.season_event = pickOne((aff.preferred_events && aff.preferred_events.length) ? aff.preferred_events : (extra.season_event || [''])) || '';
   // weather: chi lay weather HOP season + HOP location; khong co -> de null (thà bỏ trống)
@@ -511,6 +610,16 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   }
   const twistSoftFam = new Set(); if (lastReveal) twistSoftFam.add(lastReveal);
   const twistHardFam = new Set(); if (capExternal) twistHardFam.add('external_public_validator');
+  // Cap 25% cho TUNG reveal_family (khong chi rieng cap external+public_recognition):
+  // 5 bai lien tiep cung 'ordinary_witness' cung la lap, phai chan.
+  const REVEAL_CAP = 0.25;
+  const REVEAL_FAMS = ['external_public_validator', 'ordinary_witness', 'document_evidence', 'self_disclosure'];
+  const overCap = REVEAL_FAMS
+    .map((fam) => ({ fam, r: memory.rateRecent(country, 20, (c) => c.reveal_family === fam) }))
+    .filter((x) => x.r.n >= 4 && x.r.rate >= REVEAL_CAP)
+    .sort((a, b) => b.r.rate - a.r.rate);
+  // Chan toi da 2 nhom (nhieu nhat truoc) -> luon con it nhat 2 nhom de chon, khong bi ket
+  for (const x of overCap.slice(0, 2)) twistHardFam.add(x.fam);
   // GOI Y tu subcategory (reveal_affinity) — chi la bonus, khong pha cooldown/cap
   const revBonus = new Set((input && input.reveal_affinity) || []);
   bp.twist = chooseWeighted(pool.twist || [], { country, field: 'twist', wr, exclude: excludeTwist, familyOf: revealFamily, softFamilies: twistSoftFam, hardFamilies: twistHardFam, bonusFamilies: revBonus }) || '';
@@ -729,6 +838,7 @@ module.exports = {
   pickCombo, buildDnaBlock, remember, comboToSheetJson, buildSignature, themeCodeOf,
   // phan loai (cho test)
   isAuthorityRescueJustice, isHiddenWealthTwist, isReconciliationEnding,
-  townCompatLocation, seasonWeatherOk, locationWeatherOk, geoOfState, townGeoAt,
+  townCompatLocation, seasonWeatherOk, locationWeatherOk, geoOfState, geoOfTown, geoComboOk,
+  requiredGenders, requiredRelFamily,
   revealFamily, justiceFamily, relationshipFamily,
 };

@@ -1,0 +1,577 @@
+{
+  "_meta": {
+    "schema_version": "2.0",
+    "file": "story-geography-US.json",
+    "country": "US",
+    "purpose": "Chong to hop mau thuan dia ly/mua/thoi tiet. VD Oklahoma khong coastal, Hawaii khong tuyet, Memorial Day khong di voi mua thang 11.",
+    "cach_dung": [
+      "1. Chon location (state) -> lay state_geo[state].",
+      "2. Chi chon town_setting co it nhat 1 nhom trung voi state_geo. Lech -> random lai town_setting (giu location).",
+      "3. Chon season_event -> tra season_month -> chi chon weather_mood co season do trong weather_season (hoac 'any').",
+      "4. Neu state co nhom trong no_snow_geo -> CAM cac weather trong snow_weather.",
+      "5. Khong tim duoc to hop hop le -> de weather_mood = null. THA BO TRONG CON HON MAU THUAN.",
+      "6. town_setting khong co trong bang -> coi nhu 'generic', KHONG duoc bo qua validate."
+    ],
+    "nguyen_tac": "Bang nay chi CAM to hop vo ly, khong ep to hop cu the. Con lai de engine/AI tu chon."
+  },
+  "town_setting_groups": {
+    "a small coastal fishing town": [
+      "coastal_atlantic",
+      "coastal_pacific",
+      "coastal_gulf",
+      "new_england"
+    ],
+    "a coastal fishing town": [
+      "coastal_atlantic",
+      "coastal_pacific",
+      "coastal_gulf",
+      "new_england"
+    ],
+    "a weathered New England harbor town": [
+      "new_england"
+    ],
+    "a quiet New England town": [
+      "new_england"
+    ],
+    "a Gulf Coast shrimping town": [
+      "coastal_gulf"
+    ],
+    "a beach town that empties after Labor Day": [
+      "coastal_atlantic",
+      "coastal_pacific",
+      "coastal_gulf",
+      "new_england"
+    ],
+    "a Great Lakes port town": [
+      "great_lakes"
+    ],
+    "a lakeside town dependent on summer tourism": [
+      "great_lakes",
+      "northern_lakes",
+      "new_england"
+    ],
+    "a north-woods lake town": [
+      "northern_lakes"
+    ],
+    "a fading Appalachian mining village": [
+      "mountain_appalachian"
+    ],
+    "a small Appalachian mountain town": [
+      "mountain_appalachian"
+    ],
+    "a mountain town in the Rockies": [
+      "mountain_west"
+    ],
+    "a high-desert mountain town": [
+      "mountain_west",
+      "desert_southwest"
+    ],
+    "a windswept prairie town": [
+      "prairie_plains"
+    ],
+    "a flat farming town on the plains": [
+      "prairie_plains",
+      "rural_farming"
+    ],
+    "a rural farming county": [
+      "rural_farming",
+      "prairie_plains",
+      "southern",
+      "great_lakes"
+    ],
+    "a dairy-farming town": [
+      "rural_farming",
+      "northern_lakes",
+      "great_lakes"
+    ],
+    "a ranching community": [
+      "prairie_plains",
+      "mountain_west",
+      "desert_southwest"
+    ],
+    "a farm town losing its young people": [
+      "rural_farming",
+      "prairie_plains"
+    ],
+    "a dusty desert border town": [
+      "desert_southwest"
+    ],
+    "a sun-baked desert town": [
+      "desert_southwest"
+    ],
+    "a retirement community in the desert": [
+      "desert_southwest",
+      "subtropical"
+    ],
+    "a fading Midwestern factory town": [
+      "industrial_rustbelt",
+      "great_lakes"
+    ],
+    "a Rust Belt steel town": [
+      "industrial_rustbelt"
+    ],
+    "a mill town where the mill already closed": [
+      "industrial_rustbelt",
+      "mountain_appalachian",
+      "new_england"
+    ],
+    "a small Southern town": [
+      "southern"
+    ],
+    "a Southern town centered around one church": [
+      "southern"
+    ],
+    "a Delta farming town": [
+      "southern",
+      "rural_farming"
+    ],
+    "a subtropical Florida retirement town": [
+      "subtropical",
+      "coastal_gulf",
+      "coastal_atlantic"
+    ],
+    "an island town reachable only by ferry": [
+      "island_tropical",
+      "coastal_atlantic",
+      "coastal_pacific",
+      "new_england"
+    ],
+    "a quiet suburban town": [
+      "generic"
+    ],
+    "a generic small town": [
+      "generic"
+    ],
+    "an old railroad town": [
+      "generic",
+      "prairie_plains",
+      "industrial_rustbelt"
+    ],
+    "a working-class suburb outside a major city": [
+      "generic",
+      "industrial_rustbelt"
+    ],
+    "a suburban development built over old family farmland": [
+      "generic",
+      "rural_farming"
+    ],
+    "a county seat with one courthouse square": [
+      "generic",
+      "southern",
+      "rural_farming",
+      "prairie_plains"
+    ],
+    "a highway town built around one truck stop": [
+      "generic",
+      "prairie_plains",
+      "desert_southwest",
+      "rural_farming"
+    ],
+    "a college town after the students leave": [
+      "generic",
+      "new_england",
+      "rural_farming"
+    ]
+  },
+  "state_geo": {
+    "Maine": [
+      "new_england",
+      "coastal_atlantic",
+      "northern_lakes",
+      "rural_farming",
+      "generic"
+    ],
+    "New Hampshire": [
+      "new_england",
+      "mountain_appalachian",
+      "rural_farming",
+      "generic"
+    ],
+    "Vermont": [
+      "new_england",
+      "mountain_appalachian",
+      "rural_farming",
+      "generic"
+    ],
+    "Massachusetts": [
+      "new_england",
+      "coastal_atlantic",
+      "generic"
+    ],
+    "Rhode Island": [
+      "new_england",
+      "coastal_atlantic",
+      "generic"
+    ],
+    "Connecticut": [
+      "new_england",
+      "coastal_atlantic",
+      "generic"
+    ],
+    "New York": [
+      "coastal_atlantic",
+      "great_lakes",
+      "mountain_appalachian",
+      "industrial_rustbelt",
+      "rural_farming",
+      "generic"
+    ],
+    "New Jersey": [
+      "coastal_atlantic",
+      "generic"
+    ],
+    "Pennsylvania": [
+      "industrial_rustbelt",
+      "mountain_appalachian",
+      "rural_farming",
+      "great_lakes",
+      "generic"
+    ],
+    "Delaware": [
+      "coastal_atlantic",
+      "generic"
+    ],
+    "Maryland": [
+      "coastal_atlantic",
+      "mountain_appalachian",
+      "generic"
+    ],
+    "Washington DC": [
+      "generic"
+    ],
+    "Virginia": [
+      "coastal_atlantic",
+      "mountain_appalachian",
+      "southern",
+      "rural_farming",
+      "generic"
+    ],
+    "West Virginia": [
+      "mountain_appalachian",
+      "rural_farming",
+      "generic"
+    ],
+    "North Carolina": [
+      "coastal_atlantic",
+      "mountain_appalachian",
+      "southern",
+      "rural_farming",
+      "generic"
+    ],
+    "South Carolina": [
+      "coastal_atlantic",
+      "southern",
+      "rural_farming",
+      "generic"
+    ],
+    "Georgia": [
+      "coastal_atlantic",
+      "southern",
+      "mountain_appalachian",
+      "rural_farming",
+      "generic"
+    ],
+    "Florida": [
+      "subtropical",
+      "coastal_atlantic",
+      "coastal_gulf",
+      "generic"
+    ],
+    "Alabama": [
+      "southern",
+      "coastal_gulf",
+      "rural_farming",
+      "generic"
+    ],
+    "Mississippi": [
+      "southern",
+      "coastal_gulf",
+      "rural_farming",
+      "generic"
+    ],
+    "Louisiana": [
+      "coastal_gulf",
+      "southern",
+      "rural_farming",
+      "generic"
+    ],
+    "Arkansas": [
+      "southern",
+      "rural_farming",
+      "mountain_appalachian",
+      "generic"
+    ],
+    "Tennessee": [
+      "mountain_appalachian",
+      "southern",
+      "rural_farming",
+      "generic"
+    ],
+    "Kentucky": [
+      "mountain_appalachian",
+      "southern",
+      "rural_farming",
+      "generic"
+    ],
+    "Ohio": [
+      "industrial_rustbelt",
+      "great_lakes",
+      "rural_farming",
+      "generic"
+    ],
+    "Michigan": [
+      "great_lakes",
+      "industrial_rustbelt",
+      "northern_lakes",
+      "rural_farming",
+      "generic"
+    ],
+    "Indiana": [
+      "industrial_rustbelt",
+      "rural_farming",
+      "great_lakes",
+      "generic"
+    ],
+    "Illinois": [
+      "industrial_rustbelt",
+      "rural_farming",
+      "great_lakes",
+      "prairie_plains",
+      "generic"
+    ],
+    "Wisconsin": [
+      "great_lakes",
+      "northern_lakes",
+      "rural_farming",
+      "generic"
+    ],
+    "Minnesota": [
+      "northern_lakes",
+      "rural_farming",
+      "great_lakes",
+      "prairie_plains",
+      "generic"
+    ],
+    "Iowa": [
+      "rural_farming",
+      "prairie_plains",
+      "generic"
+    ],
+    "Missouri": [
+      "rural_farming",
+      "prairie_plains",
+      "southern",
+      "generic"
+    ],
+    "Kansas": [
+      "prairie_plains",
+      "rural_farming",
+      "generic"
+    ],
+    "Nebraska": [
+      "prairie_plains",
+      "rural_farming",
+      "generic"
+    ],
+    "North Dakota": [
+      "prairie_plains",
+      "rural_farming",
+      "northern_lakes",
+      "generic"
+    ],
+    "South Dakota": [
+      "prairie_plains",
+      "rural_farming",
+      "generic"
+    ],
+    "Oklahoma": [
+      "prairie_plains",
+      "rural_farming",
+      "southern",
+      "generic"
+    ],
+    "Montana": [
+      "mountain_west",
+      "prairie_plains",
+      "rural_farming",
+      "generic"
+    ],
+    "Wyoming": [
+      "mountain_west",
+      "prairie_plains",
+      "generic"
+    ],
+    "Colorado": [
+      "mountain_west",
+      "prairie_plains",
+      "desert_southwest",
+      "generic"
+    ],
+    "Idaho": [
+      "mountain_west",
+      "rural_farming",
+      "generic"
+    ],
+    "Utah": [
+      "mountain_west",
+      "desert_southwest",
+      "generic"
+    ],
+    "Nevada": [
+      "desert_southwest",
+      "mountain_west",
+      "generic"
+    ],
+    "Arizona": [
+      "desert_southwest",
+      "mountain_west",
+      "generic"
+    ],
+    "New Mexico": [
+      "desert_southwest",
+      "prairie_plains",
+      "mountain_west",
+      "generic"
+    ],
+    "Texas": [
+      "prairie_plains",
+      "desert_southwest",
+      "southern",
+      "coastal_gulf",
+      "rural_farming",
+      "generic"
+    ],
+    "California": [
+      "coastal_pacific",
+      "desert_southwest",
+      "mountain_west",
+      "rural_farming",
+      "generic"
+    ],
+    "Oregon": [
+      "coastal_pacific",
+      "mountain_west",
+      "rural_farming",
+      "generic"
+    ],
+    "Washington": [
+      "coastal_pacific",
+      "mountain_west",
+      "rural_farming",
+      "generic"
+    ],
+    "Alaska": [
+      "coastal_pacific",
+      "mountain_west",
+      "northern_lakes"
+    ],
+    "Hawaii": [
+      "island_tropical",
+      "coastal_pacific"
+    ]
+  },
+  "season_month": {
+    "New Year's Day": "winter",
+    "Martin Luther King Day": "winter",
+    "Valentine's Day": "winter",
+    "Easter": "spring",
+    "Mother's Day": "spring",
+    "Memorial Day": "late_spring",
+    "Father's Day": "summer",
+    "Independence Day": "summer",
+    "a summer BBQ": "summer",
+    "a family reunion": "summer",
+    "a military reunion": "any",
+    "a wedding weekend": "any",
+    "a class reunion": "summer",
+    "Labor Day": "late_summer",
+    "Halloween": "autumn",
+    "Veterans Day": "autumn",
+    "Thanksgiving": "late_autumn",
+    "Christmas": "winter",
+    "Christmas Eve": "winter",
+    "a funeral": "any",
+    "a graduation": "late_spring",
+    "a county fair": "summer",
+    "a church anniversary": "any",
+    "a hospital stay": "any"
+  },
+  "weather_season": {
+    "steady winter snow": [
+      "winter"
+    ],
+    "the first snow of winter": [
+      "winter",
+      "late_autumn"
+    ],
+    "a hard frost overnight": [
+      "winter",
+      "late_autumn"
+    ],
+    "cold November rain": [
+      "autumn",
+      "late_autumn"
+    ],
+    "grey drizzle that never quite stops": [
+      "autumn",
+      "late_autumn",
+      "winter",
+      "spring"
+    ],
+    "golden autumn light": [
+      "autumn"
+    ],
+    "late-afternoon golden light": [
+      "any"
+    ],
+    "a warm spring afternoon": [
+      "spring",
+      "late_spring"
+    ],
+    "the first warm day after a long winter": [
+      "spring"
+    ],
+    "a humid summer evening": [
+      "summer",
+      "late_summer",
+      "late_spring"
+    ],
+    "a dry summer heatwave": [
+      "summer",
+      "late_summer"
+    ],
+    "oppressive summer heat": [
+      "summer",
+      "late_summer"
+    ],
+    "a thunderstorm approaching": [
+      "summer",
+      "late_summer",
+      "late_spring",
+      "spring"
+    ],
+    "wind off the water": [
+      "any"
+    ],
+    "overcast and still": [
+      "any"
+    ]
+  },
+  "no_snow_geo": [
+    "island_tropical",
+    "subtropical",
+    "coastal_gulf",
+    "desert_southwest"
+  ],
+  "snow_weather": [
+    "steady winter snow",
+    "the first snow of winter",
+    "a hard frost overnight"
+  ],
+  "fallback_rules": {
+    "town_setting_unknown": "coi la 'generic' -> chi hop voi state co 'generic' (hau het bang deu co)",
+    "season_unknown": "coi la 'any' -> khong rang buoc weather",
+    "weather_unknown": "coi la 'any' -> khong rang buoc season",
+    "khong_tim_duoc": "weather_mood = null"
+  }
+}

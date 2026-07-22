@@ -42,6 +42,7 @@ const api = {
   // Story (viet truyen)
   getNiches: () => call('story:niches'),
   write: (p) => call('story:write', p),
+  stopWrite: () => call('story:stop'),
   sheetsTest: () => call('sheets:test'),
   listJobs: () => call('jobs:list'),
 

@@ -20,6 +20,7 @@ const imageGen = require('./image-gen');
 const imageRouter = require('./image-router');
 const storyDna = require('./story-dna');
 const storyCategory = require('./story-category');
+const memory = require('./story-memory');
 
 // ---- Cac NGACH mac dinh (page target). Nguoi dung sua duoc trong Cai dat. ----
 const DEFAULT_NICHES = [
@@ -407,7 +408,7 @@ function buildRow(nicheLabel, s, extra = {}) {
  * Tao 4 anh (fb, p1, p2, p3) -> up R2 -> tra link. Loi 1 anh KHONG lam sap ca bai.
  * @returns { fbImageUrl, thumbnailUrl, webUrls:{p1,p2,p3}, allOk, configured, errors[] }
  */
-async function generateArticleImages(storyId, s, onProgress = () => {}) {
+async function generateArticleImages(storyId, s, onProgress = () => {}, shouldStop = () => false) {
   const cfg = getImageConfig();
   const result = { fbImageUrl: '', thumbnailUrl: '', webUrls: { p1: '', p2: '', p3: '' }, allOk: false, configured: imageConfigReady(cfg), errors: [] };
   if (!result.configured) {
@@ -427,6 +428,8 @@ async function generateArticleImages(storyId, s, onProgress = () => {}) {
   let okCount = 0;
   let madeAny = false; // da bat dau tao it nhat 1 anh chua -> de gian cach giua CAC LAN tao
   for (const j of jobs) {
+    // DUNG giua chung khi dang tao anh: bo cac anh con lai -> bai se mang status need_image
+    if (shouldStop()) { result.errors.push(`${j.kind}: đã dừng theo yêu cầu`); result.stopped = true; continue; }
     if (!j.prompt) { result.errors.push(`${j.kind}: thiếu prompt`); continue; }
     // TUAN TU: gian cach vai giay giua 2 lan tao anh (tranh gioi han tan suat Cloudflare)
     if (madeAny) { onProgress({ message: 'Đợi 5 giây trước khi tạo ảnh tiếp (tránh giới hạn Cloudflare)...' }); await delay(5000); }
@@ -464,7 +467,7 @@ const LENGTH_MAX_ATTEMPTS = 4;  // toi da vai lan ep dai
  * Viet 1 bai. Mo 1 phien Claude, gui prompt goi skill, nhan ve, tach 16 cot.
  * Thu lai toi da 2 lan neu Claude tra sai khuon.
  */
-async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
+async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop = () => false) {
   const engine = 'claude'; // skill manh nhat o Claude (dung theo y anh Thang)
 
   // STORY DNA: App gan to hop TRUOC (pool nuoc dang chay, da loc trung) + case conflict
@@ -603,7 +606,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
         onProgress({ message: `✓ Claude xong bài ${storyId} (~${words} từ) — ngách "${nicheLabel}". Đang tạo ảnh...` });
         // Tao 5 anh (fb, thumb, p1, p2, p3) -> up R2. Loi anh KHONG lam sap bai.
         try {
-          imgs = await generateArticleImages(storyId, s, onProgress);
+          imgs = await generateArticleImages(storyId, s, onProgress, shouldStop);
         } catch (e) {
           imgs = { fbImageUrl: '', thumbnailUrl: '', webUrls: { p1: '', p2: '', p3: '' }, allOk: false, configured: true, errors: [e.message] };
           onProgress({ message: '⚠️ Lỗi tạo ảnh: ' + e.message + ' — vẫn đẩy bài (link ảnh để trống).' });
@@ -632,8 +635,13 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
       if (dna && !fastTest) {
         try { storyDna.remember({ storyId, country, niche: dedupKey, combo: pick.combo }); }
         catch (_) { /* ghi so hong khong lam sap bai */ }
-      } else if (fastTest) {
-        onProgress({ message: 'ℹ️ Test nhanh: KHÔNG ghi sổ chống trùng (cooldown bài thật giữ nguyên).' });
+      } else if (fastTest && dna) {
+        // TEST NHANH: ghi vao SO TAM (chi song trong phien) -> cac bai cung lan chay van
+        // thay nhau de xoay page + tranh lap subcategory/icon/reveal_family/justice_family.
+        // So dai han tren dia KHONG bi dong den.
+        try { memory.addSession({ storyId, country, niche: dedupKey, combo: pick.combo }); }
+        catch (_) {}
+        onProgress({ message: `ℹ️ Test nhanh: ghi sổ TẠM trong phiên (${memory.sessionCount()} bài) — sổ chống trùng dài hạn giữ nguyên.` });
       }
 
       return { ok: true, row, raw: res.text, sections: s, storyId, status, dnaCombo: dnaComboJson };
@@ -656,22 +664,44 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
  * Viet NHIEU bai lien tiep (moi bai 1 phien rieng -> khong don ngu canh -> chong lap tot hon).
  * @param {{niche:string, count:number}} input
  */
-async function writeBatch({ niche, count }, onProgress = () => {}) {
+async function writeBatch({ niche, count, pushRow = null, shouldStop = () => false }, onProgress = () => {}) {
   const niches = getNiches();
   const found = niches.find((n) => n.code === niche || n.label === niche);
   const nicheLabel = found ? found.label : (niche || niches[0].label);
   const nicheCode = found ? found.code : String(niche || '').toUpperCase();
   const total = Math.max(1, Math.min(50, parseInt(count, 10) || 1)); // tran an toan 50 bai/lan
 
+  memory.sessionStart();                    // so tam cua TEST NHANH: moi lan chay la mot phien moi
   const rows = [];
   const failed = [];
+  const pushFailed = [];
+  let stopped = false;
   for (let i = 0; i < total; i++) {
+    // DUNG: chi kiem tra GIUA cac bai -> bai dang viet do luon duoc chay het
+    if (shouldStop()) {
+      stopped = true;
+      onProgress({ message: `⏹ Đã dừng theo yêu cầu — còn ${total - i} bài chưa chạy.` });
+      break;
+    }
     onProgress({ message: `Bài ${i + 1}/${total} — ngách "${nicheLabel}"...`, done: i, total });
-    const r = await writeOne(nicheLabel, nicheCode, onProgress);
-    if (r.ok) rows.push(r.row);
-    else failed.push({ index: i + 1, error: r.error });
+    const r = await writeOne(nicheLabel, nicheCode, onProgress, shouldStop);
+    if (!r.ok) { failed.push({ index: i + 1, error: r.error }); continue; }
+    rows.push(r.row);
+    // DAY SHEET NGAY tung bai: crash giua chung chi mat bai dang do, khong mat ca loat.
+    // Bai nao day loi thi log ro va CHAY TIEP bai sau.
+    if (pushRow) {
+      try {
+        await pushRow(r.row, r);
+        onProgress({ message: `⬆️ Đã đẩy bài ${r.storyId} lên Google Sheet.` });
+      } catch (e) {
+        pushFailed.push({ index: i + 1, storyId: r.storyId, error: e.message });
+        onProgress({ message: `⚠️ Bài ${r.storyId} viết xong nhưng ĐẨY SHEET LỖI: ${e.message} — chạy tiếp bài sau.` });
+      }
+    }
   }
-  return { ok: rows.length > 0, rows, failed, columns: SHEET_COLUMNS };
+  if (stopped && shouldStop()) onProgress({ message: `⏹ Dừng: đã xong ${rows.length} bài.` });
+  memory.sessionClear();                    // het phien -> xoa so tam
+  return { ok: rows.length > 0, rows, failed, pushFailed, stopped, columns: SHEET_COLUMNS };
 }
 
 function getNiches() {

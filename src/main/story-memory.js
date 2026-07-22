@@ -22,7 +22,26 @@ const MAX_ENTRIES = 5000;                 // tran an toan, cat bot ban ghi qua c
 const HERO_WINDOW = 200;                  // 200 bai gan nhat / nuoc
 const COMBO_WINDOW = 20;                  // 20 bai gan nhat / nuoc / ngach
 
-function readDb() {
+// ---- SO TAM THEO PHIEN (cho TEST NHANH) ----
+// Bai test nhanh KHONG duoc ghi vao so dai han (giu sach cooldown cua bai that), NHUNG cac bai
+// trong CUNG mot lan bam "Bat dau viet" phai thay nhau de con xoay page / tranh lap
+// subcategory / icon / reveal_family. Mang nay chi song trong phien, xoa khi bat dau lan chay moi.
+let SESSION = [];
+function sessionStart() { SESSION = []; }
+function sessionClear() { SESSION = []; }
+function sessionCount() { return SESSION.length; }
+function addSession({ storyId, country, niche, combo }) {
+  SESSION.push({
+    story_id: storyId || '',
+    at: new Date().toISOString(),
+    country: String(country || '').toUpperCase(),
+    niche: niche || '',
+    combo: combo || {},
+    session_only: true,
+  });
+}
+
+function readDbRaw() {
   try {
     const db = store.read(FILE);
     if (!db || !Array.isArray(db.entries)) return { entries: [] };
@@ -30,6 +49,12 @@ function readDb() {
   } catch (_) {
     return { entries: [] };
   }
+}
+// MOI ham doc deu di qua day -> so tam tu dong co hieu luc voi toan bo cooldown/LRU/streak.
+function readDb() {
+  const db = readDbRaw();
+  if (!SESSION.length) return db;
+  return { entries: db.entries.concat(SESSION) };
 }
 
 function writeDb(db) {
@@ -139,7 +164,7 @@ function isDuplicate(combo, country, niche) {
 
 /** Ghi so 1 bai da chot to hop */
 function add({ storyId, country, niche, combo }) {
-  const db = readDb();
+  const db = readDbRaw();                   // KHONG lay so tam vao, tranh ghi bai test xuong dia
   db.entries.push({
     story_id: storyId || '',
     at: new Date().toISOString(),
@@ -200,7 +225,7 @@ function usageCountByPage(country, pageId, field, value, n = 50) {
 function migrateNicheKeys() {
   let migrated = 0, skipped = 0;
   try {
-    const db = readDb();
+    const db = readDbRaw();     // migrate chi dung cho so tren dia
     for (const e of db.entries) {
       const cid = e.combo && e.combo.category_id;
       if (cid && e.niche !== cid) { e.niche = cid; migrated++; }
@@ -213,6 +238,7 @@ function migrateNicheKeys() {
 
 module.exports = {
   all, recentByCountry, recentByCountryNiche, isDuplicate, add, stats, migrateNicheKeys,
+  sessionStart, sessionClear, sessionCount, addSession,
   daysSinceField, daysSinceSignature, recentWithinDays, rateRecent,
   recentByPage, subcategoryUsedRecently, categoryStreak, usageCountByPage,
   HERO_WINDOW, COMBO_WINDOW, FILE,
