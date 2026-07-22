@@ -190,8 +190,8 @@
         "E-NEW-02"
       ],
       "reveal_affinity": [
-        "document_evidence",
-        "ordinary_witness"
+        "external_public_validator",
+        "document_evidence"
       ],
       "justice_affinity": [
         "public_recognition",
@@ -1659,8 +1659,8 @@
         "E-NEW-03"
       ],
       "reveal_affinity": [
-        "ordinary_witness",
-        "document_evidence"
+        "external_public_validator",
+        "ordinary_witness"
       ],
       "justice_affinity": [
         "public_recognition",
@@ -1685,8 +1685,8 @@
         "B-NEW-18"
       ],
       "reveal_affinity": [
-        "document_evidence",
-        "ordinary_witness"
+        "external_public_validator",
+        "document_evidence"
       ],
       "justice_affinity": [
         "public_recognition",
@@ -2332,8 +2332,8 @@
       ],
       "conflict_ids": [],
       "reveal_affinity": [
-        "ordinary_witness",
-        "natural_consequence"
+        "external_public_validator",
+        "ordinary_witness"
       ],
       "justice_affinity": [
         "public_recognition",
@@ -3462,8 +3462,8 @@
         "B-NEW-18"
       ],
       "reveal_affinity": [
-        "document_evidence",
-        "ordinary_witness"
+        "external_public_validator",
+        "document_evidence"
       ],
       "justice_affinity": [
         "public_recognition",
@@ -3764,8 +3764,8 @@
         "A5_hoi_han-04"
       ],
       "reveal_affinity": [
-        "ordinary_witness",
-        "natural_consequence"
+        "external_public_validator",
+        "ordinary_witness"
       ],
       "justice_affinity": [
         "public_recognition",

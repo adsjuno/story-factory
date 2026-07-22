@@ -14,7 +14,8 @@
       "6_weighted_random"
     ],
     "selection_rule": "eligible = all_candidates - incompatible - cooldown_blocked - daily_cap_blocked. CHI SAU DO moi cong trong so affinity trong tap con hop le. TUYET DOI khong chon affinity truoc roi nhet xuong.",
-    "note_affinity": "reveal_affinity/justice_affinity la GOI Y, khong phai required. Cooldown v1.8.1 luon THANG affinity."
+    "note_affinity": "reveal_affinity/justice_affinity la GOI Y, khong phai required. Cooldown v1.8.1 luon THANG affinity.",
+    "note_validator": "external_public_validator CHI xuat hien o 6 sub thuc su hop (stolen valor, service record, cong dong vinh danh...). Van bi cap <=25%/ngay boi cooldown v1.8.1. Khong duoc mo rong tuy tien."
   },
   "global_rules": {
     "R-01_subcategory_exact_cooldown": "Khong lap cung subcategory trong 20 bai gan nhat cua cung page.",
@@ -121,8 +122,8 @@
             "scholarship letter"
           ],
           "reveal_affinity": [
-            "document_evidence",
-            "ordinary_witness"
+            "external_public_validator",
+            "document_evidence"
           ],
           "justice_affinity": [
             "public_recognition",
@@ -1137,8 +1138,8 @@
             "stained apron"
           ],
           "reveal_affinity": [
-            "ordinary_witness",
-            "document_evidence"
+            "external_public_validator",
+            "ordinary_witness"
           ],
           "justice_affinity": [
             "public_recognition",
@@ -1168,8 +1169,8 @@
             "service record"
           ],
           "reveal_affinity": [
-            "document_evidence",
-            "ordinary_witness"
+            "external_public_validator",
+            "document_evidence"
           ],
           "justice_affinity": [
             "public_recognition",
@@ -1428,8 +1429,8 @@
             "paper log"
           ],
           "reveal_affinity": [
-            "ordinary_witness",
-            "natural_consequence"
+            "external_public_validator",
+            "ordinary_witness"
           ],
           "justice_affinity": [
             "public_recognition",
@@ -2257,8 +2258,8 @@
             "citation"
           ],
           "reveal_affinity": [
-            "document_evidence",
-            "ordinary_witness"
+            "external_public_validator",
+            "document_evidence"
           ],
           "justice_affinity": [
             "public_recognition",
@@ -2429,8 +2430,8 @@
             "route card"
           ],
           "reveal_affinity": [
-            "ordinary_witness",
-            "natural_consequence"
+            "external_public_validator",
+            "ordinary_witness"
           ],
           "justice_affinity": [
             "public_recognition",

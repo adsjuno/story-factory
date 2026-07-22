@@ -78,10 +78,10 @@
       "status": "active",
       "category_weights": {
         "CAT04": 85,
-        "CAT05": 15
+        "CAT12": 15
       },
       "primary_category": "CAT04",
-      "secondary_category": "CAT05",
+      "secondary_category": "CAT12",
       "tone": "hopeful, tender, never mocking of late-life romance",
       "hero_demographic": "widow/widower 58-78",
       "preferred_emotion": "second-chance warmth",

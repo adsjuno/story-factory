@@ -143,7 +143,7 @@ function chooseWeighted(candidates, { country, field, affinityKeywords, hardDays
     const aff = list.filter((x) => affinityMatch(x, affinityKeywords));
     if (aff.length >= 3) list = aff;
   }
-  const { familyOf, softFamilies, hardFamilies } = arguments[1] || {};
+  const { familyOf, softFamilies, hardFamilies, bonusFamilies } = arguments[1] || {};
   const weights = list.map((item) => {
     const days = memory.daysSinceField(country, field, item);
     if (hardDays != null && days < hardDays) return 0;               // hard block theo ngay
@@ -153,6 +153,9 @@ function chooseWeighted(candidates, { country, field, affinityKeywords, hardDays
     if (affinityMatch(item, affinityKeywords)) w *= (wr.affinity_match_multiplier || 2.5);
     if (softDays != null && days < softDays) w *= (wr.recent_soft_penalty_multiplier != null ? wr.recent_soft_penalty_multiplier : 0.25);
     if (fam && softFamilies && softFamilies.has(fam)) w *= 0.25;     // soft penalty family (lap gan)
+    // BONUS affinity cua subcategory (chi la GOI Y): ap SAU hard-block nen 0 van la 0
+    // -> cooldown/cap v1.8.1 LUON THANG affinity.
+    if (fam && bonusFamilies && bonusFamilies.has(fam)) w *= (wr.affinity_match_multiplier || 2.5);
     if (days === Infinity) w *= (wr.underused_item_bonus_multiplier || 1.5);
     return w;
   });
@@ -487,7 +490,9 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   }
   const twistSoftFam = new Set(); if (lastReveal) twistSoftFam.add(lastReveal);
   const twistHardFam = new Set(); if (capExternal) twistHardFam.add('external_public_validator');
-  bp.twist = chooseWeighted(pool.twist || [], { country, field: 'twist', wr, exclude: excludeTwist, familyOf: revealFamily, softFamilies: twistSoftFam, hardFamilies: twistHardFam }) || '';
+  // GOI Y tu subcategory (reveal_affinity) — chi la bonus, khong pha cooldown/cap
+  const revBonus = new Set((input && input.reveal_affinity) || []);
+  bp.twist = chooseWeighted(pool.twist || [], { country, field: 'twist', wr, exclude: excludeTwist, familyOf: revealFamily, softFamilies: twistSoftFam, hardFamilies: twistHardFam, bonusFamilies: revBonus }) || '';
   bp.reveal_type = bp.twist;
   bp.reveal_family = revealFamily(bp.twist);
 
@@ -501,7 +506,8 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   const justHardFam = new Set();
   // neu vua chon reveal = external_public_validator VA combo external dang bi cap -> chan public_recognition
   if (bp.reveal_family === 'external_public_validator' && capExternal) justHardFam.add('public_recognition');
-  bp.justice_type = chooseWeighted(pool.justice_type || [], { country, field: 'justice_type', softDays: soft.justice_type, wr, exclude: excludeJust, familyOf: justiceFamily, softFamilies: justSoftFam, hardFamilies: justHardFam }) || '';
+  const justBonus = new Set((input && input.justice_affinity) || []);
+  bp.justice_type = chooseWeighted(pool.justice_type || [], { country, field: 'justice_type', softDays: soft.justice_type, wr, exclude: excludeJust, familyOf: justiceFamily, softFamilies: justSoftFam, hardFamilies: justHardFam, bonusFamilies: justBonus }) || '';
   bp.justice_family = justiceFamily(bp.justice_type);
   bp.relationship_family = relationshipFamily(bp.relationship);
 
