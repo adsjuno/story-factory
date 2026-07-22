@@ -26,6 +26,11 @@ flux-test-output/
 # Luu y: JSON that cua app nam trong src/main/ nen KHONG bi anh huong.
 /story-*.json
 
+# File lam viec cua nguoi dung o goc (Excel...) - giu tren dia, khong commit
+*.xlsx
+*.xls
+*.csv
+
 # OS files
 .DS_Store
 Thumbs.db
