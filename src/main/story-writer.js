@@ -19,6 +19,7 @@ const webai = require('./webai-electron');
 const imageGen = require('./image-gen');
 const imageRouter = require('./image-router');
 const storyDna = require('./story-dna');
+const storyCategory = require('./story-category');
 
 // ---- Cac NGACH mac dinh (page target). Nguoi dung sua duoc trong Cai dat. ----
 const DEFAULT_NICHES = [
@@ -324,6 +325,20 @@ function getRunningCountry() {
   } catch (_) { return storyDna.DEFAULT_COUNTRY; }
 }
 
+// Nguon dau vao category: auto (theo page profile) | category | subcategory (manual override)
+function getInputSelection() {
+  try {
+    const s = store.read('settings.json');
+    const i = (s.story && s.story.input) || {};
+    return {
+      mode: i.mode || 'auto',
+      pageId: i.pageId || 'P01',
+      categoryId: i.categoryId || '',
+      subcategoryId: i.subcategoryId || '',
+    };
+  } catch (_) { return { mode: 'auto', pageId: 'P01', categoryId: '', subcategoryId: '' }; }
+}
+
 // Cau lenh skill goc. Co the tuy bien chung (settings.story.skillCommand) hoac
 // RIENG theo nuoc (settings.dna.skillByCountry[COUNTRY]) - de sau nay moi nuoc 1 skill.
 // Mac dinh: /story-us-senior-viral cho US (DEFAULT_SKILL_COMMAND).
@@ -448,7 +463,28 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}) {
   // STORY DNA: App gan to hop TRUOC (pool nuoc dang chay, da loc trung) + case conflict
   // TU DUNG CAY NGACH (theo nicheCode A/B/C/D/E) roi nhet vao dau prompt.
   const country = getRunningCountry();
-  const pick = storyDna.pickCombo(country, nicheLabel, nicheCode);
+
+  // ---- LOP DAU VAO (category/subcategory) chay TRUOC Story DNA ----
+  const inSel = getInputSelection();
+  let input = null;
+  try {
+    input = storyCategory.chooseInput({
+      country,
+      pageId: inSel.pageId,
+      categoryId: inSel.mode === 'category' ? inSel.categoryId : '',
+      subcategoryId: inSel.mode === 'subcategory' ? inSel.subcategoryId : '',
+    });
+  } catch (e) {
+    onProgress({ message: '⚠️ Lỗi lớp category: ' + e.message + ' — chạy theo ngách cũ.' });
+    input = null;
+  }
+
+  const pick = storyDna.pickCombo(country, nicheLabel, nicheCode, { input });
+  if (input && input.category_id) {
+    // CHI log category/subcategory/conflict CUOI CUNG (sau validate), khong log candidate bi loai
+    onProgress({ message: `🗂️ ${input.page_profile_id} → ${input.category_name} (${input.category_id}) / ${input.subcategory_name} (${input.subcategory_id})${input.status_dynamic ? ' | status: ' + input.status_dynamic : ''}` });
+    if (input.notes && input.notes.length) onProgress({ message: 'ℹ️ ' + input.notes.join('; ') });
+  }
   if (pick.poolEmpty) {
     onProgress({ message: `ℹ️ Pool DNA của nước ${country} đang rỗng — chạy không có DNA (bài vẫn viết bình thường).` });
   } else {

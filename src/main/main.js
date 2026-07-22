@@ -12,6 +12,7 @@ const storyWriter = require('./story-writer');
 const storyDna = require('./story-dna');
 const storyMemory = require('./story-memory');
 const conflictTree = require('./conflict-tree');
+const storyCategory = require('./story-category');
 const sheets = require('./sheets');
 const webai = require('./webai-electron');
 const claudeCleanup = require('./claude-cleanup');
@@ -265,6 +266,36 @@ ipcMain.handle('dna:setRunning', (_e, { country }) => {
   s.dna.runningCountry = String(country || storyDna.DEFAULT_COUNTRY).toUpperCase();
   saveSettings(s);
   return { ok: true, running: s.dna.runningCountry };
+});
+
+// ---------------- IPC: Lop dau vao category/subcategory ----------------
+ipcMain.handle('category:get', () => {
+  requireAuth();
+  const s = loadSettings();
+  const cur = (s.story && s.story.input) || {};
+  return {
+    ok: true,
+    pages: storyCategory.allPages().map((p) => ({ id: p.page_profile_id, name: p.name, weights: p.category_weights || {} })),
+    categories: storyCategory.allCategories().map((c) => ({
+      id: c.category_id, name: c.name_en, priority: c.priority,
+      subcategories: storyCategory.subcatsOf(c.category_id).map((x) => ({ id: x.subcategory_id, name: x.name_en })),
+    })),
+    current: { mode: cur.mode || 'auto', pageId: cur.pageId || 'P01', categoryId: cur.categoryId || '', subcategoryId: cur.subcategoryId || '' },
+  };
+});
+ipcMain.handle('settings:saveInput', (_e, payload) => {
+  requireAuth();
+  const p = payload || {};
+  const s = loadSettings();
+  s.story = s.story || {};
+  s.story.input = {
+    mode: ['auto', 'category', 'subcategory'].includes(p.mode) ? p.mode : 'auto',
+    pageId: String(p.pageId || 'P01'),
+    categoryId: String(p.categoryId || ''),
+    subcategoryId: String(p.subcategoryId || ''),
+  };
+  saveSettings(s);
+  return { ok: true, input: s.story.input };
 });
 
 // ---------------- IPC: Conflict tree (theo nuoc + ngach) ----------------

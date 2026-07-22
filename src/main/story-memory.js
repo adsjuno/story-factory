@@ -162,8 +162,35 @@ function stats() {
   return { total: entries.length, byCountry };
 }
 
+// ---- LOP DAU VAO category/subcategory: cooldown theo PAGE (moi nhat truoc) ----
+function recentByPage(country, pageId, n) {
+  const c = String(country || '').toUpperCase();
+  const p = String(pageId || '');
+  const list = readDb().entries.filter((e) => String(e.country || '').toUpperCase() === c
+    && e.combo && String(e.combo.page_profile_id || '') === p);
+  return list.slice(-Math.max(0, n)).reverse();
+}
+// Subcategory da dung trong n bai gan nhat cua page chua?
+function subcategoryUsedRecently(country, pageId, subId, n) {
+  if (!subId) return false;
+  return recentByPage(country, pageId, n).some((e) => e.combo.subcategory_id === subId);
+}
+// So bai LIEN TIEP gan nhat cua page cung 1 category (de ap max_consecutive)
+function categoryStreak(country, pageId, catId) {
+  if (!catId) return 0;
+  const recent = recentByPage(country, pageId, 20); // moi nhat truoc
+  let s = 0;
+  for (const e of recent) { if (e.combo.category_id === catId) s++; else break; }
+  return s;
+}
+// Dem so lan dung 1 truong trong n bai gan nhat cua page (de chon least-used)
+function usageCountByPage(country, pageId, field, value, n = 50) {
+  return recentByPage(country, pageId, n).filter((e) => e.combo[field] === value).length;
+}
+
 module.exports = {
   all, recentByCountry, recentByCountryNiche, isDuplicate, add, stats,
   daysSinceField, daysSinceSignature, recentWithinDays, rateRecent,
+  recentByPage, subcategoryUsedRecently, categoryStreak, usageCountByPage,
   HERO_WINDOW, COMBO_WINDOW, FILE,
 };

@@ -45,6 +45,29 @@
       <p class="lead">Chọn ngách và số lượng, phần mềm sẽ để Claude tự sinh truyện rồi đẩy lên Google Sheet.</p>
 
       <div class="card">
+        <div class="lbl big">🗂️ Nguồn đầu vào (category)</div>
+        <p class="hint">Auto: App tự chọn category/subcategory theo hồ sơ page. Hoặc chọn tay — vẫn phải qua validate tương thích.</p>
+        <label class="lbl">Page</label>
+        <select id="inPage" class="in"></select>
+        <label class="lbl">Cách chọn</label>
+        <select id="inMode" class="in">
+          <option value="auto">Auto (theo page profile)</option>
+          <option value="category">Chọn Category thủ công</option>
+          <option value="subcategory">Chọn Subcategory thủ công</option>
+        </select>
+        <div id="inCatWrap" class="hidden">
+          <label class="lbl">Category</label>
+          <select id="inCategory" class="in"></select>
+        </div>
+        <div id="inSubWrap" class="hidden">
+          <label class="lbl">Subcategory</label>
+          <select id="inSubcategory" class="in"></select>
+        </div>
+        <div class="row"><button id="saveInputBtn" class="btn btn-ghost btn-sm">Lưu nguồn đầu vào</button></div>
+        <div id="inputMsg" class="msg"></div>
+      </div>
+
+      <div class="card">
         <label class="lbl">Ngách (page)</label>
         <select id="nicheSel" class="in"></select>
 

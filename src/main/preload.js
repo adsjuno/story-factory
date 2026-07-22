@@ -54,6 +54,9 @@ const api = {
   dnaGetPool: (p) => call('dna:getPool', p),
   dnaSavePool: (p) => call('dna:savePool', p),
   dnaSetRunning: (p) => call('dna:setRunning', p),
+  // Lop dau vao category/subcategory
+  categoryGet: () => call('category:get'),
+  saveInput: (p) => call('settings:saveInput', p),
   conflictGet: (p) => call('conflict:get', p),
   conflictGetBranch: (p) => call('conflict:getBranch', p),
   conflictSaveBranch: (p) => call('conflict:saveBranch', p),

@@ -47,6 +47,8 @@ async function enterApp(user){
   await loadSettings();
   bindDna();
   await loadDna();
+  bindInputLayer();
+  await loadInputLayer();
   await loadVersion();
 }
 
@@ -240,6 +242,41 @@ $('chatgptLoginBtn').onclick=async()=>{
   const r=await api.aiLogin({provider:'chatgpt'});
   msg($('imgLoginMsg'),r.ok?(r.message||'Đã lưu phiên ChatGPT'):(r.error||'Lỗi'),r.ok);
 };
+
+// ---------- LOP DAU VAO CATEGORY ----------
+let CATDATA=null;
+async function loadInputLayer(){
+  const r=await api.categoryGet();
+  if(!r||!r.ok)return;
+  CATDATA=r;
+  $('inPage').innerHTML=(r.pages||[]).map(p=>'<option value="'+esc(p.id)+'">'+esc(p.id+' — '+p.name)+'</option>').join('');
+  $('inCategory').innerHTML=(r.categories||[]).map(c=>'<option value="'+esc(c.id)+'">'+esc(c.id+' — '+c.name)+'</option>').join('');
+  const cur=r.current||{};
+  $('inPage').value=cur.pageId||'P01';
+  $('inMode').value=cur.mode||'auto';
+  if(cur.categoryId)$('inCategory').value=cur.categoryId;
+  fillSubcats(cur.subcategoryId);
+  applyInputMode();
+}
+function fillSubcats(sel){
+  const cid=$('inCategory').value;
+  const c=(CATDATA&&CATDATA.categories||[]).find(x=>x.id===cid);
+  $('inSubcategory').innerHTML=((c&&c.subcategories)||[]).map(s=>'<option value="'+esc(s.id)+'">'+esc(s.id+' — '+s.name)+'</option>').join('');
+  if(sel)$('inSubcategory').value=sel;
+}
+function applyInputMode(){
+  const m=$('inMode').value;
+  $('inCatWrap').classList.toggle('hidden', m==='auto');
+  $('inSubWrap').classList.toggle('hidden', m!=='subcategory');
+}
+function bindInputLayer(){
+  const m=$('inMode'); if(m)m.onchange=applyInputMode;
+  const c=$('inCategory'); if(c)c.onchange=()=>fillSubcats();
+  const b=$('saveInputBtn'); if(b)b.onclick=async()=>{
+    const r=await api.saveInput({mode:$('inMode').value,pageId:$('inPage').value,categoryId:$('inCategory').value,subcategoryId:$('inSubcategory').value});
+    msg($('inputMsg'),r.ok?'Đã lưu nguồn đầu vào':(r.error||'Lỗi'),r.ok);
+  };
+}
 
 // ---------- STORY DNA ----------
 let dnaAxes=[];

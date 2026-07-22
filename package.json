@@ -1,6 +1,6 @@
 {
   "name": "story-factory",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "Story Factory - Tu dong viet truyen My 55+ (Claude login -> Google Sheets -> n8n -> Facebook + Website)",
   "main": "src/main/main.js",
   "author": "",

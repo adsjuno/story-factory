@@ -346,8 +346,19 @@ function compatOk(bp, extra) {
 }
 
 // ---------------- Chon conflict theo theme (subgroup rotation + cooldown + severity) ----------------
-function chooseConflict(country, theme, conf, wr) {
-  const catalog = (conf.conflict_catalog || []).filter((x) => x.theme === theme);
+/**
+ * @param allowIds (tuy chon) tap id conflict tu LOP DAU VAO (category/subcategory).
+ *   Conflict fidelity xep DUOI hard-compat + cooldown: neu loc theo allowIds ma het ung vien
+ *   (moi cai deu bi cooldown) thi TU DONG bo rang buoc nay -> khong bao gio null/crash.
+ */
+function chooseConflict(country, theme, conf, wr, allowIds) {
+  let catalog = (conf.conflict_catalog || []).filter((x) => x.theme === theme);
+  if (allowIds && allowIds.length) {
+    const allow = new Set(allowIds);
+    const narrowed = catalog.filter((x) => allow.has(x.id));
+    // chi thu hep khi con du ung vien; het thi giu nguyen catalog theme (fallback)
+    if (narrowed.length) catalog = narrowed;
+  }
   if (!catalog.length) return null;
   const sp = conf.selection_policy || {};
   const cooldown = sp.recent_conflict_cooldown_days || 21;
@@ -370,12 +381,18 @@ function chooseConflict(country, theme, conf, wr) {
     return w;
   });
   let pick = weightedRandom(catalog, weights);
+  // Neu tap da thu hep (conflict fidelity) ma MOI cai deu bi cooldown chan -> cooldown THANG
+  // affinity/fidelity: mo lai toan bo catalog cua theme roi chon lai.
+  if (!pick && allowIds && allowIds.length) {
+    const full = (conf.conflict_catalog || []).filter((x) => x.theme === theme);
+    if (full.length > catalog.length) return chooseConflict(country, theme, conf, wr, null);
+  }
   if (!pick) pick = pickOne(catalog);
   return pick;
 }
 
 // ---------------- Sinh 1 BLUEPRINT (chay generation_order) ----------------
-function buildOnce(country, theme, pool, extra, conf, cfg) {
+function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   const wr = cfg.weighted_random || {};
   const nameRules = cfg.name_rules || {};
   const plot = cfg.plot_rules || {};
@@ -387,9 +404,22 @@ function buildOnce(country, theme, pool, extra, conf, cfg) {
   const bp = { theme };
 
   // 2) conflict theo theme
-  const cf = chooseConflict(country, theme, conf, wr);
+  // LOP DAU VAO: neu co category/subcategory -> loc conflict theo tap cua subcategory
+  const cf = chooseConflict(country, theme, conf, wr, input ? input.conflict_ids : null);
   if (cf) { bp.conflict_id = cf.id; bp.conflict = cf.conflict; bp.subgroup = cf.subgroup; bp.conflict_tags = cf.tags || []; }
   else { bp.conflict_id = ''; bp.conflict = ''; bp.subgroup = ''; bp.conflict_tags = []; }
+
+  // LOP DAU VAO: gan category/subcategory/page + legacy_theme + status_dynamic vao blueprint
+  if (input) {
+    bp.page_profile_id = input.page_profile_id || '';
+    bp.category_id = input.category_id || '';
+    bp.category_name = input.category_name || '';
+    bp.subcategory_id = input.subcategory_id || '';
+    bp.subcategory_name = input.subcategory_name || '';
+    bp.conflict_premise = input.conflict_premise || '';
+    bp.legacy_theme = input.legacy_theme || theme || '';
+    bp.status_dynamic = input.status_dynamic || '';
+  }
 
   // 3) age + relationship
   bp.relationship = pickOne(relationshipsForTheme(pool, theme)) || '';
@@ -516,13 +546,14 @@ function buildSignature(bp, extra) {
  * Chon 1 blueprint HOP LE + KHONG TRUNG cho (country, niche).
  * @returns {combo, country, theme, tries, regen, fellBack, poolEmpty, valid, conflictBranch, hasConflict, signature}
  */
-function pickCombo(country, niche, nicheCode, { maxTries = 60 } = {}) {
+function pickCombo(country, niche, nicheCode, { maxTries = 60, input = null } = {}) {
   const c = String(country || DEFAULT_COUNTRY).toUpperCase();
   const pool = poolAxes(c);
   const extra = poolExtra(c);
   const conf = conflictData(c);
   const cfg = engineConfig(c);
-  const theme = themeCodeOf(nicheCode, niche);
+  // Theme: uu tien legacy_theme do LOP DAU VAO chi dinh (subcategory), khong co thi lay tu ngach cu
+  const theme = (input && input.legacy_theme) ? input.legacy_theme : themeCodeOf(nicheCode, niche);
 
   if (!poolHasContent(pool)) {
     return { combo: {}, country: c, theme, tries: 0, regen: 0, fellBack: false, poolEmpty: true, valid: false, conflictBranch: '', hasConflict: false, signature: '' };
@@ -536,7 +567,7 @@ function pickCombo(country, niche, nicheCode, { maxTries = 60 } = {}) {
   let bp = null, sig = '';
   while (tries < maxTries) {
     tries++;
-    bp = buildOnce(c, theme, pool, extra, conf, cfg);
+    bp = buildOnce(c, theme, pool, extra, conf, cfg, input);
     // validate compatibility
     const comp = compatOk(bp, extra);
     if (!comp.ok) { regen++; lastReason = comp.reason; continue; }
@@ -575,6 +606,7 @@ function buildDnaBlock(bp, country) {
   if (bp && bp.conflict) {
     lines.push(`- ⚠️ CONFLICT CHÍNH (BẮT BUỘC kể ĐÚNG tình huống này, KHÔNG đổi sang tình huống khác): ${bp.conflict}`);
   }
+  if (bp && bp.status_dynamic) lines.push(`- status_dynamic = ${bp.status_dynamic}`);
   lines.push(`- reveal (twist) = ${g('twist')}`);
   lines.push(`- justice = ${g('justice_type')}`);
   lines.push(`- ending = ${g('ending')}`);
@@ -587,6 +619,22 @@ function buildDnaBlock(bp, country) {
   if (!bp || bp.require_cost) lines.push('- BẮT BUỘC: chiến thắng phải có cái giá/hệ quả, không "thắng dễ".');
   lines.push('- CHỈ 1 major reveal duy nhất; KHÔNG hoà giải trọn vẹn nếu không hợp lý.');
   lines.push('Skill kể câu chuyện xoay quanh ĐÚNG blueprint này. Giữ nguyên toàn bộ khuôn xuất ===...=== bên dưới.');
+
+  // ---- KHOI BAT BUOC cua LOP DAU VAO (category/subcategory) — dat SAU khi da validate ----
+  if (bp && bp.category_id) {
+    const ctx = [bp.location, bp.town_setting, bp.season_event, bp.weather_mood].filter(Boolean).join(' / ');
+    lines.push('');
+    lines.push('MANDATORY STORY INPUT');
+    lines.push(`- Category: ${bp.category_name || ''} (${bp.category_id})`);
+    lines.push(`- Subcategory: ${bp.subcategory_name || ''} (${bp.subcategory_id || ''})`);
+    lines.push(`- Core conflict premise: ${bp.conflict_premise || bp.conflict || ''}`);
+    lines.push(`- Relationship: ${bp.relationship || ''}`);
+    lines.push(`- Location/town/season/weather: ${ctx}`);
+    lines.push(`- Reveal family: ${bp.reveal_family || ''}`);
+    lines.push(`- Justice family: ${bp.justice_family || ''}`);
+    lines.push('');
+    lines.push('You MUST tell the selected core conflict. Do not replace it with another family conflict. You may add secondary complications only if they support the selected conflict. The final story must remain classifiable under the selected category and subcategory.');
+  }
   lines.push('');
   return lines.join('\n');
 }
@@ -602,6 +650,15 @@ function comboToSheetJson(bp, country, theme) {
   const c = bp || {};
   return JSON.stringify({
     country: String(country || DEFAULT_COUNTRY).toUpperCase(),
+    // LOP DAU VAO (ghi vao cot story_dna hien co, KHONG them cot Sheet moi)
+    page_profile_id: c.page_profile_id || '',
+    category_id: c.category_id || '',
+    category_name: c.category_name || '',
+    subcategory_id: c.subcategory_id || '',
+    subcategory_name: c.subcategory_name || '',
+    conflict_premise: c.conflict_premise || '',
+    legacy_theme: c.legacy_theme || c.theme || '',
+    status_dynamic: c.status_dynamic || '',
     theme: c.theme || theme || '',
     conflict_id: c.conflict_id || '',
     conflict: c.conflict || '',                 // TEXT conflict cuoi cung (sau validate)

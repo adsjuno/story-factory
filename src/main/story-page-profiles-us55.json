@@ -1,0 +1,223 @@
+{
+  "_meta": {
+    "schema_version": "1.0",
+    "file": "story-page-profiles-us55-v1.json",
+    "country": "US",
+    "audience": "55+",
+    "purpose": "Cau hinh 10 fanpage chay thu. Moi page co loi hua noi dung rieng nhung dung chung engine + kho DNA.",
+    "mix_rule": "85% category chinh / 15% category phu (test). Category streak toi da 3 bai lien tiep.",
+    "note": "page_profile_id la dau vao dau tien cua chuoi chon: page -> category -> subcategory -> conflict -> DNA."
+  },
+  "pages": [
+    {
+      "page_profile_id": "P01",
+      "name": "Grandparent Stories",
+      "status": "active",
+      "category_weights": {
+        "CAT01": 85,
+        "CAT02": 15
+      },
+      "primary_category": "CAT01",
+      "secondary_category": "CAT02",
+      "tone": "warm, nostalgic, protective of elders",
+      "hero_demographic": "grandparent 65-80",
+      "preferred_emotion": "tenderness, quiet pride",
+      "forbidden_patterns": [
+        "default_villain_grandchild",
+        "secret_wealth_reveal"
+      ],
+      "max_consecutive_same_category": 3,
+      "subcategory_cooldown_window": 20,
+      "posting_mix_note": "85% chinh / 15% test"
+    },
+    {
+      "page_profile_id": "P02",
+      "name": "Family Caregiving",
+      "status": "active",
+      "category_weights": {
+        "CAT02": 85,
+        "CAT03": 15
+      },
+      "primary_category": "CAT02",
+      "secondary_category": "CAT03",
+      "tone": "honest, exhausted-but-loving, unglamorous",
+      "hero_demographic": "adult caregiver 50-70 or elder parent",
+      "preferred_emotion": "recognition of invisible labor",
+      "forbidden_patterns": [
+        "medical_sensationalism",
+        "specific_medical_advice"
+      ],
+      "max_consecutive_same_category": 3,
+      "subcategory_cooldown_window": 20,
+      "posting_mix_note": "85% chinh / 15% test"
+    },
+    {
+      "page_profile_id": "P03",
+      "name": "Home & Inheritance",
+      "status": "active",
+      "category_weights": {
+        "CAT03": 85,
+        "CAT04": 15
+      },
+      "primary_category": "CAT03",
+      "secondary_category": "CAT04",
+      "tone": "grounded, legal-plausible, dignity-focused",
+      "hero_demographic": "homeowner 65-85",
+      "preferred_emotion": "autonomy, rootedness",
+      "forbidden_patterns": [
+        "surprise_will_overuse",
+        "implausible_legal_shortcut"
+      ],
+      "max_consecutive_same_category": 3,
+      "subcategory_cooldown_window": 20,
+      "posting_mix_note": "85% chinh / 15% test"
+    },
+    {
+      "page_profile_id": "P04",
+      "name": "Love After 55",
+      "status": "active",
+      "category_weights": {
+        "CAT04": 85,
+        "CAT05": 15
+      },
+      "primary_category": "CAT04",
+      "secondary_category": "CAT05",
+      "tone": "hopeful, tender, never mocking of late-life romance",
+      "hero_demographic": "widow/widower 58-78",
+      "preferred_emotion": "second-chance warmth",
+      "forbidden_patterns": [
+        "naive_elder_portrayal",
+        "scam_over_50pct"
+      ],
+      "max_consecutive_same_category": 3,
+      "subcategory_cooldown_window": 20,
+      "posting_mix_note": "85% chinh / 15% test"
+    },
+    {
+      "page_profile_id": "P05",
+      "name": "Family Secrets",
+      "status": "active",
+      "category_weights": {
+        "CAT05": 85,
+        "CAT06": 15
+      },
+      "primary_category": "CAT05",
+      "secondary_category": "CAT06",
+      "tone": "mystery-tinged, evidence-driven, restrained",
+      "hero_demographic": "any elder 60-85 + descendant",
+      "preferred_emotion": "revelation, reframing the past",
+      "forbidden_patterns": [
+        "every_secret_is_hidden_child",
+        "every_secret_is_a_will"
+      ],
+      "max_consecutive_same_category": 3,
+      "subcategory_cooldown_window": 20,
+      "posting_mix_note": "85% chinh / 15% test"
+    },
+    {
+      "page_profile_id": "P06",
+      "name": "Over 50 at Work",
+      "status": "active",
+      "category_weights": {
+        "CAT06": 85,
+        "CAT11": 15
+      },
+      "primary_category": "CAT06",
+      "secondary_category": "CAT11",
+      "tone": "competent, unsentimental, quietly defiant",
+      "hero_demographic": "worker 52-70",
+      "preferred_emotion": "respect for skill",
+      "forbidden_patterns": [
+        "secret_founder_twist",
+        "secret_ceo_twist"
+      ],
+      "max_consecutive_same_category": 3,
+      "subcategory_cooldown_window": 20,
+      "posting_mix_note": "85% chinh / 15% test"
+    },
+    {
+      "page_profile_id": "P07",
+      "name": "Protecting What Matters",
+      "status": "active",
+      "category_weights": {
+        "CAT07": 85,
+        "CAT03": 15
+      },
+      "primary_category": "CAT07",
+      "secondary_category": "CAT03",
+      "tone": "cautionary but never condescending",
+      "hero_demographic": "elder 62-85 or protective relative",
+      "preferred_emotion": "vigilance, self-trust",
+      "forbidden_patterns": [
+        "replicable_scam_method",
+        "unrealistic_money_recovery"
+      ],
+      "max_consecutive_same_category": 3,
+      "subcategory_cooldown_window": 20,
+      "posting_mix_note": "85% chinh / 15% test"
+    },
+    {
+      "page_profile_id": "P08",
+      "name": "Pets Are Family",
+      "status": "active",
+      "category_weights": {
+        "CAT08": 85,
+        "CAT10": 15
+      },
+      "primary_category": "CAT08",
+      "secondary_category": "CAT10",
+      "tone": "gentle, companionable, community-minded",
+      "hero_demographic": "elder 60-85 with animal",
+      "preferred_emotion": "comfort, belonging",
+      "forbidden_patterns": [
+        "pet_loss_over_20pct",
+        "animal_cruelty_detail"
+      ],
+      "max_consecutive_same_category": 3,
+      "subcategory_cooldown_window": 20,
+      "posting_mix_note": "85% chinh / 15% test"
+    },
+    {
+      "page_profile_id": "P09",
+      "name": "Forgotten Service",
+      "status": "active",
+      "category_weights": {
+        "CAT09": 85,
+        "CAT05": 15
+      },
+      "primary_category": "CAT09",
+      "secondary_category": "CAT05",
+      "tone": "respectful, restrained, anti-spectacle",
+      "hero_demographic": "veteran 68-88",
+      "preferred_emotion": "dignity, quiet honor",
+      "forbidden_patterns": [
+        "general_walks_in_overuse",
+        "celebrity_validator_overuse"
+      ],
+      "max_consecutive_same_category": 3,
+      "subcategory_cooldown_window": 20,
+      "posting_mix_note": "85% chinh / 15% test"
+    },
+    {
+      "page_profile_id": "P10",
+      "name": "Small-Town Human Stories",
+      "status": "active",
+      "category_weights": {
+        "CAT10": 85,
+        "CAT01": 15
+      },
+      "primary_category": "CAT10",
+      "secondary_category": "CAT01",
+      "tone": "neighborly, communal, slice-of-life",
+      "hero_demographic": "any elder 60-85 + community",
+      "preferred_emotion": "belonging, chosen family",
+      "forbidden_patterns": [
+        "proselytizing",
+        "faith_as_moral_lesson"
+      ],
+      "max_consecutive_same_category": 3,
+      "subcategory_cooldown_window": 20,
+      "posting_mix_note": "85% chinh / 15% test"
+    }
+  ]
+}

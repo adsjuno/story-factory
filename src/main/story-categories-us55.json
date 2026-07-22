@@ -1,0 +1,3145 @@
+{
+  "_meta": {
+    "schema_version": "1.0",
+    "file": "story-categories-us55-v1.json",
+    "country": "US",
+    "audience": "55+",
+    "purpose": "Lop dinh huong noi dung (category/subcategory) NAM TREN Story DNA Engine v1.8.1. Khong thay the conflict catalog cu.",
+    "priority_order_when_conflict": [
+      "1_hard_compatibility (geography/season/weather/gender-role)",
+      "2_family_cooldown_and_daily_cap (v1.8.1)",
+      "3_conflict_fidelity (khong doi conflict da chon)",
+      "4_page_profile_constraints",
+      "5_subcategory_affinity (CHI la weighted preference)",
+      "6_weighted_random"
+    ],
+    "selection_rule": "eligible = all_candidates - incompatible - cooldown_blocked - daily_cap_blocked. CHI SAU DO moi cong trong so affinity trong tap con hop le. TUYET DOI khong chon affinity truoc roi nhet xuong.",
+    "note_affinity": "reveal_affinity/justice_affinity la GOI Y, khong phai required. Cooldown v1.8.1 luon THANG affinity."
+  },
+  "global_rules": {
+    "R-01_subcategory_exact_cooldown": "Khong lap cung subcategory trong 20 bai gan nhat cua cung page.",
+    "R-02_cross_page_global_cooldown": "Khong hard block toan he thong; chi soft penalty trong 5 bai gan nhat toan network.",
+    "R-03_category_streak": "Page chuyen category toi da 3 bai lien tiep cung category; bai thu 4 phai lay category phu neu co.",
+    "R-04_priority_mix": "Toan network giai doan dau: P0 ~64%, P1 ~30%, P2 ~6%.",
+    "R-05_reveal_diversity": "Subcategory affinity chi la uu tien; van tuan family cooldown v1.8.1.",
+    "R-06_no_villain_monoculture": "Khong de >40% bai trong 20 bai gan nhat co villain la adult child/in-law.",
+    "R-07_no_wealth_shortcut": "Hidden wealth/inheritance reveal theo cap cu; CAT03 khong dong nghia hidden wealth.",
+    "R-08_pet_loss_cap": "CAT08: death/loss ending toi da 20% rolling 20.",
+    "R-09_romance_scam_balance": "CAT04: scam toi da 50%; con lai phai la love/companionship that.",
+    "R-10_veteran_validator_cap": "CAT09 van ap external_public_validator + public_recognition <=25% theo ngay."
+  },
+  "categories": [
+    {
+      "category_id": "CAT01",
+      "slug": "grandparents-grandchildren",
+      "name_en": "Grandparents & Grandchildren",
+      "name_vi": "Ông bà và cháu",
+      "description": "Tình yêu, hy sinh, khoảng cách thế hệ và quyền được hiện diện trong đời cháu.",
+      "priority": "P0",
+      "base_weight": 12,
+      "expected_viral": 9.5,
+      "status": "active",
+      "page_affinity": [
+        "P01"
+      ],
+      "max_consecutive": 3,
+      "cooldown_window": 5,
+      "risk_notes": [
+        "avoid_villainizing_children_by_default",
+        "avoid_secret_wealth_overuse"
+      ],
+      "subcategories": [
+        {
+          "subcategory_id": "C01S01",
+          "category_id": "CAT01",
+          "name_en": "Raised the Grandchild",
+          "conflict_premise": "A grandparent raised a grandchild but the sacrifice is denied.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "custody papers",
+            "school photo"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "caregiving_denied",
+            "raised_child",
+            "sacrifice_erased"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C01S02",
+          "category_id": "CAT01",
+          "name_en": "Blocked From Seeing Grandchildren",
+          "conflict_premise": "An adult child cuts off contact with the grandchildren after a divorce or conflict.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "birthday card",
+            "voicemail"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "access_denied",
+            "estrangement",
+            "visitation"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C01S03",
+          "category_id": "CAT01",
+          "name_en": "Secret Tuition Sacrifice",
+          "conflict_premise": "The grandparent quietly paid tuition or sold assets, but someone else takes the credit.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "bank receipt",
+            "scholarship letter"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "A_me_gia",
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "secret_payment",
+            "credit_stolen",
+            "financial_sacrifice"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C01S04",
+          "category_id": "CAT01",
+          "name_en": "The Grandchild Who Returned",
+          "conflict_premise": "An adult grandchild comes back to care for or defend the grandparent.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "old key",
+            "family photograph"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "walk_away_dignity"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "reconciliation",
+            "defender_appears",
+            "return_home"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C01S05",
+          "category_id": "CAT01",
+          "name_en": "Grandparent Used as Free Labor",
+          "conflict_premise": "Treated as an unpaid babysitter with no respect for boundaries.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "calendar",
+            "packed lunch"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "free_labor",
+            "boundary_violation",
+            "exploited_help"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C01S06",
+          "category_id": "CAT01",
+          "name_en": "Family History Discovered by Grandchild",
+          "conflict_premise": "A grandchild finds letters, a diary or an object that changes how the family sees the grandparent.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "diary",
+            "medal",
+            "cassette"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "public_recognition"
+          ],
+          "legacy_themes": [
+            "A_me_gia",
+            "B_veteran"
+          ],
+          "compatible_conflict_tags": [
+            "hidden_past",
+            "found_evidence",
+            "legacy_revealed"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C01S07",
+          "category_id": "CAT01",
+          "name_en": "Step-Grandparent or Chosen Grandparent",
+          "conflict_premise": "Someone with no blood tie becomes the real grandparent.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "handmade gift",
+            "adoption photo"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "chosen_family",
+            "step_family",
+            "belonging"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C01S08",
+          "category_id": "CAT01",
+          "name_en": "Grandchild Defends Grandparent Publicly",
+          "conflict_premise": "The grandchild is the only one who stands up for the grandparent.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "speech notes",
+            "phone video"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia",
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "public_defense",
+            "humiliation_reversed",
+            "witness_speaks"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        }
+      ]
+    },
+    {
+      "category_id": "CAT02",
+      "slug": "family-caregiving-sibling-conflict",
+      "name_en": "Family Caregiving & Sibling Conflict",
+      "name_vi": "Chăm sóc người thân già và xung đột anh chị em",
+      "description": "Ai thực sự ở lại khi cha mẹ già yếu, và cái giá vô hình của người chăm sóc.",
+      "priority": "P0",
+      "base_weight": 11,
+      "expected_viral": 9.4,
+      "status": "active",
+      "page_affinity": [
+        "P02"
+      ],
+      "max_consecutive": 3,
+      "cooldown_window": 5,
+      "risk_notes": [
+        "no_medical_sensationalism",
+        "no_specific_medical_or_legal_advice"
+      ],
+      "subcategories": [
+        {
+          "subcategory_id": "C02S01",
+          "category_id": "CAT02",
+          "name_en": "One Sibling Did Everything",
+          "conflict_premise": "One child gave years of care; the others appear only when assets are divided.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "care log",
+            "receipts"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "caregiver_burden",
+            "sibling_rivalry",
+            "inheritance_pressure"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C02S02",
+          "category_id": "CAT02",
+          "name_en": "Long-Distance Sibling Thinks Money Is Enough",
+          "conflict_premise": "A distant sibling sends money but does not understand the daily burden.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "transfer record",
+            "missed-call list"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "absent_sibling",
+            "money_vs_presence",
+            "caregiver_burden"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C02S03",
+          "category_id": "CAT02",
+          "name_en": "Caregiver Accused of Living Off Parent",
+          "conflict_premise": "The caregiver is accused of freeloading or manipulating the parent's assets.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "medical schedule",
+            "power bill"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "walk_away_dignity"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "false_accusation",
+            "caregiver_burden",
+            "financial_suspicion"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C02S04",
+          "category_id": "CAT02",
+          "name_en": "Dispute Over Treatment Decisions",
+          "conflict_premise": "Siblings fight over who decides the parent's care and treatment.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "advance directive",
+            "hospital folder"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "medical_decision",
+            "sibling_rivalry",
+            "authority_dispute"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C02S05",
+          "category_id": "CAT02",
+          "name_en": "Paid Caregiver Became Family",
+          "conflict_premise": "A hired caregiver understands the elder better than the biological children.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "recipe notebook",
+            "care badge"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "chosen_family",
+            "outsider_cares",
+            "caregiver_bond"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C02S06",
+          "category_id": "CAT02",
+          "name_en": "Dementia Reveals an Old Secret",
+          "conflict_premise": "Memory loss brings an old promise or secret to the surface.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "old photo",
+            "labeled drawer"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "hidden_past",
+            "memory_loss",
+            "old_promise"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C02S07",
+          "category_id": "CAT02",
+          "name_en": "Grandchild Becomes Caregiver",
+          "conflict_premise": "A grandchild must choose between their own future and caring for a grandparent.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "college acceptance",
+            "pill organizer"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "walk_away_dignity"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "young_caregiver",
+            "sacrifice_choice",
+            "caregiver_burden"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C02S08",
+          "category_id": "CAT02",
+          "name_en": "House Promised to the Caregiver",
+          "conflict_premise": "The parent promised the house to the caregiver, triggering a fight with siblings.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "deed",
+            "handwritten note"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia",
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "inheritance_pressure",
+            "promise_broken",
+            "property_control"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        }
+      ]
+    },
+    {
+      "category_id": "CAT03",
+      "slug": "home-inheritance-aging-in-place",
+      "name_en": "Home, Inheritance & Aging in Place",
+      "name_vi": "Nhà cửa, thừa kế và quyền sống trong nhà mình",
+      "description": "Ngôi nhà không chỉ là tài sản; đó là ký ức, quyền tự chủ và phẩm giá.",
+      "priority": "P0",
+      "base_weight": 11,
+      "expected_viral": 9.3,
+      "status": "active",
+      "page_affinity": [
+        "P03"
+      ],
+      "max_consecutive": 3,
+      "cooldown_window": 5,
+      "risk_notes": [
+        "avoid_surprise_will_overuse",
+        "require_basic_legal_plausibility"
+      ],
+      "subcategories": [
+        {
+          "subcategory_id": "C03S01",
+          "category_id": "CAT03",
+          "name_en": "Children Try to Sell the Parent's Home",
+          "conflict_premise": "Adult children push to sell the home, claiming the parent can no longer live alone.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "front-door key",
+            "appraisal"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "procedural"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "forced_sale",
+            "property_pressure",
+            "autonomy_denied"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C03S02",
+          "category_id": "CAT03",
+          "name_en": "Hidden Ownership or Deed Clause",
+          "conflict_premise": "Old paperwork reveals ownership or a clause nobody knew about.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "deed",
+            "county record"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "A_me_gia",
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "property_control",
+            "found_evidence",
+            "inheritance_pressure"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C03S03",
+          "category_id": "CAT03",
+          "name_en": "Sibling Renovates Then Claims the House",
+          "conflict_premise": "One sibling renovates, then uses the cost to claim ownership.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "contractor invoice",
+            "blueprint"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "property_control",
+            "sibling_rivalry",
+            "financial_leverage"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C03S04",
+          "category_id": "CAT03",
+          "name_en": "Forced Into Assisted Living",
+          "conflict_premise": "The family pushes an elder out of the home although they can still decide for themselves.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "packed suitcase",
+            "medical assessment"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "walk_away_dignity"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "assisted_living",
+            "autonomy_denied",
+            "forced_move"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C03S05",
+          "category_id": "CAT03",
+          "name_en": "Power of Attorney Abuse",
+          "conflict_premise": "A relative uses power of attorney to control money and property.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "POA document",
+            "bank statement"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia",
+            "D_vo_phan_boi"
+          ],
+          "compatible_conflict_tags": [
+            "power_of_attorney",
+            "financial_control",
+            "betrayal_of_trust"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C03S06",
+          "category_id": "CAT03",
+          "name_en": "Home Has Community History",
+          "conflict_premise": "A house thought worthless turns out to carry local or community history.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "old plaque",
+            "newspaper clipping"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "community_history",
+            "hidden_value",
+            "legacy_revealed"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C03S07",
+          "category_id": "CAT03",
+          "name_en": "House Turned Into Rental While Owner Is Away",
+          "conflict_premise": "The home is rented or listed while the owner is hospitalized or away.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "rental listing",
+            "spare key"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "property_control",
+            "betrayal_of_trust",
+            "forced_sale"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C03S08",
+          "category_id": "CAT03",
+          "name_en": "Chosen Heir Instead of Blood Relative",
+          "conflict_premise": "A caregiver or neighbor inherits because they were the one who stayed.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "will",
+            "garden tool"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "procedural"
+          ],
+          "legacy_themes": [
+            "A_me_gia",
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "inheritance_pressure",
+            "chosen_family",
+            "promise_kept"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        }
+      ]
+    },
+    {
+      "category_id": "CAT04",
+      "slug": "late-life-love-widowhood-romance-scams",
+      "name_en": "Late-Life Love, Widowhood & Romance Scams",
+      "name_vi": "Tình yêu tuổi xế chiều, góa bụa và lừa đảo tình cảm",
+      "description": "Quyền được yêu lại, nỗi sợ phản bội ký ức người cũ và ranh giới giữa tình yêu thật với lợi dụng.",
+      "priority": "P0",
+      "base_weight": 10,
+      "expected_viral": 9.2,
+      "status": "active",
+      "page_affinity": [
+        "P04"
+      ],
+      "max_consecutive": 3,
+      "cooldown_window": 5,
+      "risk_notes": [
+        "no_naive_elder_portrayal",
+        "min_50pct_genuine_love_not_scam"
+      ],
+      "subcategories": [
+        {
+          "subcategory_id": "C04S01",
+          "category_id": "CAT04",
+          "name_en": "Children Oppose a New Relationship",
+          "conflict_premise": "Adult children oppose a new love, fearing assets or the memory of the late parent.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "wedding ring",
+            "dinner receipt"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "new_relationship",
+            "family_opposition",
+            "inheritance_pressure"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C04S02",
+          "category_id": "CAT04",
+          "name_en": "High-School Sweetheart Returns",
+          "conflict_premise": "A first love reappears after decades.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "yearbook",
+            "old dance ticket"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "second_chance",
+            "reunion",
+            "late_life_love"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C04S03",
+          "category_id": "CAT04",
+          "name_en": "Romance Scam Detected by a Small Detail",
+          "conflict_premise": "The character spots the scam themselves through one small inconsistency.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "chat screenshot",
+            "mismatched photo"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "procedural"
+          ],
+          "legacy_themes": [
+            "D_vo_phan_boi"
+          ],
+          "compatible_conflict_tags": [
+            "romance_scam",
+            "self_rescue",
+            "deception_detected"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C04S04",
+          "category_id": "CAT04",
+          "name_en": "Love Inside a Retirement Community",
+          "conflict_premise": "Two residents fall in love but hide it, fearing judgment.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "shared crossword",
+            "garden bench"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "late_life_love",
+            "social_judgment",
+            "secret_relationship"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C04S05",
+          "category_id": "CAT04",
+          "name_en": "Second Marriage Exposes Family Greed",
+          "conflict_premise": "A late wedding exposes the family's greed over inheritance.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "prenuptial agreement",
+            "guest list"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "inheritance_pressure",
+            "family_greed",
+            "new_relationship"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C04S06",
+          "category_id": "CAT04",
+          "name_en": "Guilt About Moving On",
+          "conflict_premise": "The character feels guilty about loving again after a spouse's death.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "old voicemail",
+            "memorial flower"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "private_resolution"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "widowhood",
+            "guilt",
+            "late_life_love"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C04S07",
+          "category_id": "CAT04",
+          "name_en": "Online Connection Turns Into Investment Pressure",
+          "conflict_premise": "An online relationship turns into pressure to lend or invest.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "wire request",
+            "fake profile"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "D_vo_phan_boi"
+          ],
+          "compatible_conflict_tags": [
+            "romance_scam",
+            "investment_pressure",
+            "deception_detected"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C04S08",
+          "category_id": "CAT04",
+          "name_en": "Friendship Becomes Love",
+          "conflict_premise": "A long friendship becomes love after both have lost their partners.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "shared recipe",
+            "walking route"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "private_resolution"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "late_life_love",
+            "friendship",
+            "widowhood"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        }
+      ]
+    },
+    {
+      "category_id": "CAT05",
+      "slug": "family-secrets-legacy-lost-history",
+      "name_en": "Family Secrets, Legacy & Lost History",
+      "name_vi": "Bí mật gia đình, di sản và lịch sử bị mất",
+      "description": "Một vật chứng nhỏ có thể thay đổi cách cả gia đình hiểu về quá khứ.",
+      "priority": "P0",
+      "base_weight": 10,
+      "expected_viral": 9.1,
+      "status": "active",
+      "page_affinity": [
+        "P05"
+      ],
+      "max_consecutive": 3,
+      "cooldown_window": 5,
+      "risk_notes": [
+        "not_every_secret_is_hidden_child_or_will",
+        "diversify_evidence_types"
+      ],
+      "subcategories": [
+        {
+          "subcategory_id": "C05S01",
+          "category_id": "CAT05",
+          "name_en": "Letters Reveal a Hidden Child",
+          "conflict_premise": "Old letters reveal a hidden child or relationship.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "bundle of letters",
+            "birth certificate"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "hidden_past",
+            "found_evidence",
+            "family_secret"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C05S02",
+          "category_id": "CAT05",
+          "name_en": "Family Recipe Was Stolen or Misattributed",
+          "conflict_premise": "A famous recipe belongs to someone erased from the family story.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "recipe card",
+            "stained apron"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "A_me_gia",
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "credit_stolen",
+            "legacy_revealed",
+            "erased_contribution"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C05S03",
+          "category_id": "CAT05",
+          "name_en": "Medal or Service Record Tells Another Story",
+          "conflict_premise": "A medal or service record shows a truth different from the family's version.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "medal",
+            "service record"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "B_veteran"
+          ],
+          "compatible_conflict_tags": [
+            "hidden_past",
+            "service_record",
+            "legacy_revealed"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C05S04",
+          "category_id": "CAT05",
+          "name_en": "Bible, Journal or Ledger Changes the Inheritance",
+          "conflict_premise": "Notes in a book, journal or ledger clarify an old promise.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "family Bible",
+            "ledger"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "found_evidence",
+            "inheritance_pressure",
+            "old_promise"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C05S05",
+          "category_id": "CAT05",
+          "name_en": "Cassette or Voicemail From the Dead",
+          "conflict_premise": "A recording left behind carries an explanation or a late apology.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "cassette",
+            "answering machine"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia",
+            "D_vo_phan_boi"
+          ],
+          "compatible_conflict_tags": [
+            "found_evidence",
+            "posthumous_message",
+            "family_secret"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C05S06",
+          "category_id": "CAT05",
+          "name_en": "Genealogy Exposes a Buried Identity",
+          "conflict_premise": "Genealogy or DNA reveals a hidden identity, relation or history.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "family tree",
+            "lab envelope"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "private_resolution"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "hidden_identity",
+            "found_evidence",
+            "family_secret"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C05S07",
+          "category_id": "CAT05",
+          "name_en": "Illiterate Parent Recorded Their Life",
+          "conflict_premise": "A parent who could not write quietly recorded their life in sound or pictures.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "tapes",
+            "disposable camera"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "hidden_past",
+            "legacy_revealed",
+            "erased_contribution"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C05S08",
+          "category_id": "CAT05",
+          "name_en": "Object Returned Decades Later",
+          "conflict_premise": "A lost object comes back, bringing an untold story with it.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "watch",
+            "locket",
+            "tool"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "public_recognition"
+          ],
+          "legacy_themes": [
+            "B_veteran"
+          ],
+          "compatible_conflict_tags": [
+            "found_evidence",
+            "object_returned",
+            "hidden_past"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        }
+      ]
+    },
+    {
+      "category_id": "CAT06",
+      "slug": "workplace-ageism-second-careers",
+      "name_en": "Workplace Ageism & Second Careers",
+      "name_vi": "Phân biệt tuổi tác nơi làm việc và sự nghiệp thứ hai",
+      "description": "Kinh nghiệm bị coi thường, quyền được làm việc và giá trị con người ngoài tuổi tác.",
+      "priority": "P0",
+      "base_weight": 10,
+      "expected_viral": 9.1,
+      "status": "active",
+      "page_affinity": [
+        "P06"
+      ],
+      "max_consecutive": 3,
+      "cooldown_window": 5,
+      "risk_notes": [
+        "no_secret_founder_or_ceo_twist",
+        "diversify_justice"
+      ],
+      "subcategories": [
+        {
+          "subcategory_id": "C06S01",
+          "category_id": "CAT06",
+          "name_en": "Training the Younger Replacement",
+          "conflict_premise": "An older worker is asked to train the person who will replace them.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "training manual",
+            "schedule"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "walk_away_dignity"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "ageism",
+            "forced_out",
+            "replacement"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C06S02",
+          "category_id": "CAT06",
+          "name_en": "Pushed Out Before Retirement Benefits",
+          "conflict_premise": "Forced out just before benefits or seniority vest.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "HR email",
+            "benefits statement"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "ageism",
+            "forced_out",
+            "benefits_denied"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C06S03",
+          "category_id": "CAT06",
+          "name_en": "Old Skill Saves the Business",
+          "conflict_premise": "A skill dismissed as obsolete saves the system or the customer.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "manual tool",
+            "paper log"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "B_veteran"
+          ],
+          "compatible_conflict_tags": [
+            "skill_undervalued",
+            "ageism",
+            "competence_proven"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C06S04",
+          "category_id": "CAT06",
+          "name_en": "Idea Stolen by a Younger Coworker",
+          "conflict_premise": "A younger colleague takes credit for the older worker's idea.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "draft file",
+            "timestamped notebook"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "credit_stolen",
+            "ageism",
+            "workplace_betrayal"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C06S05",
+          "category_id": "CAT06",
+          "name_en": "Returning After Caregiving or Widowhood",
+          "conflict_premise": "Returning to work after years of caregiving or widowhood.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "old résumé",
+            "name badge"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "walk_away_dignity"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "reentry",
+            "ageism",
+            "second_career"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C06S06",
+          "category_id": "CAT06",
+          "name_en": "Retiree Starts a Small Business",
+          "conflict_premise": "Rejected by employers, the character starts their own small operation.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "garage key",
+            "first invoice"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "private_resolution"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "second_career",
+            "ageism",
+            "self_reliance"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C06S07",
+          "category_id": "CAT06",
+          "name_en": "Customer Chooses Experience",
+          "conflict_premise": "A customer trusts experience over a younger manager's polish.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "customer letter",
+            "repair receipt"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "public_recognition"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "competence_proven",
+            "ageism",
+            "skill_undervalued"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C06S08",
+          "category_id": "CAT06",
+          "name_en": "Refuses the Comeback Offer",
+          "conflict_premise": "After the company realizes their value, the character declines to return.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "offer letter",
+            "packed desk box"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "walk_away_dignity",
+            "hero_choice"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "ageism",
+            "refusal",
+            "dignity_choice"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        }
+      ]
+    },
+    {
+      "category_id": "CAT07",
+      "slug": "financial-exploitation-scams",
+      "name_en": "Financial Exploitation & Scams",
+      "name_vi": "Lừa đảo tài chính và người thân lợi dụng",
+      "description": "Sự phản bội tiền bạc thường đau nhất khi đến từ người thân hoặc người được tin tưởng.",
+      "priority": "P1",
+      "base_weight": 8,
+      "expected_viral": 9,
+      "status": "active",
+      "page_affinity": [
+        "P07"
+      ],
+      "max_consecutive": 3,
+      "cooldown_window": 5,
+      "risk_notes": [
+        "no_replicable_criminal_method",
+        "no_unrealistic_money_recovery"
+      ],
+      "subcategories": [
+        {
+          "subcategory_id": "C07S01",
+          "category_id": "CAT07",
+          "name_en": "Grandchild Emergency Scam",
+          "conflict_premise": "A scammer poses as a grandchild in trouble to demand emergency money.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "voicemail",
+            "money-transfer receipt"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "impersonation_scam",
+            "emergency_pressure",
+            "deception_detected"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C07S02",
+          "category_id": "CAT07",
+          "name_en": "Tech Support or Government Impersonation",
+          "conflict_premise": "A fake support or agency call gets access to accounts.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "popup screenshot",
+            "call log"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "impersonation_scam",
+            "account_access",
+            "deception_detected"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C07S03",
+          "category_id": "CAT07",
+          "name_en": "Fake Charity After a Disaster",
+          "conflict_premise": "Someone exploits community goodwill with a fake fundraiser.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "donation letter",
+            "receipt"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "public_recognition"
+          ],
+          "legacy_themes": [
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "fake_charity",
+            "community_trust",
+            "deception_detected"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C07S04",
+          "category_id": "CAT07",
+          "name_en": "Adult Child Uses Parent's Credit",
+          "conflict_premise": "An adult child uses a parent's card or account.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "credit statement",
+            "hidden card"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "procedural"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "financial_control",
+            "betrayal_of_trust",
+            "family_theft"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C07S05",
+          "category_id": "CAT07",
+          "name_en": "Caregiver Financial Abuse",
+          "conflict_premise": "A caregiver exploits trust to take assets.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "missing checks",
+            "inventory list"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "financial_control",
+            "betrayal_of_trust",
+            "caregiver_abuse"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C07S06",
+          "category_id": "CAT07",
+          "name_en": "Investment or Crypto Pressure",
+          "conflict_premise": "A new friend or partner pushes a can't-lose investment.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "investment deck",
+            "wire request"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "procedural"
+          ],
+          "legacy_themes": [
+            "D_vo_phan_boi"
+          ],
+          "compatible_conflict_tags": [
+            "investment_pressure",
+            "deception_detected",
+            "financial_control"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C07S07",
+          "category_id": "CAT07",
+          "name_en": "Forged Signature or POA",
+          "conflict_premise": "A signature or power of attorney is forged or used beyond its scope.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "notarized paper",
+            "bank alert"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "power_of_attorney",
+            "forgery",
+            "financial_control"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C07S08",
+          "category_id": "CAT07",
+          "name_en": "Family Discovers the Scam but Blames the Victim",
+          "conflict_premise": "The victim is shamed by their own family instead of protected.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "chat history",
+            "family group text"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "walk_away_dignity",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "victim_blamed",
+            "family_shame",
+            "deception_detected"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        }
+      ]
+    },
+    {
+      "category_id": "CAT08",
+      "slug": "pets-loneliness-rescue",
+      "name_en": "Pets, Loneliness & Rescue",
+      "name_vi": "Thú cưng, cô đơn và cơ hội sống lại",
+      "description": "Thú cưng là gia đình, mục đích sống và đôi khi là cầu nối cuối cùng với cộng đồng.",
+      "priority": "P1",
+      "base_weight": 8,
+      "expected_viral": 9,
+      "status": "active",
+      "page_affinity": [
+        "P08"
+      ],
+      "max_consecutive": 3,
+      "cooldown_window": 5,
+      "risk_notes": [
+        "pet_loss_ending_max_20pct"
+      ],
+      "subcategories": [
+        {
+          "subcategory_id": "C08S01",
+          "category_id": "CAT08",
+          "name_en": "Family Wants to Surrender the Pet",
+          "conflict_premise": "The children want to give away the pet when the elder is hospitalized or moving.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "collar",
+            "shelter form"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "procedural"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "pet_at_risk",
+            "autonomy_denied",
+            "forced_move"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C08S02",
+          "category_id": "CAT08",
+          "name_en": "Pet Alerts a Neighbor",
+          "conflict_premise": "The pet leads a neighbor to an owner in danger.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "leash",
+            "scratched door"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "private_resolution"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "rescue",
+            "neighbor_help",
+            "loneliness"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C08S03",
+          "category_id": "CAT08",
+          "name_en": "Inherited Pet From a Late Spouse",
+          "conflict_premise": "Caring for a late partner's animal restores a sense of purpose.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "old tag",
+            "feeding note"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "widowhood",
+            "purpose_regained",
+            "grief"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C08S04",
+          "category_id": "CAT08",
+          "name_en": "Veteran and Rescue Animal Heal Together",
+          "conflict_premise": "A veteran and a rescue animal recover together.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "service vest",
+            "dog tag"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "B_veteran"
+          ],
+          "compatible_conflict_tags": [
+            "healing",
+            "service_animal",
+            "loneliness"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C08S05",
+          "category_id": "CAT08",
+          "name_en": "Housing Denies the Pet",
+          "conflict_premise": "The elder must choose between housing and their only companion.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "lease",
+            "carrier"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "walk_away_dignity"
+          ],
+          "legacy_themes": [
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "housing_pressure",
+            "pet_at_risk",
+            "impossible_choice"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C08S06",
+          "category_id": "CAT08",
+          "name_en": "Nobody Wants the Pet During Inheritance Fight",
+          "conflict_premise": "The family fights over assets but abandons the animal.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "will",
+            "food bowl"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "inheritance_pressure",
+            "pet_at_risk",
+            "family_greed"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C08S07",
+          "category_id": "CAT08",
+          "name_en": "Retiree Finds Community Through Rescue Work",
+          "conflict_premise": "Rescue work pulls a retiree out of isolation.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "volunteer badge",
+            "adoption photo"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "private_resolution"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "loneliness",
+            "purpose_regained",
+            "community"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C08S08",
+          "category_id": "CAT08",
+          "name_en": "Pet Leads to a Hidden Memory",
+          "conflict_premise": "The animal uncovers a letter or object that reconnects family memory.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "buried box",
+            "blanket"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "found_evidence",
+            "hidden_past",
+            "family_secret"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        }
+      ]
+    },
+    {
+      "category_id": "CAT09",
+      "slug": "veterans-forgotten-service",
+      "name_en": "Veterans & Forgotten Service",
+      "name_vi": "Cựu chiến binh và sự phục vụ bị lãng quên",
+      "description": "Phẩm giá, hậu quả lâu dài của phục vụ và khoảng cách giữa biểu tượng với cách xã hội đối xử thật.",
+      "priority": "P1",
+      "base_weight": 7,
+      "expected_viral": 8.9,
+      "status": "active",
+      "page_affinity": [
+        "P09"
+      ],
+      "max_consecutive": 3,
+      "cooldown_window": 5,
+      "risk_notes": [
+        "external_public_validator_plus_public_recognition_max_25pct",
+        "avoid_general_or_celebrity_overuse"
+      ],
+      "subcategories": [
+        {
+          "subcategory_id": "C09S01",
+          "category_id": "CAT09",
+          "name_en": "Benefits or Records Denied",
+          "conflict_premise": "Benefits or records are denied through an administrative error.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "service record",
+            "claim letter"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "B_veteran"
+          ],
+          "compatible_conflict_tags": [
+            "benefits_denied",
+            "bureaucracy",
+            "service_record"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C09S02",
+          "category_id": "CAT09",
+          "name_en": "Family Dismisses the Veteran's Sacrifice",
+          "conflict_premise": "The family treats the service history as old news or a burden.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "medal box",
+            "photograph"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "walk_away_dignity"
+          ],
+          "legacy_themes": [
+            "B_veteran",
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "service_dismissed",
+            "family_disrespect",
+            "hidden_past"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C09S03",
+          "category_id": "CAT09",
+          "name_en": "Cannot Afford Medication or Housing",
+          "conflict_premise": "Financial pressure pushes the veteran into an impossible choice.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "pharmacy receipt",
+            "eviction notice"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "B_veteran",
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "financial_hardship",
+            "housing_pressure",
+            "impossible_choice"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C09S04",
+          "category_id": "CAT09",
+          "name_en": "Service Animal or Battle Buddy",
+          "conflict_premise": "A service dog or an old comrade helps close an open wound.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "dog tag",
+            "letter"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "B_veteran"
+          ],
+          "compatible_conflict_tags": [
+            "healing",
+            "comradeship",
+            "service_animal"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C09S05",
+          "category_id": "CAT09",
+          "name_en": "Stolen Valor or Miscredited Heroism",
+          "conflict_premise": "Someone else takes credit for, or misreports, a past act.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "unit photo",
+            "citation"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "procedural"
+          ],
+          "legacy_themes": [
+            "B_veteran"
+          ],
+          "compatible_conflict_tags": [
+            "credit_stolen",
+            "stolen_valor",
+            "service_record"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C09S06",
+          "category_id": "CAT09",
+          "name_en": "Small Town Misjudges the Veteran",
+          "conflict_premise": "The community misreads the veteran's behavior without knowing the context.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "toolbox",
+            "folded flag"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "public_recognition"
+          ],
+          "legacy_themes": [
+            "B_veteran"
+          ],
+          "compatible_conflict_tags": [
+            "misjudged",
+            "community_trust",
+            "hidden_past"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C09S07",
+          "category_id": "CAT09",
+          "name_en": "Veteran Helps a Younger Person Quietly",
+          "conflict_premise": "The character helps a young person without seeking recognition.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "bus ticket",
+            "workshop tool"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "B_veteran"
+          ],
+          "compatible_conflict_tags": [
+            "quiet_help",
+            "mentorship",
+            "dignity_choice"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C09S08",
+          "category_id": "CAT09",
+          "name_en": "Refuses Ceremonial Recognition",
+          "conflict_premise": "Invited to be honored, the character chooses a more private act instead.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "ceremony invitation",
+            "handwritten note"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "walk_away_dignity",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "B_veteran"
+          ],
+          "compatible_conflict_tags": [
+            "refusal",
+            "dignity_choice",
+            "quiet_help"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        }
+      ]
+    },
+    {
+      "category_id": "CAT10",
+      "slug": "neighbors-faith-chosen-family",
+      "name_en": "Neighbors, Faith Communities & Chosen Family",
+      "name_vi": "Hàng xóm, cộng đồng đức tin và gia đình được lựa chọn",
+      "description": "Gia đình không chỉ là huyết thống; người ở lại đôi khi là hàng xóm, người đưa thư hoặc cộng đồng.",
+      "priority": "P1",
+      "base_weight": 7,
+      "expected_viral": 8.8,
+      "status": "active",
+      "page_affinity": [
+        "P10"
+      ],
+      "max_consecutive": 3,
+      "cooldown_window": 5,
+      "risk_notes": [
+        "no_proselytizing",
+        "faith_as_social_context_only"
+      ],
+      "subcategories": [
+        {
+          "subcategory_id": "C10S01",
+          "category_id": "CAT10",
+          "name_en": "Neighbor Cares When Children Live Far Away",
+          "conflict_premise": "A neighbor becomes the real caregiver when the children live far away.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "spare key",
+            "grocery list"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "neighbor_help",
+            "chosen_family",
+            "absent_family"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C10S02",
+          "category_id": "CAT10",
+          "name_en": "Mail Carrier Notices Something Is Wrong",
+          "conflict_premise": "A mail carrier notices an elder is missing or in trouble.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "uncollected mail",
+            "route card"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "private_resolution"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "rescue",
+            "neighbor_help",
+            "community"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C10S03",
+          "category_id": "CAT10",
+          "name_en": "Church Donation Secret",
+          "conflict_premise": "A quiet donation or sacrifice is misunderstood.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "offering envelope",
+            "ledger"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "public_recognition"
+          ],
+          "legacy_themes": [
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "quiet_help",
+            "misjudged",
+            "community_trust"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C10S04",
+          "category_id": "CAT10",
+          "name_en": "Trailer Park or Neighborhood Faces Displacement",
+          "conflict_premise": "A community fights being bought out or displaced.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "rent notice",
+            "petition"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "displacement",
+            "community",
+            "housing_pressure"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C10S05",
+          "category_id": "CAT10",
+          "name_en": "Friend Included in the Will",
+          "conflict_premise": "A friend or neighbor is named because they were the one who stayed.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "will",
+            "porch chair"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "procedural"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "inheritance_pressure",
+            "chosen_family",
+            "promise_kept"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C10S06",
+          "category_id": "CAT10",
+          "name_en": "Town Misjudged Someone for Decades",
+          "conflict_premise": "An old rumor made the whole town misread one person.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "newspaper clipping",
+            "photo"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "misjudged",
+            "community_trust",
+            "hidden_past"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C10S07",
+          "category_id": "CAT10",
+          "name_en": "Community Meal Reveals an Old Bond",
+          "conflict_premise": "A meal, festival or fair brings back an old secret or friendship.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "recipe dish",
+            "name tag"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "public_recognition"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "community",
+            "reunion",
+            "hidden_past"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C10S08",
+          "category_id": "CAT10",
+          "name_en": "Chosen Family at the End of Life",
+          "conflict_premise": "Friends or community become the real family at the end of life.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "visitor log",
+            "quilt"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "walk_away_dignity"
+          ],
+          "legacy_themes": [
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "chosen_family",
+            "end_of_life",
+            "absent_family"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        }
+      ]
+    },
+    {
+      "category_id": "CAT11",
+      "slug": "retirement-reversal-reinvention",
+      "name_en": "Retirement Reversal & Reinvention",
+      "name_vi": "Nghỉ hưu thất bại và tái tạo cuộc đời",
+      "description": "Nghỉ hưu không phải kết thúc; đôi khi là cú rơi tài chính, đôi khi là cơ hội sống lại.",
+      "priority": "P2",
+      "base_weight": 3,
+      "expected_viral": 8.7,
+      "status": "active",
+      "page_affinity": [],
+      "max_consecutive": 3,
+      "cooldown_window": 5,
+      "risk_notes": [
+        "no_risky_investment_promotion",
+        "no_get_rich_quick_ending"
+      ],
+      "subcategories": [
+        {
+          "subcategory_id": "C11S01",
+          "category_id": "CAT11",
+          "name_en": "Returns to Work for Basic Expenses",
+          "conflict_premise": "Rising costs force a return to work.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "old uniform",
+            "first paycheck"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "private_resolution"
+          ],
+          "legacy_themes": [
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "financial_hardship",
+            "reentry",
+            "second_career"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C11S02",
+          "category_id": "CAT11",
+          "name_en": "Retirement Fund Mismanaged",
+          "conflict_premise": "A retirement fund is mismanaged or used by a relative.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "statement",
+            "advisor email"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia",
+            "D_vo_phan_boi"
+          ],
+          "compatible_conflict_tags": [
+            "financial_control",
+            "betrayal_of_trust",
+            "financial_hardship"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C11S03",
+          "category_id": "CAT11",
+          "name_en": "Starts a Small Business From a Hobby",
+          "conflict_premise": "A craft or hobby becomes income and community.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "workbench",
+            "first order"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "hero_choice"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "second_career",
+            "purpose_regained",
+            "self_reliance"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C11S04",
+          "category_id": "CAT11",
+          "name_en": "Works Again Because of Loneliness",
+          "conflict_premise": "Returning to work is about purpose, not money.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "name badge",
+            "lunch table"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "loneliness",
+            "purpose_regained",
+            "reentry"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C11S05",
+          "category_id": "CAT11",
+          "name_en": "RV or Dream Retirement Collapses",
+          "conflict_premise": "The ideal retirement plan fails and the couple must start over.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "RV key",
+            "map"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "private_resolution"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "financial_hardship",
+            "plan_collapse",
+            "resilience"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C11S06",
+          "category_id": "CAT11",
+          "name_en": "Learns Technology Late in Life",
+          "conflict_premise": "Learning a new skill to keep a job or stay connected.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "laptop",
+            "handwritten cheat sheet"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "public_recognition",
+            "private_resolution"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "ageism",
+            "reentry",
+            "resilience"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C11S07",
+          "category_id": "CAT11",
+          "name_en": "Hides Night Work From Adult Children",
+          "conflict_premise": "A parent hides a second job out of shame or to protect the children.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "delivery bag",
+            "late-night receipt"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "A_me_gia",
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "financial_hardship",
+            "hidden_sacrifice",
+            "family_shame"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C11S08",
+          "category_id": "CAT11",
+          "name_en": "Redefines Success After Retirement",
+          "conflict_premise": "Trading old status for smaller but meaningful work.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "business card",
+            "garden gloves"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "walk_away_dignity",
+            "hero_choice"
+          ],
+          "legacy_themes": [],
+          "compatible_conflict_tags": [
+            "dignity_choice",
+            "purpose_regained",
+            "second_career"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        }
+      ]
+    },
+    {
+      "category_id": "CAT12",
+      "slug": "marriage-betrayal-inlaws-adult-family",
+      "name_en": "Marriage Betrayal, In-Laws & Adult Family Conflict",
+      "name_vi": "Phản bội hôn nhân, nhà chồng/nhà vợ và xung đột gia đình trưởng thành",
+      "description": "Drama gia đình trưởng thành, nhưng phải có chiều sâu và hậu quả thật thay vì chỉ trả đũa.",
+      "priority": "P2",
+      "base_weight": 3,
+      "expected_viral": 8.7,
+      "status": "active",
+      "page_affinity": [],
+      "max_consecutive": 3,
+      "cooldown_window": 5,
+      "risk_notes": [
+        "no_evil_mother_in_law_cliche",
+        "limit_hidden_wealth_reveal"
+      ],
+      "subcategories": [
+        {
+          "subcategory_id": "C12S01",
+          "category_id": "CAT12",
+          "name_en": "Late-Life Infidelity",
+          "conflict_premise": "Betrayal after decades of marriage, tangled with assets and reputation.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "hotel receipt",
+            "old anniversary card"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "procedural"
+          ],
+          "legacy_themes": [
+            "D_vo_phan_boi"
+          ],
+          "compatible_conflict_tags": [
+            "infidelity",
+            "betrayal_of_trust",
+            "asset_dispute"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C12S02",
+          "category_id": "CAT12",
+          "name_en": "Adult Children Take Sides",
+          "conflict_premise": "Adult children are pulled into the parents' conflict and forced to choose.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "family group chat",
+            "holiday plan"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "ordinary_witness"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "D_vo_phan_boi"
+          ],
+          "compatible_conflict_tags": [
+            "family_division",
+            "loyalty_conflict",
+            "infidelity"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C12S03",
+          "category_id": "CAT12",
+          "name_en": "Bride or Groom Humiliated by In-Laws",
+          "conflict_premise": "A new family member is humiliated over class, age or past.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "seating chart",
+            "wedding photo"
+          ],
+          "reveal_affinity": [
+            "ordinary_witness",
+            "self_disclosure"
+          ],
+          "justice_affinity": [
+            "hero_choice",
+            "walk_away_dignity"
+          ],
+          "legacy_themes": [
+            "C_co_dau",
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "class_humiliation",
+            "in_law_conflict",
+            "public_humiliation"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C12S04",
+          "category_id": "CAT12",
+          "name_en": "Caregiving Exposes a Bad Marriage",
+          "conflict_premise": "Illness or caregiving exposes a long-hidden truth about the marriage.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "care journal",
+            "locked drawer"
+          ],
+          "reveal_affinity": [
+            "natural_consequence",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "walk_away_dignity",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "D_vo_phan_boi",
+            "A_me_gia"
+          ],
+          "compatible_conflict_tags": [
+            "marriage_truth",
+            "caregiver_burden",
+            "hidden_past"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C12S05",
+          "category_id": "CAT12",
+          "name_en": "Secret Debt or Double Life",
+          "conflict_premise": "A debt or a second life has been hidden for years.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "credit report",
+            "second phone"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "D_vo_phan_boi"
+          ],
+          "compatible_conflict_tags": [
+            "double_life",
+            "financial_control",
+            "betrayal_of_trust"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C12S06",
+          "category_id": "CAT12",
+          "name_en": "Family Business Favoritism",
+          "conflict_premise": "An in-law or child is pushed out of the family business.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "partnership agreement",
+            "payroll"
+          ],
+          "reveal_affinity": [
+            "document_evidence",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "procedural",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "C_co_dau",
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "favoritism",
+            "business_dispute",
+            "in_law_conflict"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C12S07",
+          "category_id": "CAT12",
+          "name_en": "Holiday Gathering Breaks the Silence",
+          "conflict_premise": "A holiday gathering is where words or evidence break years of silence.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "place card",
+            "recorded toast"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "document_evidence"
+          ],
+          "justice_affinity": [
+            "private_resolution",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "C_co_dau",
+            "E_ngheo_vs_giau"
+          ],
+          "compatible_conflict_tags": [
+            "public_confrontation",
+            "family_secret",
+            "in_law_conflict"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        },
+        {
+          "subcategory_id": "C12S08",
+          "category_id": "CAT12",
+          "name_en": "Chooses Peace Over Revenge",
+          "conflict_premise": "The character has a chance at revenge but chooses to leave with dignity.",
+          "base_weight": 1,
+          "status": "active",
+          "object_suggestions": [
+            "packed suitcase",
+            "returned ring"
+          ],
+          "reveal_affinity": [
+            "self_disclosure",
+            "natural_consequence"
+          ],
+          "justice_affinity": [
+            "walk_away_dignity",
+            "hero_choice"
+          ],
+          "legacy_themes": [
+            "D_vo_phan_boi"
+          ],
+          "compatible_conflict_tags": [
+            "dignity_choice",
+            "refusal",
+            "revenge_declined"
+          ],
+          "disallowed_combos": [],
+          "cooldown_window": 20
+        }
+      ]
+    }
+  ]
+}
