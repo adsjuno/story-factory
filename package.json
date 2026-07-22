@@ -34,7 +34,8 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "Story-Factory-Setup-${version}.${ext}"
     },
     "publish": {
       "provider": "github",
