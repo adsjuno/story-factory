@@ -361,10 +361,13 @@ const THEME_REL = {
   C_co_dau: /\b(bride|mother-in-law|new husband)\b/i,
   D_vo_phan_boi: /\b(betrayed wife|widow|widower|late spouse|husband living a double life)\b/i,
   E_ngheo_vs_giau: /\b(poor aunt|poor|wealthy niece|sibling|younger brother|retired employee|entitled|niece|nephew)\b/i,
+  F_anh_chi_em: /\b(sibling|brother|sister)\b/i,                       // anh chi em
+  G_cong_dong: /\b(neighbor|community|congregation|church|volunteer|town|friend)\b/i, // cong dong
 };
 const THEME_AGE_ROLE = {
   A_me_gia: 'elderly_parent', B_veteran: 'veteran', C_co_dau: 'new_bride',
   D_vo_phan_boi: 'betrayed_wife', E_ngheo_vs_giau: 'poor_relative',
+  F_anh_chi_em: 'elderly_parent', G_cong_dong: 'elderly_parent',      // vai chinh vẫn nguoi cao tuoi
 };
 function relationshipsForTheme(pool, theme) {
   const re = THEME_REL[theme];
@@ -621,11 +624,13 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   const twistHardFam = new Set(); if (capExternal) twistHardFam.add('external_public_validator');
   // Cap 25% cho TUNG reveal_family (khong chi rieng cap external+public_recognition):
   // 5 bai lien tiep cung 'ordinary_witness' cung la lap, phai chan.
+  // Cap 25% cho TUNG reveal_family. CHOT n>=2 (khong phai 4) -> cap co hieu luc NGAY o test nhanh
+  //   (chi 2-3 bai). Truoc day n>=4 nen loat ngan khong bao gio cap -> external (60% pool) tran ngap.
   const REVEAL_CAP = 0.25;
   const REVEAL_FAMS = ['external_public_validator', 'ordinary_witness', 'document_evidence', 'self_disclosure'];
   const overCap = REVEAL_FAMS
     .map((fam) => ({ fam, r: memory.rateRecent(country, 20, (c) => c.reveal_family === fam) }))
-    .filter((x) => x.r.n >= 4 && x.r.rate >= REVEAL_CAP)
+    .filter((x) => x.r.n >= 2 && x.r.rate >= REVEAL_CAP)
     .sort((a, b) => b.r.rate - a.r.rate);
   // Chan toi da 2 nhom (nhieu nhat truoc) -> luon con it nhat 2 nhom de chon, khong bi ket
   for (const x of overCap.slice(0, 2)) twistHardFam.add(x.fam);
@@ -634,6 +639,11 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   bp.twist = chooseWeighted(pool.twist || [], { country, field: 'twist', wr, exclude: excludeTwist, familyOf: revealFamily, softFamilies: twistSoftFam, hardFamilies: twistHardFam, bonusFamilies: revBonus }) || '';
   bp.reveal_type = bp.twist;
   bp.reveal_family = revealFamily(bp.twist);
+  // Log ro khi pool BUOC PHAI NOI: chon ra 1 family da bi cap (vi cac nhom khac deu bi chan
+  // hoac khong con twist phu hop) -> nguoi dung biet ly do lap.
+  if (twistHardFam.has(bp.reveal_family)) {
+    bp.reveal_cap_note = `pool reveal buộc nới — '${bp.reveal_family}' đang vượt cap ${Math.round(REVEAL_CAP * 100)}% nhưng các nhóm khác cạn twist phù hợp (pool twist lệch: 60% external)`;
+  }
 
   // 11) justice_type — plot authority-rescue + LOP2 family (tranh lap; cap public_recognition khi external cao)
   const arRate = memory.rateRecent(country, 20, (c) => isAuthorityRescueJustice(c.justice_type)).rate;

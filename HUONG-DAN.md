@@ -67,6 +67,16 @@ Hết lượt → thay bằng câu mặc định an toàn "The rest of the story
 **HOOK_VARIANTS** (nếu skill xuất): parse + ghi vào Log để xem 3 phương án caption + điểm. Không có
 cũng không lỗi. Chưa thêm cột Sheet.
 
+Cold open giờ kiểm **5 đoạn** đầu: đoạn 1 ≤40 từ, 3 đoạn đầu ≤120 từ, **đoạn 4 và 5 mỗi đoạn ≤60 từ**
+(chống Claude viết 3 dòng ngắn rồi đoạn 4 lại tả cảnh dài làm khựng nhịp). Lỗi → bắt viết lại 5 dòng
+(3 cold + 2 chuyển tiếp ngắn).
+
+## Chống lặp theo chủ đề (legacy_theme)
+
+Hai bài **liền kề** không được cùng legacy_theme (loại các subcategory trùng theme bài ngay trước;
+subcategory để rỗng theme thì không bị ràng buộc). Áp cả trong sổ tạm test nhanh. Ngoài ra cap
+mỗi kiểu reveal ≤25% giờ có hiệu lực ngay từ bài thứ 3 (trước đây cần ≥4 bài mới chặn).
+
 **Đẩy Sheet từng bài một**, không gom đến cuối. Nếu đang chạy 10 bài mà máy tắt ở bài thứ 7
 thì 6 bài đầu đã nằm trên Sheet rồi. Bài nào đẩy lỗi thì log báo rõ và chạy tiếp bài sau.
 

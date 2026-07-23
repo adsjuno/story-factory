@@ -14,7 +14,8 @@
     ],
     "legacy_note": "5 ngach cu KHONG map 1-1 sang category. Moi subcategory chi mang TOI DA 1 legacy_theme (hero archetype chi phoi). Sub thuoc mang moi de RONG - engine KHONG duoc suy nguoc de gan theme. E_ngheo_vs_giau la truong status_dynamic rieng, ap xuyen category, KHONG dung de loc conflict.",
     "conflict_filter_rule": "Loc conflict theo conflict_ids/fallback_tags cua SUBCATEGORY truoc. legacy_theme chi dung de loc THEM trong tap do neu con du candidate. Neu subcategory khong co legacy_theme -> khong loc theo theme, chi dung tag.",
-    "derivation_note": "Bang nay SUY RA tu data thuc te (theme cua tung subcategory), khong phai gan tay. Engine CHI dung bang nay de kiem tra hop le, TUYET DOI khong dung de SUY NGUOC gan theme cho subcategory de rong. Subcategory de rong legacy_theme => khong loc conflict theo theme, chi loc theo tag/conflict_ids."
+    "derivation_note": "Bang nay SUY RA tu data thuc te (theme cua tung subcategory), khong phai gan tay. Engine CHI dung bang nay de kiem tra hop le, TUYET DOI khong dung de SUY NGUOC gan theme cho subcategory de rong. Subcategory de rong legacy_theme => khong loc conflict theo theme, chi loc theo tag/conflict_ids.",
+    "theme_definition": "legacy_theme = AI LA TRUNG TAM XUNG DOT (hero archetype), khong phai 'bai co nguoi gia'. A_me_gia chi dung khi nguoi gia BI CHINH CON/CHAU bac dai la truc chinh. Xung dot anh chi em -> F_anh_chi_em. Nguoi ngoai thay gia dinh -> G_cong_dong. Trung tam khac (thu cung, tien huu, cong so, bi mat) -> de RONG."
   },
   "legacy_themes": {
     "A_me_gia": "Me gia - con bac beo (hero_archetype: elderly parent)",
@@ -34,15 +35,19 @@
   "legacy_theme_to_categories": {
     "A_me_gia": [
       "CAT01",
-      "CAT02",
       "CAT03",
       "CAT04",
-      "CAT05",
-      "CAT06",
-      "CAT07",
-      "CAT08",
-      "CAT10",
-      "CAT11"
+      "CAT07"
+    ],
+    "G_cong_dong": [
+      "CAT01",
+      "CAT02",
+      "CAT03",
+      "CAT10"
+    ],
+    "F_anh_chi_em": [
+      "CAT02",
+      "CAT03"
     ],
     "D_vo_phan_boi": [
       "CAT04",
@@ -58,7 +63,7 @@
     "C_co_dau": [
       "CAT12"
     ],
-    "E_ngheo_vs_giau": "KHONG phai legacy_theme - da chuyen thanh truong status_dynamic rieng tren tung subcategory"
+    "E_ngheo_vs_giau": "KHONG phai legacy_theme - da chuyen thanh truong status_dynamic rieng"
   },
   "subcategory_map": {
     "C01S01": {
@@ -263,34 +268,14 @@
       "category_id": "CAT01",
       "name_en": "Step-Grandparent or Chosen Grandparent",
       "legacy_themes": [
-        "A_me_gia"
+        "G_cong_dong"
       ],
       "fallback_tags": [
         "chosen_family",
         "step_family",
         "belonging"
       ],
-      "conflict_ids": [
-        "A1_bo_roi-01",
-        "A1_bo_roi-02",
-        "A1_bo_roi-03",
-        "A1_bo_roi-04",
-        "A1_bo_roi-05",
-        "A1_bo_roi-06",
-        "A1_bo_roi-07",
-        "A2_cuop_tai_san-01",
-        "A3_lam_nhuc-01",
-        "A3_lam_nhuc-02",
-        "A3_lam_nhuc-03",
-        "A3_lam_nhuc-04",
-        "A3_lam_nhuc-05",
-        "A3_lam_nhuc-06",
-        "A3_lam_nhuc-07",
-        "A4_loi_dung-02",
-        "A4_loi_dung-05",
-        "A-NEW-08",
-        "A-NEW-07"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "ordinary_witness",
         "self_disclosure"
@@ -299,7 +284,8 @@
         "hero_choice",
         "private_resolution"
       ],
-      "status_dynamic": null
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C01S08": {
       "category_id": "CAT01",
@@ -336,16 +322,14 @@
       "category_id": "CAT02",
       "name_en": "One Sibling Did Everything",
       "legacy_themes": [
-        "A_me_gia"
+        "F_anh_chi_em"
       ],
       "fallback_tags": [
         "caregiver_burden",
         "sibling_rivalry",
         "inheritance_pressure"
       ],
-      "conflict_ids": [
-        "A2_cuop_tai_san-01"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "document_evidence",
         "ordinary_witness"
@@ -361,18 +345,14 @@
       "category_id": "CAT02",
       "name_en": "Long-Distance Sibling Thinks Money Is Enough",
       "legacy_themes": [
-        "A_me_gia"
+        "F_anh_chi_em"
       ],
       "fallback_tags": [
         "absent_sibling",
         "money_vs_presence",
         "caregiver_burden"
       ],
-      "conflict_ids": [
-        "A2_cuop_tai_san-01",
-        "A2_cuop_tai_san-04",
-        "A4_loi_dung-06"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "self_disclosure",
         "natural_consequence"
@@ -381,29 +361,21 @@
         "private_resolution",
         "hero_choice"
       ],
-      "status_dynamic": null
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C02S03": {
       "category_id": "CAT02",
       "name_en": "Caregiver Accused of Living Off Parent",
       "legacy_themes": [
-        "A_me_gia"
+        "F_anh_chi_em"
       ],
       "fallback_tags": [
         "false_accusation",
         "caregiver_burden",
         "financial_suspicion"
       ],
-      "conflict_ids": [
-        "A2_cuop_tai_san-01",
-        "A2_cuop_tai_san-02",
-        "A2_cuop_tai_san-03",
-        "A2_cuop_tai_san-04",
-        "A2_cuop_tai_san-05",
-        "A2_cuop_tai_san-06",
-        "A2_cuop_tai_san-07",
-        "A-NEW-08"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "document_evidence",
         "ordinary_witness"
@@ -412,13 +384,14 @@
         "procedural",
         "walk_away_dignity"
       ],
-      "status_dynamic": null
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C02S04": {
       "category_id": "CAT02",
       "name_en": "Dispute Over Treatment Decisions",
       "legacy_themes": [
-        "A_me_gia"
+        "F_anh_chi_em"
       ],
       "fallback_tags": [
         "medical_decision",
@@ -441,39 +414,14 @@
       "category_id": "CAT02",
       "name_en": "Paid Caregiver Became Family",
       "legacy_themes": [
-        "A_me_gia"
+        "G_cong_dong"
       ],
       "fallback_tags": [
         "chosen_family",
         "outsider_cares",
         "caregiver_bond"
       ],
-      "conflict_ids": [
-        "A1_bo_roi-01",
-        "A1_bo_roi-02",
-        "A1_bo_roi-03",
-        "A1_bo_roi-04",
-        "A1_bo_roi-05",
-        "A1_bo_roi-06",
-        "A1_bo_roi-07",
-        "A2_cuop_tai_san-01",
-        "A2_cuop_tai_san-05",
-        "A3_lam_nhuc-01",
-        "A3_lam_nhuc-02",
-        "A3_lam_nhuc-03",
-        "A3_lam_nhuc-04",
-        "A3_lam_nhuc-05",
-        "A3_lam_nhuc-06",
-        "A3_lam_nhuc-07",
-        "A4_loi_dung-01",
-        "A4_loi_dung-02",
-        "A4_loi_dung-03",
-        "A4_loi_dung-04",
-        "A4_loi_dung-05",
-        "A4_loi_dung-06",
-        "A-NEW-08",
-        "A-NEW-07"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "ordinary_witness",
         "self_disclosure"
@@ -482,20 +430,35 @@
         "hero_choice",
         "private_resolution"
       ],
-      "status_dynamic": null
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C02S06": {
       "category_id": "CAT02",
       "name_en": "Dementia Reveals an Old Secret",
-      "legacy_themes": [
-        "A_me_gia"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "hidden_past",
         "memory_loss",
         "old_promise"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "D-05-01",
+        "D-05-02",
+        "D-05-03",
+        "D-05-04",
+        "D-05-05",
+        "E-01-03",
+        "E-02-03",
+        "E-03-03",
+        "E-04-03",
+        "E-05-03",
+        "E-06-03",
+        "E-07-03",
+        "E-08-03",
+        "E-09-03",
+        "E-10-03"
+      ],
       "reveal_affinity": [
         "natural_consequence",
         "document_evidence"
@@ -504,22 +467,31 @@
         "private_resolution",
         "hero_choice"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C02S07": {
       "category_id": "CAT02",
       "name_en": "Grandchild Becomes Caregiver",
-      "legacy_themes": [
-        "A_me_gia"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "young_caregiver",
         "sacrifice_choice",
         "caregiver_burden"
       ],
       "conflict_ids": [
-        "A5_hoi_han-01"
+        "A5_hoi_han-01",
+        "B_cases-08",
+        "E-01-06",
+        "E-02-06",
+        "E-03-06",
+        "E-04-06",
+        "E-05-06",
+        "E-06-06",
+        "E-07-06",
+        "E-08-06",
+        "E-09-06",
+        "E-10-06",
+        "E-NEW-02"
       ],
       "reveal_affinity": [
         "self_disclosure",
@@ -529,29 +501,20 @@
         "hero_choice",
         "walk_away_dignity"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C02S08": {
       "category_id": "CAT02",
       "name_en": "House Promised to the Caregiver",
       "legacy_themes": [
-        "A_me_gia"
+        "F_anh_chi_em"
       ],
       "fallback_tags": [
         "inheritance_pressure",
         "promise_broken",
         "property_control"
       ],
-      "conflict_ids": [
-        "A2_cuop_tai_san-01",
-        "A2_cuop_tai_san-02",
-        "A2_cuop_tai_san-03",
-        "A2_cuop_tai_san-04",
-        "A2_cuop_tai_san-05",
-        "A2_cuop_tai_san-06",
-        "A2_cuop_tai_san-07"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "document_evidence",
         "ordinary_witness"
@@ -560,7 +523,8 @@
         "procedural",
         "hero_choice"
       ],
-      "status_dynamic": "caregiver_vs_inheritors"
+      "status_dynamic": "caregiver_vs_inheritors",
+      "needs_category_fallback": true
     },
     "C03S01": {
       "category_id": "CAT03",
@@ -627,23 +591,14 @@
       "category_id": "CAT03",
       "name_en": "Sibling Renovates Then Claims the House",
       "legacy_themes": [
-        "A_me_gia"
+        "F_anh_chi_em"
       ],
       "fallback_tags": [
         "property_control",
         "sibling_rivalry",
         "financial_leverage"
       ],
-      "conflict_ids": [
-        "A2_cuop_tai_san-01",
-        "A2_cuop_tai_san-02",
-        "A2_cuop_tai_san-03",
-        "A2_cuop_tai_san-04",
-        "A2_cuop_tai_san-05",
-        "A2_cuop_tai_san-06",
-        "A2_cuop_tai_san-07",
-        "A-NEW-08"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "natural_consequence",
         "document_evidence"
@@ -652,7 +607,8 @@
         "procedural",
         "hero_choice"
       ],
-      "status_dynamic": null
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C03S04": {
       "category_id": "CAT03",
@@ -863,34 +819,14 @@
       "category_id": "CAT03",
       "name_en": "Chosen Heir Instead of Blood Relative",
       "legacy_themes": [
-        "A_me_gia"
+        "G_cong_dong"
       ],
       "fallback_tags": [
         "inheritance_pressure",
         "chosen_family",
         "promise_kept"
       ],
-      "conflict_ids": [
-        "A1_bo_roi-01",
-        "A1_bo_roi-02",
-        "A1_bo_roi-03",
-        "A1_bo_roi-04",
-        "A1_bo_roi-05",
-        "A1_bo_roi-06",
-        "A1_bo_roi-07",
-        "A2_cuop_tai_san-01",
-        "A3_lam_nhuc-01",
-        "A3_lam_nhuc-02",
-        "A3_lam_nhuc-03",
-        "A3_lam_nhuc-04",
-        "A3_lam_nhuc-05",
-        "A3_lam_nhuc-06",
-        "A3_lam_nhuc-07",
-        "A4_loi_dung-02",
-        "A4_loi_dung-05",
-        "A-NEW-08",
-        "A-NEW-07"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "document_evidence",
         "ordinary_witness"
@@ -899,7 +835,8 @@
         "private_resolution",
         "procedural"
       ],
-      "status_dynamic": "caregiver_vs_inheritors"
+      "status_dynamic": "caregiver_vs_inheritors",
+      "needs_category_fallback": true
     },
     "C04S01": {
       "category_id": "CAT04",
@@ -1486,9 +1423,7 @@
     "C05S02": {
       "category_id": "CAT05",
       "name_en": "Family Recipe Was Stolen or Misattributed",
-      "legacy_themes": [
-        "A_me_gia"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "credit_stolen",
         "legacy_revealed",
@@ -1500,7 +1435,99 @@
         "A5_hoi_han-02",
         "A5_hoi_han-03",
         "A5_hoi_han-04",
-        "A5_hoi_han-05"
+        "A5_hoi_han-05",
+        "D-01-04",
+        "D-02-01",
+        "D-02-02",
+        "D-02-03",
+        "D-02-04",
+        "D-02-05",
+        "D-03-04",
+        "D-04-01",
+        "D-04-02",
+        "D-04-03",
+        "D-04-04",
+        "D-04-05",
+        "D-05-01",
+        "D-05-02",
+        "D-05-03",
+        "D-05-04",
+        "D-05-05",
+        "D-06-01",
+        "D-06-02",
+        "D-06-03",
+        "D-06-04",
+        "D-06-05",
+        "D-07-04",
+        "D-08-04",
+        "D-09-04",
+        "D-10-04",
+        "D-11-04",
+        "D-12-04",
+        "E-01-01",
+        "E-01-02",
+        "E-01-03",
+        "E-01-04",
+        "E-01-05",
+        "E-01-06",
+        "E-02-01",
+        "E-02-02",
+        "E-02-03",
+        "E-02-04",
+        "E-02-05",
+        "E-02-06",
+        "E-03-01",
+        "E-03-02",
+        "E-03-03",
+        "E-03-04",
+        "E-03-05",
+        "E-03-06",
+        "E-04-01",
+        "E-04-02",
+        "E-04-03",
+        "E-04-04",
+        "E-04-05",
+        "E-04-06",
+        "E-05-01",
+        "E-05-02",
+        "E-05-03",
+        "E-05-04",
+        "E-05-05",
+        "E-05-06",
+        "E-06-01",
+        "E-06-02",
+        "E-06-03",
+        "E-06-04",
+        "E-06-05",
+        "E-06-06",
+        "E-07-01",
+        "E-07-02",
+        "E-07-03",
+        "E-07-04",
+        "E-07-05",
+        "E-07-06",
+        "E-08-01",
+        "E-08-02",
+        "E-08-03",
+        "E-08-04",
+        "E-08-05",
+        "E-08-06",
+        "E-09-01",
+        "E-09-02",
+        "E-09-03",
+        "E-09-04",
+        "E-09-05",
+        "E-09-06",
+        "E-10-01",
+        "E-10-02",
+        "E-10-03",
+        "E-10-04",
+        "E-10-05",
+        "E-10-06",
+        "B-NEW-16",
+        "C-NEW-01",
+        "D-NEW-02",
+        "E-NEW-03"
       ],
       "reveal_affinity": [
         "external_public_validator",
@@ -1542,16 +1569,89 @@
     "C05S04": {
       "category_id": "CAT05",
       "name_en": "Bible, Journal or Ledger Changes the Inheritance",
-      "legacy_themes": [
-        "A_me_gia"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "found_evidence",
         "inheritance_pressure",
         "old_promise"
       ],
       "conflict_ids": [
-        "A2_cuop_tai_san-01"
+        "A2_cuop_tai_san-01",
+        "C-01-04",
+        "C-02-04",
+        "C-03-04",
+        "C-04-04",
+        "C-05-04",
+        "C-06-04",
+        "D-01-01",
+        "D-01-02",
+        "D-01-03",
+        "D-01-04",
+        "D-01-05",
+        "D-02-01",
+        "D-02-02",
+        "D-02-03",
+        "D-02-04",
+        "D-02-05",
+        "D-03-01",
+        "D-03-02",
+        "D-03-03",
+        "D-03-04",
+        "D-03-05",
+        "D-04-01",
+        "D-04-02",
+        "D-04-03",
+        "D-04-04",
+        "D-04-05",
+        "D-05-01",
+        "D-05-02",
+        "D-05-03",
+        "D-05-04",
+        "D-05-05",
+        "D-06-01",
+        "D-06-02",
+        "D-06-03",
+        "D-06-04",
+        "D-06-05",
+        "D-07-01",
+        "D-07-02",
+        "D-07-03",
+        "D-07-04",
+        "D-07-05",
+        "D-08-01",
+        "D-08-02",
+        "D-08-03",
+        "D-08-04",
+        "D-08-05",
+        "D-09-01",
+        "D-09-02",
+        "D-09-03",
+        "D-09-04",
+        "D-09-05",
+        "D-10-01",
+        "D-10-02",
+        "D-10-03",
+        "D-10-04",
+        "D-10-05",
+        "D-11-01",
+        "D-11-02",
+        "D-11-03",
+        "D-11-04",
+        "D-11-05",
+        "D-12-01",
+        "D-12-02",
+        "D-12-03",
+        "D-12-04",
+        "D-12-05",
+        "E-02-01",
+        "E-02-02",
+        "E-02-03",
+        "E-02-04",
+        "E-02-05",
+        "E-02-06",
+        "D-NEW-01",
+        "D-NEW-02",
+        "D-NEW-03"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -1561,15 +1661,12 @@
         "procedural",
         "private_resolution"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C05S05": {
       "category_id": "CAT05",
       "name_en": "Cassette or Voicemail From the Dead",
-      "legacy_themes": [
-        "A_me_gia"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "found_evidence",
         "posthumous_message",
@@ -1594,8 +1691,165 @@
         "A4_loi_dung-02",
         "A4_loi_dung-05",
         "A5_hoi_han-05",
+        "B_cases-05",
+        "B_cases-12",
+        "C-01-02",
+        "C-01-03",
+        "C-01-04",
+        "C-01-06",
+        "C-02-02",
+        "C-02-03",
+        "C-02-04",
+        "C-02-06",
+        "C-03-02",
+        "C-03-03",
+        "C-03-04",
+        "C-03-06",
+        "C-04-02",
+        "C-04-03",
+        "C-04-04",
+        "C-04-06",
+        "C-05-01",
+        "C-05-02",
+        "C-05-03",
+        "C-05-04",
+        "C-05-05",
+        "C-05-06",
+        "C-05-07",
+        "C-06-02",
+        "C-06-03",
+        "C-06-04",
+        "C-06-06",
+        "D-01-01",
+        "D-01-02",
+        "D-01-03",
+        "D-01-04",
+        "D-01-05",
+        "D-02-01",
+        "D-02-02",
+        "D-02-03",
+        "D-02-04",
+        "D-02-05",
+        "D-03-01",
+        "D-03-02",
+        "D-03-03",
+        "D-03-04",
+        "D-03-05",
+        "D-04-01",
+        "D-04-02",
+        "D-04-03",
+        "D-04-04",
+        "D-04-05",
+        "D-05-01",
+        "D-05-02",
+        "D-05-03",
+        "D-05-04",
+        "D-05-05",
+        "D-06-01",
+        "D-06-02",
+        "D-06-03",
+        "D-06-04",
+        "D-06-05",
+        "D-07-01",
+        "D-07-02",
+        "D-07-03",
+        "D-07-04",
+        "D-07-05",
+        "D-08-01",
+        "D-08-02",
+        "D-08-03",
+        "D-08-04",
+        "D-08-05",
+        "D-09-01",
+        "D-09-02",
+        "D-09-03",
+        "D-09-04",
+        "D-09-05",
+        "D-10-01",
+        "D-10-02",
+        "D-10-03",
+        "D-10-04",
+        "D-10-05",
+        "D-11-01",
+        "D-11-02",
+        "D-11-03",
+        "D-11-04",
+        "D-11-05",
+        "D-12-01",
+        "D-12-02",
+        "D-12-03",
+        "D-12-04",
+        "D-12-05",
+        "E-01-01",
+        "E-01-02",
+        "E-01-03",
+        "E-01-04",
+        "E-01-05",
+        "E-01-06",
+        "E-02-01",
+        "E-02-02",
+        "E-02-03",
+        "E-02-04",
+        "E-02-05",
+        "E-02-06",
+        "E-03-01",
+        "E-03-02",
+        "E-03-03",
+        "E-03-04",
+        "E-03-05",
+        "E-03-06",
+        "E-04-01",
+        "E-04-02",
+        "E-04-03",
+        "E-04-04",
+        "E-04-05",
+        "E-04-06",
+        "E-05-01",
+        "E-05-02",
+        "E-05-03",
+        "E-05-04",
+        "E-05-05",
+        "E-05-06",
+        "E-06-01",
+        "E-06-02",
+        "E-06-03",
+        "E-06-04",
+        "E-06-05",
+        "E-06-06",
+        "E-07-01",
+        "E-07-02",
+        "E-07-03",
+        "E-07-04",
+        "E-07-05",
+        "E-07-06",
+        "E-08-01",
+        "E-08-02",
+        "E-08-03",
+        "E-08-04",
+        "E-08-05",
+        "E-08-06",
+        "E-09-01",
+        "E-09-02",
+        "E-09-03",
+        "E-09-04",
+        "E-09-05",
+        "E-09-06",
+        "E-10-01",
+        "E-10-02",
+        "E-10-03",
+        "E-10-04",
+        "E-10-05",
+        "E-10-06",
         "A-NEW-08",
-        "A-NEW-07"
+        "A-NEW-07",
+        "B-NEW-18",
+        "C-NEW-02",
+        "C-NEW-03",
+        "D-NEW-01",
+        "D-NEW-02",
+        "D-NEW-03",
+        "E-NEW-02",
+        "E-NEW-03"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -2111,15 +2365,15 @@
     "C06S05": {
       "category_id": "CAT06",
       "name_en": "Returning After Caregiving or Widowhood",
-      "legacy_themes": [
-        "A_me_gia"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "reentry",
         "ageism",
         "second_career"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "D-NEW-01"
+      ],
       "reveal_affinity": [
         "self_disclosure",
         "ordinary_witness"
@@ -2567,9 +2821,7 @@
     "C08S01": {
       "category_id": "CAT08",
       "name_en": "Family Wants to Surrender the Pet",
-      "legacy_themes": [
-        "A_me_gia"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "pet_at_risk",
         "autonomy_denied",
@@ -2577,7 +2829,14 @@
       ],
       "conflict_ids": [
         "A1_bo_roi-04",
-        "A5_hoi_han-02"
+        "A5_hoi_han-02",
+        "B_cases-14",
+        "D-04-01",
+        "D-04-02",
+        "D-04-03",
+        "D-04-04",
+        "D-04-05",
+        "C-NEW-01"
       ],
       "reveal_affinity": [
         "self_disclosure",
@@ -2587,8 +2846,7 @@
         "hero_choice",
         "procedural"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C08S02": {
       "category_id": "CAT08",
@@ -2703,9 +2961,7 @@
     "C08S06": {
       "category_id": "CAT08",
       "name_en": "Nobody Wants the Pet During Inheritance Fight",
-      "legacy_themes": [
-        "A_me_gia"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "inheritance_pressure",
         "pet_at_risk",
@@ -2734,8 +2990,108 @@
         "A5_hoi_han-03",
         "A5_hoi_han-04",
         "A5_hoi_han-05",
+        "B_cases-05",
+        "B_cases-12",
+        "C-01-02",
+        "C-01-03",
+        "C-01-04",
+        "C-01-06",
+        "C-02-02",
+        "C-02-03",
+        "C-02-04",
+        "C-02-06",
+        "C-03-02",
+        "C-03-03",
+        "C-03-04",
+        "C-03-06",
+        "C-04-02",
+        "C-04-03",
+        "C-04-04",
+        "C-04-06",
+        "C-05-01",
+        "C-05-02",
+        "C-05-03",
+        "C-05-04",
+        "C-05-05",
+        "C-05-06",
+        "C-05-07",
+        "C-06-02",
+        "C-06-03",
+        "C-06-04",
+        "C-06-06",
+        "D-06-01",
+        "D-06-02",
+        "D-06-03",
+        "D-06-04",
+        "D-06-05",
+        "E-01-01",
+        "E-01-02",
+        "E-01-03",
+        "E-01-04",
+        "E-01-05",
+        "E-01-06",
+        "E-02-01",
+        "E-02-02",
+        "E-02-03",
+        "E-02-04",
+        "E-02-05",
+        "E-02-06",
+        "E-03-01",
+        "E-03-02",
+        "E-03-03",
+        "E-03-04",
+        "E-03-05",
+        "E-03-06",
+        "E-04-01",
+        "E-04-02",
+        "E-04-03",
+        "E-04-04",
+        "E-04-05",
+        "E-04-06",
+        "E-05-01",
+        "E-05-02",
+        "E-05-03",
+        "E-05-04",
+        "E-05-05",
+        "E-05-06",
+        "E-06-01",
+        "E-06-02",
+        "E-06-03",
+        "E-06-04",
+        "E-06-05",
+        "E-06-06",
+        "E-07-01",
+        "E-07-02",
+        "E-07-03",
+        "E-07-04",
+        "E-07-05",
+        "E-07-06",
+        "E-08-01",
+        "E-08-02",
+        "E-08-03",
+        "E-08-04",
+        "E-08-05",
+        "E-08-06",
+        "E-09-01",
+        "E-09-02",
+        "E-09-03",
+        "E-09-04",
+        "E-09-05",
+        "E-09-06",
+        "E-10-01",
+        "E-10-02",
+        "E-10-03",
+        "E-10-04",
+        "E-10-05",
+        "E-10-06",
         "A-NEW-08",
-        "A-NEW-07"
+        "A-NEW-07",
+        "B-NEW-18",
+        "C-NEW-02",
+        "C-NEW-03",
+        "D-NEW-03",
+        "E-NEW-02",
+        "E-NEW-03"
       ],
       "reveal_affinity": [
         "natural_consequence",
@@ -3191,35 +3547,14 @@
       "category_id": "CAT10",
       "name_en": "Neighbor Cares When Children Live Far Away",
       "legacy_themes": [
-        "A_me_gia"
+        "G_cong_dong"
       ],
       "fallback_tags": [
         "neighbor_help",
         "chosen_family",
         "absent_family"
       ],
-      "conflict_ids": [
-        "A1_bo_roi-01",
-        "A1_bo_roi-02",
-        "A1_bo_roi-03",
-        "A1_bo_roi-04",
-        "A1_bo_roi-05",
-        "A1_bo_roi-06",
-        "A1_bo_roi-07",
-        "A2_cuop_tai_san-01",
-        "A3_lam_nhuc-01",
-        "A3_lam_nhuc-02",
-        "A3_lam_nhuc-03",
-        "A3_lam_nhuc-04",
-        "A3_lam_nhuc-05",
-        "A3_lam_nhuc-06",
-        "A3_lam_nhuc-07",
-        "A4_loi_dung-02",
-        "A4_loi_dung-05",
-        "A5_hoi_han-04",
-        "A-NEW-08",
-        "A-NEW-07"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "ordinary_witness",
         "self_disclosure"
@@ -3228,7 +3563,8 @@
         "private_resolution",
         "hero_choice"
       ],
-      "status_dynamic": null
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C10S02": {
       "category_id": "CAT10",
@@ -3345,34 +3681,14 @@
       "category_id": "CAT10",
       "name_en": "Friend Included in the Will",
       "legacy_themes": [
-        "A_me_gia"
+        "G_cong_dong"
       ],
       "fallback_tags": [
         "inheritance_pressure",
         "chosen_family",
         "promise_kept"
       ],
-      "conflict_ids": [
-        "A1_bo_roi-01",
-        "A1_bo_roi-02",
-        "A1_bo_roi-03",
-        "A1_bo_roi-04",
-        "A1_bo_roi-05",
-        "A1_bo_roi-06",
-        "A1_bo_roi-07",
-        "A2_cuop_tai_san-01",
-        "A3_lam_nhuc-01",
-        "A3_lam_nhuc-02",
-        "A3_lam_nhuc-03",
-        "A3_lam_nhuc-04",
-        "A3_lam_nhuc-05",
-        "A3_lam_nhuc-06",
-        "A3_lam_nhuc-07",
-        "A4_loi_dung-02",
-        "A4_loi_dung-05",
-        "A-NEW-08",
-        "A-NEW-07"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "document_evidence",
         "ordinary_witness"
@@ -3381,7 +3697,8 @@
         "private_resolution",
         "procedural"
       ],
-      "status_dynamic": null
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C10S06": {
       "category_id": "CAT10",
@@ -3467,35 +3784,14 @@
       "category_id": "CAT10",
       "name_en": "Chosen Family at the End of Life",
       "legacy_themes": [
-        "A_me_gia"
+        "G_cong_dong"
       ],
       "fallback_tags": [
         "chosen_family",
         "end_of_life",
         "absent_family"
       ],
-      "conflict_ids": [
-        "A1_bo_roi-01",
-        "A1_bo_roi-02",
-        "A1_bo_roi-03",
-        "A1_bo_roi-04",
-        "A1_bo_roi-05",
-        "A1_bo_roi-06",
-        "A1_bo_roi-07",
-        "A2_cuop_tai_san-01",
-        "A2_cuop_tai_san-04",
-        "A3_lam_nhuc-01",
-        "A3_lam_nhuc-02",
-        "A3_lam_nhuc-03",
-        "A3_lam_nhuc-04",
-        "A3_lam_nhuc-05",
-        "A3_lam_nhuc-06",
-        "A3_lam_nhuc-07",
-        "A4_loi_dung-02",
-        "A4_loi_dung-05",
-        "A-NEW-08",
-        "A-NEW-07"
-      ],
+      "conflict_ids": [],
       "reveal_affinity": [
         "ordinary_witness",
         "self_disclosure"
@@ -3504,7 +3800,8 @@
         "hero_choice",
         "walk_away_dignity"
       ],
-      "status_dynamic": null
+      "status_dynamic": null,
+      "needs_category_fallback": true
     },
     "C11S01": {
       "category_id": "CAT11",
@@ -3539,9 +3836,7 @@
     "C11S02": {
       "category_id": "CAT11",
       "name_en": "Retirement Fund Mismanaged",
-      "legacy_themes": [
-        "A_me_gia"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "financial_control",
         "betrayal_of_trust",
@@ -3555,7 +3850,78 @@
         "A2_cuop_tai_san-05",
         "A2_cuop_tai_san-06",
         "A2_cuop_tai_san-07",
-        "A-NEW-08"
+        "C-01-01",
+        "C-01-02",
+        "C-01-03",
+        "C-01-04",
+        "C-01-05",
+        "C-01-06",
+        "C-01-07",
+        "D-01-01",
+        "D-01-02",
+        "D-01-03",
+        "D-01-04",
+        "D-01-05",
+        "D-02-01",
+        "D-02-02",
+        "D-02-03",
+        "D-02-04",
+        "D-02-05",
+        "D-03-01",
+        "D-03-02",
+        "D-03-03",
+        "D-03-04",
+        "D-03-05",
+        "D-04-01",
+        "D-04-02",
+        "D-04-03",
+        "D-04-04",
+        "D-04-05",
+        "D-05-01",
+        "D-05-02",
+        "D-05-03",
+        "D-05-04",
+        "D-05-05",
+        "D-06-01",
+        "D-06-02",
+        "D-06-03",
+        "D-06-04",
+        "D-06-05",
+        "D-07-01",
+        "D-07-02",
+        "D-07-03",
+        "D-07-04",
+        "D-07-05",
+        "D-08-01",
+        "D-08-02",
+        "D-08-03",
+        "D-08-04",
+        "D-08-05",
+        "D-09-01",
+        "D-09-02",
+        "D-09-03",
+        "D-09-04",
+        "D-09-05",
+        "D-10-01",
+        "D-10-02",
+        "D-10-03",
+        "D-10-04",
+        "D-10-05",
+        "D-11-01",
+        "D-11-02",
+        "D-11-03",
+        "D-11-04",
+        "D-11-05",
+        "D-12-01",
+        "D-12-02",
+        "D-12-03",
+        "D-12-04",
+        "D-12-05",
+        "A-NEW-08",
+        "C-NEW-02",
+        "D-NEW-01",
+        "D-NEW-02",
+        "D-NEW-03"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -3682,9 +4048,7 @@
     "C11S07": {
       "category_id": "CAT11",
       "name_en": "Hides Night Work From Adult Children",
-      "legacy_themes": [
-        "A_me_gia"
-      ],
+      "legacy_themes": [],
       "fallback_tags": [
         "financial_hardship",
         "hidden_sacrifice",
@@ -3715,9 +4079,116 @@
         "A4_loi_dung-02",
         "A4_loi_dung-05",
         "A5_hoi_han-01",
+        "B_cases-05",
+        "B_cases-07",
+        "B_cases-12",
+        "C-01-02",
+        "C-01-03",
+        "C-01-04",
+        "C-01-06",
+        "C-02-02",
+        "C-02-03",
+        "C-02-04",
+        "C-02-06",
+        "C-03-02",
+        "C-03-03",
+        "C-03-04",
+        "C-03-06",
+        "C-04-02",
+        "C-04-03",
+        "C-04-04",
+        "C-04-06",
+        "C-05-01",
+        "C-05-02",
+        "C-05-03",
+        "C-05-04",
+        "C-05-05",
+        "C-05-06",
+        "C-05-07",
+        "C-06-02",
+        "C-06-03",
+        "C-06-04",
+        "C-06-06",
+        "D-05-01",
+        "D-05-02",
+        "D-05-03",
+        "D-05-04",
+        "D-05-05",
+        "D-06-01",
+        "D-06-02",
+        "D-06-03",
+        "D-06-04",
+        "D-06-05",
+        "E-01-01",
+        "E-01-02",
+        "E-01-03",
+        "E-01-04",
+        "E-01-05",
+        "E-01-06",
+        "E-02-01",
+        "E-02-02",
+        "E-02-03",
+        "E-02-04",
+        "E-02-05",
+        "E-02-06",
+        "E-03-01",
+        "E-03-02",
+        "E-03-03",
+        "E-03-04",
+        "E-03-05",
+        "E-03-06",
+        "E-04-01",
+        "E-04-02",
+        "E-04-03",
+        "E-04-04",
+        "E-04-05",
+        "E-04-06",
+        "E-05-01",
+        "E-05-02",
+        "E-05-03",
+        "E-05-04",
+        "E-05-05",
+        "E-05-06",
+        "E-06-01",
+        "E-06-02",
+        "E-06-03",
+        "E-06-04",
+        "E-06-05",
+        "E-06-06",
+        "E-07-01",
+        "E-07-02",
+        "E-07-03",
+        "E-07-04",
+        "E-07-05",
+        "E-07-06",
+        "E-08-01",
+        "E-08-02",
+        "E-08-03",
+        "E-08-04",
+        "E-08-05",
+        "E-08-06",
+        "E-09-01",
+        "E-09-02",
+        "E-09-03",
+        "E-09-04",
+        "E-09-05",
+        "E-09-06",
+        "E-10-01",
+        "E-10-02",
+        "E-10-03",
+        "E-10-04",
+        "E-10-05",
+        "E-10-06",
         "A-NEW-08",
         "A-NEW-08",
-        "A-NEW-07"
+        "A-NEW-07",
+        "B-NEW-18",
+        "C-NEW-01",
+        "C-NEW-02",
+        "C-NEW-03",
+        "D-NEW-03",
+        "E-NEW-02",
+        "E-NEW-03"
       ],
       "reveal_affinity": [
         "self_disclosure",

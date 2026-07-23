@@ -257,7 +257,7 @@
             "private_resolution"
           ],
           "legacy_themes": [
-            "A_me_gia"
+            "G_cong_dong"
           ],
           "compatible_conflict_tags": [
             "chosen_family",
@@ -341,7 +341,7 @@
             "private_resolution"
           ],
           "legacy_themes": [
-            "A_me_gia"
+            "F_anh_chi_em"
           ],
           "compatible_conflict_tags": [
             "caregiver_burden",
@@ -372,7 +372,7 @@
             "hero_choice"
           ],
           "legacy_themes": [
-            "A_me_gia"
+            "F_anh_chi_em"
           ],
           "compatible_conflict_tags": [
             "absent_sibling",
@@ -403,7 +403,7 @@
             "walk_away_dignity"
           ],
           "legacy_themes": [
-            "A_me_gia"
+            "F_anh_chi_em"
           ],
           "compatible_conflict_tags": [
             "false_accusation",
@@ -434,7 +434,7 @@
             "private_resolution"
           ],
           "legacy_themes": [
-            "A_me_gia"
+            "F_anh_chi_em"
           ],
           "compatible_conflict_tags": [
             "medical_decision",
@@ -465,7 +465,7 @@
             "private_resolution"
           ],
           "legacy_themes": [
-            "A_me_gia"
+            "G_cong_dong"
           ],
           "compatible_conflict_tags": [
             "chosen_family",
@@ -495,9 +495,7 @@
             "private_resolution",
             "hero_choice"
           ],
-          "legacy_themes": [
-            "A_me_gia"
-          ],
+          "legacy_themes": [],
           "compatible_conflict_tags": [
             "hidden_past",
             "memory_loss",
@@ -526,9 +524,7 @@
             "hero_choice",
             "walk_away_dignity"
           ],
-          "legacy_themes": [
-            "A_me_gia"
-          ],
+          "legacy_themes": [],
           "compatible_conflict_tags": [
             "young_caregiver",
             "sacrifice_choice",
@@ -558,7 +554,7 @@
             "hero_choice"
           ],
           "legacy_themes": [
-            "A_me_gia"
+            "F_anh_chi_em"
           ],
           "compatible_conflict_tags": [
             "inheritance_pressure",
@@ -673,7 +669,7 @@
             "hero_choice"
           ],
           "legacy_themes": [
-            "A_me_gia"
+            "F_anh_chi_em"
           ],
           "compatible_conflict_tags": [
             "property_control",
@@ -826,7 +822,7 @@
             "procedural"
           ],
           "legacy_themes": [
-            "A_me_gia"
+            "G_cong_dong"
           ],
           "compatible_conflict_tags": [
             "inheritance_pressure",
@@ -1167,9 +1163,7 @@
             "public_recognition",
             "private_resolution"
           ],
-          "legacy_themes": [
-            "A_me_gia"
-          ],
+          "legacy_themes": [],
           "compatible_conflict_tags": [
             "credit_stolen",
             "legacy_revealed",
@@ -1229,9 +1223,7 @@
             "procedural",
             "private_resolution"
           ],
-          "legacy_themes": [
-            "A_me_gia"
-          ],
+          "legacy_themes": [],
           "compatible_conflict_tags": [
             "found_evidence",
             "inheritance_pressure",
@@ -1260,9 +1252,7 @@
             "private_resolution",
             "hero_choice"
           ],
-          "legacy_themes": [
-            "A_me_gia"
-          ],
+          "legacy_themes": [],
           "compatible_conflict_tags": [
             "found_evidence",
             "posthumous_message",
@@ -1521,9 +1511,7 @@
             "hero_choice",
             "walk_away_dignity"
           ],
-          "legacy_themes": [
-            "A_me_gia"
-          ],
+          "legacy_themes": [],
           "compatible_conflict_tags": [
             "reentry",
             "ageism",
@@ -1926,9 +1914,7 @@
             "hero_choice",
             "procedural"
           ],
-          "legacy_themes": [
-            "A_me_gia"
-          ],
+          "legacy_themes": [],
           "compatible_conflict_tags": [
             "pet_at_risk",
             "autonomy_denied",
@@ -2075,9 +2061,7 @@
             "private_resolution",
             "hero_choice"
           ],
-          "legacy_themes": [
-            "A_me_gia"
-          ],
+          "legacy_themes": [],
           "compatible_conflict_tags": [
             "inheritance_pressure",
             "pet_at_risk",
@@ -2457,7 +2441,7 @@
             "hero_choice"
           ],
           "legacy_themes": [
-            "A_me_gia"
+            "G_cong_dong"
           ],
           "compatible_conflict_tags": [
             "neighbor_help",
@@ -2575,7 +2559,7 @@
             "procedural"
           ],
           "legacy_themes": [
-            "A_me_gia"
+            "G_cong_dong"
           ],
           "compatible_conflict_tags": [
             "inheritance_pressure",
@@ -2664,7 +2648,7 @@
             "walk_away_dignity"
           ],
           "legacy_themes": [
-            "A_me_gia"
+            "G_cong_dong"
           ],
           "compatible_conflict_tags": [
             "chosen_family",
@@ -2743,9 +2727,7 @@
             "procedural",
             "hero_choice"
           ],
-          "legacy_themes": [
-            "A_me_gia"
-          ],
+          "legacy_themes": [],
           "compatible_conflict_tags": [
             "financial_control",
             "betrayal_of_trust",
@@ -2890,9 +2872,7 @@
             "private_resolution",
             "hero_choice"
           ],
-          "legacy_themes": [
-            "A_me_gia"
-          ],
+          "legacy_themes": [],
           "compatible_conflict_tags": [
             "financial_hardship",
             "hidden_sacrifice",

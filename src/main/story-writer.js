@@ -437,6 +437,7 @@ Chỉ xuất: ===TITLE=== rồi tiêu đề mới.`;
 // Skill yeu cau mo bai bang 3-4 dong ngan dam thang; Claude hay mo bang doan van dai ta canh.
 const COLD_FIRST_MAX = 40;      // <p> dau tien > 40 tu -> khong phai cold open
 const COLD_THREE_MAX = 120;     // 3 doan dau cong lai > 120 tu -> qua dai
+const COLD_P45_MAX = 60;        // doan 4 va 5 moi doan > 60 tu -> nhip khung (Claude ta canh o doan 4)
 function wc(html) { return wordCount(html); }  // dung lai bo dem tu (bo the HTML)
 // Lay noi dung cac the <p> dau tien SAU <h2>Part 1...</h2> (hoac dau bai neu khong co h2).
 function firstParagraphs(html, n) {
@@ -450,24 +451,34 @@ function firstParagraphs(html, n) {
   return ps;
 }
 function checkColdOpen(html) {
-  const ps = firstParagraphs(html, 3);
-  if (!ps.length) return { ok: true, first: 0, three: 0, note: 'khong thay <p> dau -> bo qua' };
+  const ps = firstParagraphs(html, 5);
+  if (!ps.length) return { ok: true, first: 0, three: 0, p4: 0, p5: 0, note: 'khong thay <p> dau -> bo qua' };
   const first = wc(ps[0]);
-  const three = ps.reduce((a, p) => a + wc(p), 0);
-  const ok = first <= COLD_FIRST_MAX && three <= COLD_THREE_MAX;
-  return { ok, first, three };
+  const three = ps.slice(0, 3).reduce((a, p) => a + wc(p), 0);
+  const p4 = ps[3] ? wc(ps[3]) : 0;
+  const p5 = ps[4] ? wc(ps[4]) : 0;
+  const reasons = [];
+  if (first > COLD_FIRST_MAX) reasons.push(`đoạn đầu ${first} từ (>${COLD_FIRST_MAX})`);
+  if (three > COLD_THREE_MAX) reasons.push(`3 đoạn đầu ${three} từ (>${COLD_THREE_MAX})`);
+  if (p4 > COLD_P45_MAX) reasons.push(`đoạn 4 ${p4} từ (>${COLD_P45_MAX})`);
+  if (p5 > COLD_P45_MAX) reasons.push(`đoạn 5 ${p5} từ (>${COLD_P45_MAX})`);
+  return { ok: reasons.length === 0, first, three, p4, p5, reason: reasons.join('; ') };
 }
-function coldOpenRewritePrompt(firstWords) {
-  return `Bài vừa rồi mở đầu bằng đoạn văn ${firstWords} từ — không phải cold open.
-Viết lại 3-4 dòng MỞ ĐẦU cho Part 1, mỗi dòng một thẻ <p>, mỗi dòng dưới 35 từ:
-- Dòng 1: sự xúc phạm cụ thể (câu thoại hoặc hành động), KHÔNG tả thời tiết/căn phòng.
-- Dòng 2: phản ứng im lặng của nhân vật.
-- Dòng 3: dấu hiệu sắp có chuyện xảy ra — KHÔNG nói ai xuất hiện, KHÔNG nói chuyện gì, KHÔNG nói kết cục.
-Mẫu đúng:
+function coldOpenRewritePrompt(info) {
+  const first = (typeof info === 'number') ? info : (info && info.first) || 0;
+  const detail = (info && typeof info === 'object' && info.reason) ? info.reason : `đoạn đầu ${first} từ`;
+  return `Phần mở đầu Part 1 chưa đạt (${detail}) — nhịp bị khựng ngay khi vừa kéo người đọc vào.
+Viết lại 5 dòng MỞ ĐẦU cho Part 1, mỗi dòng một thẻ <p>:
+- Dòng 1 (dưới 35 từ): sự xúc phạm cụ thể (câu thoại hoặc hành động), KHÔNG tả thời tiết/căn phòng.
+- Dòng 2 (dưới 35 từ): phản ứng im lặng của nhân vật.
+- Dòng 3 (dưới 35 từ): dấu hiệu sắp có chuyện — KHÔNG nói ai xuất hiện, KHÔNG nói chuyện gì, KHÔNG nói kết cục.
+- Dòng 4 (dưới 60 từ): MỘT câu chuyển tiếp ngắn dẫn vào mạch kể chậm — KHÔNG phải đoạn tả cảnh đầy đủ.
+- Dòng 5 (dưới 60 từ): câu chuyển tiếp ngắn thứ hai, bắt đầu vào hồi tưởng/bối cảnh.
+Mẫu 3 dòng đầu:
 <p>They told the seventy-three-year-old bus driver to use the side door so the guests would not see her.</p>
 <p>She carried in the food, said nothing, and took her usual place near the kitchen.</p>
 <p>Twenty minutes later, one man stood up — and the expression on her grandson's face told her everything she needed to know.</p>
-Chỉ xuất: ===COLD_OPEN=== rồi 3-4 thẻ <p>. Không viết lại phần còn lại của bài.`;
+Chỉ xuất: ===COLD_OPEN=== rồi đúng 5 thẻ <p>. Không viết lại phần còn lại của bài.`;
 }
 // Chen cold open MOI vao ngay sau <h2>Part 1...</h2> (hoac dau bai). Giu nguyen phan con lai.
 function insertColdOpen(html, coldOpen) {
@@ -688,6 +699,15 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
     onProgress({ message: '⚠️ Cảnh báo: có DNA nhưng cột story_dna rỗng — kiểm tra story-dna.js.' });
   }
 
+  // Nhan hien thi theo PAGE·CATEGORY that (khong con nhan ngach A-E cu)
+  const runLabel = (input && input.page_profile_id)
+    ? `${input.page_profile_id} · ${input.category_name || input.category_id}`
+    : `FALLBACK · ${nicheLabel}`;
+  // VIEC 4: log ro khi pool reveal buoc phai noi (external tran vi pool lech)
+  if (pick.combo && pick.combo.reveal_cap_note) {
+    onProgress({ message: `⚠️ ${pick.combo.reveal_cap_note}` });
+  }
+
   const basePrompt = buildPrompt(topicLabel, dna)
     + '\n\n[YÊU CẦU ĐỘ DÀI] web_body PHẢI dài 2200-2800 từ tiếng Anh (đếm từ). Viết đầy đủ 3 phần, thêm hồi tưởng, đối thoại, chi tiết cảm xúc. TUYỆT ĐỐI không viết ngắn dưới 2000 từ.';
   let prompt = basePrompt;
@@ -699,7 +719,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
   const chat = await webai.openChat(engine, { show: false });
   try {
   for (let attempt = 1; attempt <= LENGTH_MAX_ATTEMPTS; attempt++) {
-    onProgress({ message: `Ngách "${nicheLabel}"${attempt > 1 ? ` (thử lại lần ${attempt})` : ''}: Claude đang chạy skill viết truyện...` });
+    onProgress({ message: `${runLabel}${attempt > 1 ? ` (thử lại lần ${attempt})` : ''}: Claude đang chạy skill viết truyện...` });
     const res = await chat.send(prompt, { timeoutMs: 420000 }); // doan chat MOI, skill dai -> cho 7 phut
     if (!res.ok) {
       lastErr = new Error(res.error || 'Claude không trả về');
@@ -811,16 +831,16 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
         onProgress({ message: `🏷️ Tiêu đề: ${origWords}→${titleWordCount(s.WEB_TITLE)} từ, viết lại ${rewrites} lần${origLeak ? `, lỗi gốc: "${origLeak}"` : ', không lỗi gốc'}.` });
       }
 
-      // ---- BUOC 2c: KIEM COLD OPEN (dau web_body) BANG CODE ----
+      // ---- BUOC 2c: KIEM COLD OPEN (dau web_body, 5 doan) BANG CODE ----
       {
         let co = checkColdOpen(s.WEB_BODY || '');
-        const origFirst = co.first, origThree = co.three;
+        const origFirst = co.first, origThree = co.three, origReason = co.reason || '';
         let rewrites = 0;
         while (!co.ok && rewrites < 2) {
           rewrites++;
-          onProgress({ message: `🥶 Cold open lỗi (đoạn đầu ${co.first} từ, 3 đoạn ${co.three} từ) — yêu cầu Claude viết lại phần mở đầu (lần ${rewrites})...` });
+          onProgress({ message: `🥶 Cold open lỗi (${co.reason}) — yêu cầu Claude viết lại phần mở đầu 5 dòng (lần ${rewrites})...` });
           let rw = null;
-          try { rw = await chat.send(coldOpenRewritePrompt(co.first), { sameChat: true, timeoutMs: 120000 }); }
+          try { rw = await chat.send(coldOpenRewritePrompt(co), { sameChat: true, timeoutMs: 120000 }); }
           catch (e) { rw = { ok: false, error: e.message }; }
           if (!rw || !rw.ok) { onProgress({ message: `⚠️ Không nhận được cold open mới (${(rw && rw.error) || '?'}).` }); break; }
           const block = (parseSections(rw.text).COLD_OPEN || '').trim();
@@ -830,13 +850,13 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
         }
         if (!co.ok) {
           // KHONG tu chen gi -> giu nguyen bai goc, chi canh bao.
-          onProgress({ message: `⚠️ Cold open vẫn lỗi sau ${rewrites} lần — giữ nguyên bài gốc (đoạn đầu ${co.first} từ).` });
+          onProgress({ message: `⚠️ Cold open vẫn lỗi sau ${rewrites} lần — giữ nguyên bài gốc (${co.reason}).` });
         }
         store.writeRawLog('', {
           at: new Date().toISOString(), niche: nicheLabel, attempt, phase: 'cold_open_check',
-          origFirst, origThree, finalFirst: co.first, finalThree: co.three, rewrites, passed: co.ok,
+          origFirst, origThree, origReason, finalFirst: co.first, finalThree: co.three, finalP4: co.p4, finalP5: co.p5, rewrites, passed: co.ok,
         });
-        onProgress({ message: `🧊 Cold open: đoạn đầu ${origFirst}→${co.first} từ, viết lại ${rewrites} lần.` });
+        onProgress({ message: `🧊 Cold open: đoạn đầu ${origFirst}→${co.first} từ, đoạn 4/5 ${co.p4}/${co.p5} từ, viết lại ${rewrites} lần.` });
       }
 
       // ---- BUOC 2d: KIEM CTA BANG CODE (khong doi comment/type YES, khong lo noi dung sau) ----
@@ -894,7 +914,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
         imgs = { fbImageUrl: '', thumbnailUrl: '', webUrls: { p1: '', p2: '', p3: '' }, allOk: true, configured: false, errors: [] };
         status = 'draft_test';                 // n8n KHONG duoc dang bai test
       } else {
-        onProgress({ message: `✓ Claude xong bài ${storyId} (~${words} từ) — ngách "${nicheLabel}". Đang tạo ảnh...` });
+        onProgress({ message: `✓ Claude xong bài ${storyId} (~${words} từ) — ${runLabel}. Đang tạo ảnh...` });
         // Tao 5 anh (fb, thumb, p1, p2, p3) -> up R2. Loi anh KHONG lam sap bai.
         try {
           imgs = await generateArticleImages(storyId, s, onProgress, shouldStop);
@@ -906,7 +926,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
         if (status === 'need_image') {
           onProgress({ message: `⚠️ Bài ${storyId}: tạo ảnh chưa đủ (${imgs.errors.join('; ')}). Đẩy bài, đánh dấu need_image để chạy lại.` });
         } else {
-          onProgress({ message: `✓ Xong bài ${storyId} — ngách "${nicheLabel}"` });
+          onProgress({ message: `✓ Xong bài ${storyId} — ${runLabel}` });
         }
       }
 
@@ -979,7 +999,7 @@ async function writeBatch({ niche, count, pushRow = null, shouldStop = () => fal
       onProgress({ message: `⏹ Đã dừng theo yêu cầu — còn ${total - i} bài chưa chạy.` });
       break;
     }
-    onProgress({ message: `Bài ${i + 1}/${total} — ngách "${nicheLabel}"...`, done: i, total });
+    onProgress({ message: `Bài ${i + 1}/${total} — đang chọn page & viết...`, done: i, total });
     const r = await writeOne(nicheLabel, nicheCode, onProgress, shouldStop);
     if (!r.ok) { failed.push({ index: i + 1, error: r.error }); continue; }
     rows.push(r.row);

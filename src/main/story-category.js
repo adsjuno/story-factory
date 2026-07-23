@@ -58,6 +58,19 @@ function isThemeValidForCategory(theme, catId) {
   return cats.includes(catId);
 }
 
+// legacy_theme HIEU LUC cua 1 subcategory (toi da 1, bo E cu). '' neu sub de rong.
+function themeOfSub(sub) {
+  if (!sub) return '';
+  const m = mapOf(sub.subcategory_id);
+  const th = ((sub.legacy_themes) || (m && m.legacy_themes) || []).filter((t) => t && t !== 'E_ngheo_vs_giau');
+  return th[0] || '';
+}
+// legacy_theme cua BAI GAN NHAT (ca so tam test nhanh, vi recentByCountry doc readDb gom SESSION).
+function lastLegacyTheme(country) {
+  const last = memory.recentByCountry(country, 1)[0];
+  return (last && last.combo && last.combo.legacy_theme) || '';
+}
+
 // ---------------- weighted random trong TAP DA HOP LE ----------------
 function weightedPick(items, weightOf) {
   const ws = items.map((it) => Math.max(0, Number(weightOf(it)) || 0));
@@ -115,7 +128,16 @@ function chooseSubcategory(country, page, category, manualSubcategoryId) {
     return !memory.subcategoryUsedRecently(country, pageId, s.subcategory_id, win);
   });
   if (eligible.length) {
-    return { subcategory: weightedPick(eligible, (s) => s.base_weight || 1), fallback: false, reason: '' };
+    // COOLDOWN legacy_theme: 2 bai lien tiep KHONG cung theme (sub rong KHONG bi rang buoc).
+    const lastTheme = lastLegacyTheme(country);
+    let pool = eligible;
+    let themeNote = '';
+    if (lastTheme) {
+      const diff = eligible.filter((s) => { const t = themeOfSub(s); return !t || t !== lastTheme; });
+      if (diff.length) pool = diff;
+      else themeNote = `theme "${lastTheme}" lặp — pool cạn sau khi loại, nới ra (giữ nguyên)`;
+    }
+    return { subcategory: weightedPick(pool, (s) => s.base_weight || 1), fallback: false, reason: themeNote };
   }
   // FALLBACK (khong bao gio null): LEAST-RECENTLY-USED -> gian cach TOI DA co the.
   // Luu y: neu category chi co 8 subcategory ma cua so cooldown la 20 thi VE MAT TOAN HOC
