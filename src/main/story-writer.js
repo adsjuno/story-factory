@@ -370,6 +370,68 @@ function getQaConfig() {
   return { enabled, command: cmd };
 }
 
+// ==================== KIEM TIEU DE BANG CODE (thay QA skill tu cham) ====================
+// Claude khong tu cham duoc tieu de cua chinh no (tieu de 28 tu lo ket van bao "dat").
+// -> dung LUAT CO DINH: <=20 tu + khong chua cum lo ket.
+const TITLE_MAX_WORDS = 20;
+const RESCUER_NOUNS = ['colonel', 'general', 'judge', 'doctor', 'sergeant', 'captain', 'officer', 'novelist', 'celebrity', 'stranger', 'detective', 'veteran'];
+const ENDING_PHRASES = ['stood up', 'said her name', 'said his name', 'told everyone', 'the whole town', 'changed everything', 'who she really was', 'who he really was', 'really been', 'revealed', 'exposed', 'learned the truth'];
+function reEsc(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function titleWordCount(t) { return String(t || '').trim().split(/\s+/).filter(Boolean).length; }
+// Tra ve CUM lo ket dau tien tim thay (giu nguyen chu goc de bao loi), '' neu sach.
+function findTitleLeak(title) {
+  const t = String(title || '');
+  // a) "then/until a|an|the" dau tieu de HOAC sau dau gach ngang / cham
+  let m = t.match(/(^|[—–\-.:;]\s*)\b(then|until)\s+(a|an|the)\b/i);
+  if (m) return (m[2] + ' ' + m[3]);
+  // b) danh tu nguoi den cuu sau a|an|the
+  m = t.match(new RegExp('\\b(a|an|the)\\s+(' + RESCUER_NOUNS.join('|') + ')\\b', 'i'));
+  if (m) return m[0];
+  // c) cum canh ket
+  for (const p of ENDING_PHRASES) {
+    const mm = t.match(new RegExp('\\b' + reEsc(p) + '\\b', 'i'));
+    if (mm) return mm[0];
+  }
+  return '';
+}
+function checkTitle(title) {
+  const words = titleWordCount(title);
+  const leak = findTitleLeak(title);
+  return { ok: words <= TITLE_MAX_WORDS && !leak, words, leak };
+}
+// Tu cat khi het luot viet lai:
+//  1) giu phan TRUOC dau gach ngang / cham dau tien
+//  2) neu VAN con cum lo ket -> cat ngay TRUOC cum do (tieu de lo thuong khong co dau ngan cach)
+//  3) cat con <=20 tu
+function truncateTitle(title) {
+  const cap = (s) => { const w = String(s || '').trim().split(/\s+/).filter(Boolean); return (w.length > TITLE_MAX_WORDS ? w.slice(0, TITLE_MAX_WORDS) : w).join(' '); };
+  let t = String(title || '').trim();
+  const cut = t.search(/\s[—–-]\s|[—–]|\.(?:\s|$)/);
+  if (cut > 0) t = t.slice(0, cut);
+  const dashCut = cap(t.trim().replace(/[\s.,;:—–-]+$/, ''));  // phuong an giu lai neu cat lo ket ra rong
+  // con lo ket -> cat truoc vi tri cum do (giu phan mo dau, bo phan he lo)
+  let guard = 0, leak = findTitleLeak(t);
+  while (leak && guard++ < 6) {
+    const idx = t.toLowerCase().indexOf(leak.toLowerCase());
+    if (idx <= 0) { t = ''; break; }
+    t = t.slice(0, idx).trim().replace(/[\s.,;:—–-]+$/, '').trim();
+    leak = findTitleLeak(t);
+  }
+  t = cap(t.trim().replace(/[\s.,;:—–-]+$/, ''));
+  // KHONG de rong: cum lo nam ngay dau -> giu phan truoc dau gach/cham (<=20 tu), chap nhan con lo.
+  return t || dashCut || cap(title);
+}
+function titleRewritePrompt(words, leak) {
+  const leakClause = leak ? `và chứa cụm lộ kết: "${leak}"` : '(vượt giới hạn độ dài)';
+  return `Tiêu đề vừa rồi có ${words} từ (giới hạn 20) ${leakClause}.
+Viết lại tiêu đề theo đúng khuôn sau, KHÔNG thêm gì:
+- Chỉ nêu sự xúc phạm cụ thể xảy ra ở đầu truyện.
+- Dừng lại ngay tại đó. Không "Then", không "Until", không nói ai xuất hiện, không nói kết cục.
+- Tối đa 20 từ.
+Ví dụ đúng: "They Made Her Use the Side Door So the Guests Wouldn't See the Bus Driver"
+Chỉ xuất: ===TITLE=== rồi tiêu đề mới.`;
+}
+
 // Dung prompt cuoi = KHOI DNA (bat buoc dung to hop) + cau lenh goi skill.
 // @param dna { combo, country } da chon san (co the null -> khong nhet DNA)
 // @param topicLabel chu de gui cho Claude: "<category_name> — <subcategory_name>"
@@ -611,11 +673,11 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
         continue;
       }
 
-      // ---- BUOC 2: QA TIEU DE trong CUNG doan chat (skill doc bai o tren) ----
-      // Loi/timeout/khong ra khoi nao -> giu nguyen bai goc, chi canh bao. KHONG lam sap bai.
+      // ---- BUOC 2a: QA skill trong CUNG doan chat — CHI cho CTA + số liệu (TIEU DE do CODE lo) ----
+      // Loi/timeout -> bo qua, chi canh bao. KHONG lam sap bai.
       let qaReport = '';
       if (qaCfg.enabled) {
-        onProgress({ message: `🔎 Chạy QA tiêu đề (${qaCfg.command}) trong cùng đoạn chat...` });
+        onProgress({ message: `🔎 Chạy QA (CTA/số liệu) (${qaCfg.command}) trong cùng đoạn chat...` });
         let qa = null;
         try {
           qa = await chat.send(qaCfg.command, { sameChat: true, timeoutMs: 180000 });
@@ -625,8 +687,8 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
         if (qa && qa.ok) {
           const q = parseSections(qa.text);
           qaReport = q.QA_REPORT || '';
-          let changed = [];
-          if (q.TITLE && q.TITLE.trim()) { s.WEB_TITLE = q.TITLE.trim(); changed.push('web_title'); }
+          const changed = [];
+          // TIEU DE gio kiem bang CODE (buoc 2b) — KHONG lay ===TITLE=== cua skill nua.
           if (q.CTA && q.CTA.trim()) { s.FB_CTA = q.CTA.trim(); changed.push('fb_cta'); }
           store.writeRawLog(qa.text, {
             at: new Date().toISOString(), niche: nicheLabel, attempt,
@@ -634,14 +696,43 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
           });
           onProgress({ message: changed.length
             ? `✏️ QA sửa ${changed.join(' + ')}${qaReport ? ' — ' + qaReport.slice(0, 160) : ''}`
-            : `✓ QA: tiêu đề/CTA đạt, giữ nguyên${qaReport ? ' — ' + qaReport.slice(0, 160) : ''}` });
+            : `✓ QA (CTA/số liệu) xong${qaReport ? ' — ' + qaReport.slice(0, 160) : ''}` });
         } else {
-          onProgress({ message: `⚠️ QA skill không chạy được (${(qa && qa.error) || 'không rõ'}) — dùng nguyên bài gốc.` });
+          onProgress({ message: `⚠️ QA skill không chạy được (${(qa && qa.error) || 'không rõ'}) — bỏ qua CTA/số liệu.` });
           store.writeRawLog((qa && qa.text) || '', {
             at: new Date().toISOString(), niche: nicheLabel, attempt,
             ok: false, phase: 'title_qa', error: (qa && qa.error) || 'QA không trả về',
           });
         }
+      }
+
+      // ---- BUOC 2b: KIEM TIEU DE BANG CODE (luat co dinh) + yeu cau viet lai neu lo ket ----
+      {
+        let chk = checkTitle(s.WEB_TITLE || '');
+        const origWords = chk.words, origLeak = chk.leak, origTitle = s.WEB_TITLE || '';
+        let rewrites = 0;
+        while (!chk.ok && rewrites < 3) {
+          rewrites++;
+          onProgress({ message: `📛 Tiêu đề lỗi (${chk.words} từ${chk.leak ? `, lộ kết: "${chk.leak}"` : ''}) — yêu cầu Claude viết lại (lần ${rewrites})...` });
+          let rw = null;
+          try { rw = await chat.send(titleRewritePrompt(chk.words, chk.leak), { sameChat: true, timeoutMs: 120000 }); }
+          catch (e) { rw = { ok: false, error: e.message }; }
+          if (!rw || !rw.ok) { onProgress({ message: `⚠️ Không nhận được tiêu đề mới (${(rw && rw.error) || '?'}).` }); break; }
+          const nt = (parseSections(rw.text).TITLE || '').trim();
+          if (!nt) { onProgress({ message: '⚠️ Claude không xuất ===TITLE===.' }); continue; }
+          s.WEB_TITLE = nt;
+          chk = checkTitle(s.WEB_TITLE);
+        }
+        if (!chk.ok) {
+          s.WEB_TITLE = truncateTitle(s.WEB_TITLE || origTitle);
+          chk = checkTitle(s.WEB_TITLE);
+          onProgress({ message: `✂️ Tiêu đề vẫn lỗi sau ${rewrites} lần — tự cắt còn "${s.WEB_TITLE}" (${chk.words} từ${chk.leak ? `, còn cụm: "${chk.leak}"` : ''}).` });
+        }
+        store.writeRawLog('', {
+          at: new Date().toISOString(), niche: nicheLabel, attempt, phase: 'title_check',
+          origWords, origLeak, origTitle, finalTitle: s.WEB_TITLE, finalWords: titleWordCount(s.WEB_TITLE), rewrites, passed: chk.ok,
+        });
+        onProgress({ message: `🏷️ Tiêu đề: ${origWords}→${titleWordCount(s.WEB_TITLE)} từ, viết lại ${rewrites} lần${origLeak ? `, lỗi gốc: "${origLeak}"` : ', không lỗi gốc'}.` });
       }
 
       // Cap story_id (bo dem local, +1 moi bai)
@@ -725,7 +816,9 @@ async function writeBatch({ niche, count, pushRow = null, shouldStop = () => fal
   const nicheCode = found ? found.code : String(niche || '').toUpperCase();
   const total = Math.max(1, Math.min(50, parseInt(count, 10) || 1)); // tran an toan 50 bai/lan
 
-  memory.sessionStart();                    // so tam cua TEST NHANH: moi lan chay la mot phien moi
+  // KHONG sessionStart() o day nua. So tam cua TEST NHANH phai GIU qua cac lan bam "Bat dau viet"
+  // trong CUNG mot lan mo app -> page moi xoay dung (1 bai x5 lan = 5 page). Xoa khi tat app
+  // (SESSION reset khi nap lai module) hoac khi bam nut "Reset sổ tạm".
   const rows = [];
   const failed = [];
   const pushFailed = [];
@@ -754,7 +847,7 @@ async function writeBatch({ niche, count, pushRow = null, shouldStop = () => fal
     }
   }
   if (stopped && shouldStop()) onProgress({ message: `⏹ Dừng: đã xong ${rows.length} bài.` });
-  memory.sessionClear();                    // het phien -> xoa so tam
+  // KHONG xoa so tam o day (giu qua cac lan chay) -> chi xoa khi tat app / bam Reset.
   return { ok: rows.length > 0, rows, failed, pushFailed, stopped, columns: SHEET_COLUMNS };
 }
 
@@ -773,6 +866,7 @@ module.exports = {
   DEFAULT_SKILL_COMMAND,
   DEFAULT_NICHES,
   // exported for tests / reuse
+  titleWordCount, findTitleLeak, checkTitle, truncateTitle, titleRewritePrompt,
   parseSections,
   missingSections,
   checkLeakedLabels,

@@ -233,6 +233,14 @@ ipcMain.handle('story:stop', () => {
   return { ok: true };
 });
 
+// Reset SO TAM cua test nhanh (xoay page) — vd truoc khi bat dau mot loat test moi.
+ipcMain.handle('story:resetSession', () => {
+  requireAuth();
+  const n = storyMemory.sessionCount();
+  storyMemory.sessionClear();
+  return { ok: true, cleared: n };
+});
+
 ipcMain.handle('sheets:test', async () => {
   requireAuth();
   const s = loadSettings();

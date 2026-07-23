@@ -219,6 +219,11 @@ $('stopBtn').onclick=async()=>{
   await api.stopWrite();
 };
 
+$('resetSessionBtn').onclick=async()=>{
+  const r=await api.resetSession();
+  logLine(r&&r.ok?('🧹 Đã reset sổ tạm test ('+(r.cleared||0)+' bản ghi) — vòng xoay page bắt đầu lại.'):'⚠️ Không reset được sổ tạm.', r&&r.ok?'ok':'err');
+};
+
 // ---------- CAI DAT ----------
 async function loadSettings(){
   const r=await api.getSettings();

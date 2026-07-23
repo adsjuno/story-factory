@@ -30,6 +30,7 @@ let SESSION = [];
 function sessionStart() { SESSION = []; }
 function sessionClear() { SESSION = []; }
 function sessionCount() { return SESSION.length; }
+const SESSION_MAX = 500;                    // tran an toan (giu qua nhieu lan chay trong 1 phien app)
 function addSession({ storyId, country, niche, combo }) {
   SESSION.push({
     story_id: storyId || '',
@@ -39,6 +40,7 @@ function addSession({ storyId, country, niche, combo }) {
     combo: combo || {},
     session_only: true,
   });
+  if (SESSION.length > SESSION_MAX) SESSION = SESSION.slice(-SESSION_MAX);
 }
 
 function readDbRaw() {

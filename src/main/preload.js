@@ -43,6 +43,7 @@ const api = {
   getNiches: () => call('story:niches'),
   write: (p) => call('story:write', p),
   stopWrite: () => call('story:stop'),
+  resetSession: () => call('story:resetSession'),
   sheetsTest: () => call('sheets:test'),
   listJobs: () => call('jobs:list'),
 

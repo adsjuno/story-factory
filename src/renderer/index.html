@@ -92,6 +92,8 @@
         <!-- Hien thay cho nut tren trong luc dang chay -->
         <button id="stopBtn" class="btn btn-danger btn-block big hidden">⏹ Dừng</button>
         <div id="stopHint" class="hint hidden">Sẽ hoàn tất bài đang viết dở rồi dừng, không chạy các bài còn lại.</div>
+        <button id="resetSessionBtn" class="btn btn-ghost btn-block btn-sm">🧹 Reset sổ tạm test (xoay page)</button>
+        <div class="hint">Sổ tạm giúp test nhanh xoay đều P01→P10 giữa các lần chạy. Bấm để xoá và bắt đầu vòng xoay mới. Tự xoá khi tắt app.</div>
       </div>
 
       <div class="card log-card">
@@ -300,7 +302,7 @@
         <textarea id="skillCmd" class="in area mono" rows="10"></textarea>
         <div style="margin:10px 0">
           <label><input type="checkbox" id="cleanupChats" checked> 🧹 Tự dọn (xoá) lịch sử chat Claude sau khi bài đã đẩy lên Sheet — giữ list chat gọn (bài đã lưu Sheet, không mất dữ liệu)</label>
-          <label><input type="checkbox" id="titleQa" checked> 🔎 Chạy QA tiêu đề sau khi viết — gõ tiếp "/story-title-qa" trong cùng đoạn chat để soát & sửa tiêu đề/CTA (tắt để viết nhanh hơn)</label>
+          <label><input type="checkbox" id="titleQa" checked> 🔎 Chạy QA CTA/số liệu sau khi viết — gõ tiếp "/story-title-qa" trong cùng đoạn chat (tiêu đề đã kiểm bằng code riêng; tắt để viết nhanh hơn)</label>
         </div>
         <div class="row">
           <button id="saveStoryBtn" class="btn btn-primary">Lưu ngách & câu lệnh</button>

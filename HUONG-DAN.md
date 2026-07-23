@@ -36,16 +36,25 @@ Nhân viên bấm "Viết bài"
    → (n8n đọc Sheet → đăng WordPress + Facebook + thả link comment)
 ```
 
-## QA tiêu đề (bước 2, chạy chung đoạn chat)
+## Kiểm tiêu đề bằng CODE + QA cho CTA/số liệu (bước 2, chung đoạn chat)
 
-Mặc định BẬT (Cài đặt → "Chạy QA tiêu đề sau khi viết"). Sau khi Claude viết xong bài,
-phần mềm **không mở chat mới** mà gõ tiếp `/story-title-qa` **ngay trong đoạn chat đó**, nên
-skill QA đọc được nguyên bài vừa viết ở trên.
-- QA trả về khối `===QA_REPORT===` (luôn có) — ghi vào Log để xem QA nhận xét gì.
-- Nếu QA trả `===TITLE===` mới → **ghi đè** web_title. Nếu trả `===CTA===` mới → **ghi đè** fb_cta.
-- Không trả khối nào → giữ nguyên bài gốc.
-- QA lỗi/timeout → dùng nguyên bài gốc, chỉ log cảnh báo, **không làm hỏng bài**.
-- Tắt QA để viết nhanh hơn (bỏ hẳn bước 2).
+Sau khi Claude viết xong bài, phần mềm **không mở chat mới** mà làm tiếp trong cùng đoạn chat:
+
+**2a. QA CTA + số liệu** (skill `/story-title-qa`, mặc định BẬT — Cài đặt → "Chạy QA tiêu đề sau khi viết"):
+- Trả `===QA_REPORT===` (ghi Log). Nếu trả `===CTA===` mới → **ghi đè** fb_cta.
+- Tiêu đề KHÔNG còn lấy từ skill (Claude tự chấm tiêu đề của nó không đáng tin).
+- QA lỗi/timeout → bỏ qua CTA/số liệu, không làm hỏng bài.
+
+**2b. Kiểm tiêu đề bằng CODE** (luôn chạy, luật cố định — không hỏi ý AI):
+- Quá **20 từ** → lỗi.
+- Chứa **cụm lộ kết** → lỗi: "then/until a…" sau gạch ngang/chấm; "a/the + colonel/judge/
+  doctor/stranger/veteran…"; "stood up", "said her name", "the whole town", "revealed",
+  "learned the truth"…
+- Lỗi → gõ prompt ngắn nêu **đích danh** lỗi, bắt Claude viết lại (tối đa 3 lần), kiểm lại mỗi lần.
+- Hết lượt vẫn lỗi → **tự cắt**: bỏ phần lộ kết, giữ ≤20 từ, log cảnh báo.
+- Log rõ: số từ trước→sau, cụm vi phạm, đã viết lại mấy lần.
+
+Tắt QA để nhanh hơn — nhưng **bước kiểm tiêu đề (2b) vẫn chạy** (chỉ dùng Claude khi tiêu đề lỗi).
 
 **Đẩy Sheet từng bài một**, không gom đến cuối. Nếu đang chạy 10 bài mà máy tắt ở bài thứ 7
 thì 6 bài đầu đã nằm trên Sheet rồi. Bài nào đẩy lỗi thì log báo rõ và chạy tiếp bài sau.
