@@ -80,14 +80,23 @@ async function deleteFirstChat(wc) {
       'button[aria-haspopup="menu"],button[aria-label*="menu" i],button[aria-label*="option" i],button[aria-label*="more" i],'
       +'button[data-testid*="menu" i],button[data-testid*="option" i],[data-testid*="menu" i][role="button"],'
       +'button[aria-label*="tùy chọn" i],button[aria-label*="conversation" i],button[aria-haspopup="true"]'))); }
-    addAll(item); addAll(item.parentElement); addAll(link.parentElement);
-    // du phong: nut cuoi cung trong item chi co icon (khong chu)
-    var allBtns = Array.prototype.slice.call(item.querySelectorAll('button')).filter(vis);
-    var iconBtns = allBtns.filter(function(b){ return txt(b).length===0; });
-    var menuBtn = cands.filter(vis)[0] || iconBtns[iconBtns.length-1] || null;
+    // Tim nut menu o item VA cac to tien (nut "..." co the nam ngoai closest() bat duoc,
+    // hoac o hang cha). Di len toi 4 cap.
+    var scope = item;
+    for (var up=0; up<4 && scope; up++){ addAll(scope); scope = scope.parentElement; }
+    addAll(link.parentElement);
+    // Nut chi co icon (khong chu) trong pham vi hang — quet ca to tien vai cap
+    var rowScope = item;
+    for (var u2=0; u2<3 && rowScope && rowScope.querySelectorAll('a[href*="/chat/"]').length<=1; u2++){ rowScope = rowScope.parentElement || rowScope; if(!rowScope.parentElement) break; }
+    var allBtns = Array.prototype.slice.call((rowScope||item).querySelectorAll('button'));
+    var iconBtns = allBtns.filter(vis).filter(function(b){ return txt(b).length===0; });
+    // Uu tien ung vien menu HIEN; nhung claude an nut qua CSS :hover (JS khong bat duoc)
+    // -> chap nhan ung vien menu CU THE ke ca khi chua hien (van click duoc bang JS).
+    var menuBtn = cands.filter(vis)[0] || cands[0] || iconBtns[iconBtns.length-1] || null;
 
-    // Log cau truc nut de chan doan (khi giao dien doi)
-    var diag = allBtns.map(function(b){ return (b.getAttribute('aria-label')||b.getAttribute('data-testid')||txt(b)||'?'); }).slice(0,8);
+    // Log cau truc nut de chan doan (khi giao dien doi): so ung vien menu + tong nut + nhan
+    var diag = ['cands=' + cands.length, 'btns=' + allBtns.length].concat(
+      allBtns.map(function(b){ return (b.getAttribute('aria-label')||b.getAttribute('data-testid')||txt(b)||'?'); }).slice(0,8));
 
     if(!menuBtn){
       // du phong cuoi: chuot phai (context menu)

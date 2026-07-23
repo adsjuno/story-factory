@@ -115,6 +115,15 @@ function login(provider, { timeoutMs = 600000 } = {}) {
  * LOI: gui 1 prompt tren cua so ĐÃ MO SAN trang chat (composer đã sẵn sàng),
  * đợi câu trả lời và lấy text. Tách riêng để dùng cho cả ask() 1 phát lẫn phiên tab tái dùng.
  */
+// So ky tu TOI THIEU trong o soan de coi la "da go duoc prompt". Theo DO DAI PROMPT,
+// KHONG dung nguong cung: prompt QA ngan (vd "/story-title-qa"=15) tung bi nguong 50 cu
+// bao that bai du da go dung. wantLen = do dai prompt (cat tran 40); needLen = 1/2 wantLen.
+function typedThreshold(prompt) {
+  const promptLen = String(prompt || '').trim().length;
+  const wantLen = Math.min(promptLen, 40);
+  return Math.max(1, Math.floor(wantLen * 0.5));
+}
+
 async function runPrompt(wc, cfg, prompt, timeoutMs, opts = {}) {
   // waitBaseline: khi gui prompt TIEP trong CUNG doan chat, cau tra loi cu VAN o tren trang.
   // Phai doi den khi tin nhan tro ly MOI khac baseline moi coi la xong -> tranh tra nham
@@ -123,29 +132,70 @@ async function runPrompt(wc, cfg, prompt, timeoutMs, opts = {}) {
   // Chen prompt NGAY TRONG trang bang execCommand('insertText') — cach nay an voi
   // ProseMirror/contenteditable cua UI moi (wc.insertText bi UI moi bo qua -> o trong,
   // nut gui khong bao gio hien, tool ngoi cho vo ich). Co KIEM TRA + du phong.
-  const composerLen = () => jsEval(wc,
-    `(function(){var e=document.querySelector(${JSON.stringify(cfg.composer)}); return e ? (e.innerText||e.value||'').trim().length : -1;})()`);
 
-  await jsEval(wc, `(function(){
+  // "Da go duoc chua": so sanh theo DO DAI PROMPT, khong dung nguong cung.
+  // Prompt QA rat ngan (vd "/story-title-qa" = 15 ky tu) -> nguong cu 50 luon bao that bai
+  // du da go dung. wantLen = do dai prompt (cat tran 40 cho prompt dai); needLen = 1/2 wantLen.
+  const needLen = typedThreshold(prompt);
+
+  // Trang thai o soan (tim thay / do dai / disabled / hien) — de kiem tra + chan doan
+  const composerState = () => jsEval(wc, `(function(){
+    var e=document.querySelector(${JSON.stringify(cfg.composer)});
+    if(!e) return {found:false};
+    var cs; try{ cs=getComputedStyle(e); }catch(_){ cs={visibility:'visible'}; }
+    return {found:true, len:(e.innerText||e.value||'').trim().length,
+      disabled: !!e.disabled || e.getAttribute('contenteditable')==='false' || e.getAttribute('aria-disabled')==='true',
+      visible: (e.offsetParent!==null) && cs.visibility!=='hidden'};
+  })()`);
+  const sendState = () => jsEval(wc, `(function(){
+    var b=document.querySelector(${JSON.stringify(cfg.sendButton)});
+    if(!b) return {found:false};
+    return {found:true, disabled:!!b.disabled};
+  })()`);
+  const composerLen = async () => { const s = await composerState(); return (s && s.found) ? s.len : -1; };
+
+  // 1) DOI O SOAN SAN SANG: sau khi Claude vua stream xong bai 2800 tu, o soan co the con
+  //    disabled/chua mount lai. Doi het stream + o soan ton tai + hien + KHONG disabled.
+  const readyDeadline = Date.now() + 20000;
+  while (Date.now() < readyDeadline) {
+    const streaming = await isStreaming(wc, cfg.stopButton);
+    const cs = await composerState();
+    if (!streaming && cs && cs.found && cs.visible && !cs.disabled) break;
+    await delay(400);
+  }
+
+  // 2) GO PROMPT + KIEM TRA, THU LAI toi da 3 lan. Truoc moi lan: scroll o soan vao tam nhin
+  //    (bai dai render ra co the day o soan ra ngoai viewport) roi focus.
+  const insertScript = `(function(){
     var el = document.querySelector(${JSON.stringify(cfg.composer)});
     if (!el) return false;
+    try { el.scrollIntoView({block:'center'}); } catch(_){}
     el.focus();
     try { document.execCommand('selectAll', false, null); document.execCommand('delete', false, null); } catch(_){}
     try { return document.execCommand('insertText', false, ${JSON.stringify(prompt)}); } catch(_){ return false; }
-  })()`);
-  await delay(600);
-
-  let len = await composerLen();
-  if (len < 50) {
-    // Du phong: go qua Electron (cach cu)
-    await jsEval(wc, `(function(){var e=document.querySelector(${JSON.stringify(cfg.composer)}); if(e){e.focus();}})()`);
+  })()`;
+  let len = -1;
+  for (let attempt = 1; attempt <= 3 && len < needLen; attempt++) {
+    await jsEval(wc, insertScript);
+    await delay(600);
+    len = await composerLen();
+    if (len >= needLen) break;
+    // du phong: go qua Electron (sau khi scroll + focus)
+    await jsEval(wc, `(function(){var e=document.querySelector(${JSON.stringify(cfg.composer)}); if(e){try{e.scrollIntoView({block:'center'});}catch(_){}e.focus();}})()`);
     await delay(300);
     wc.insertText(prompt);
     await delay(700);
     len = await composerLen();
+    if (len < needLen && attempt < 3) await delay(1200); // cho o soan on dinh roi thu lai
   }
-  if (len < 50) {
-    return { ok: false, error: 'Không gõ được prompt vào ' + cfg.name + ' (giao diện web có thể vừa đổi). Thử đăng nhập lại hoặc đổi động cơ AI khác.' };
+  if (len < needLen) {
+    const cs = await composerState();
+    const ss = await sendState();
+    const streaming = await isStreaming(wc, cfg.stopButton);
+    const diag = 'ô soạn=' + (cs && cs.found ? ('thấy(len=' + cs.len + (cs.disabled ? ',disabled' : '') + (cs.visible ? '' : ',ẩn') + ')') : 'KHÔNG thấy')
+      + ', nút gửi=' + (ss && ss.found ? (ss.disabled ? 'thấy(disabled)' : 'thấy') : 'KHÔNG thấy')
+      + ', stream=' + (streaming ? 'còn chạy' : 'đã hết');
+    return { ok: false, error: 'Không gõ được prompt vào ' + cfg.name + ' [' + diag + ']. Giao diện web có thể vừa đổi.' };
   }
 
   // Gui: bam nut send; KIEM TRA da gui that (dang stream hoac o nhap da rong); chua thi Enter
@@ -166,7 +216,9 @@ async function runPrompt(wc, cfg, prompt, timeoutMs, opts = {}) {
     if (!(await isSent())) await trySendClick();
     await delay(800);
     if (!(await isSent())) {
-      return { ok: false, error: 'Đã gõ prompt nhưng không bấm gửi được trên ' + cfg.name + ' (không thấy nút gửi). Giao diện web có thể vừa đổi.' };
+      const ss = await sendState();
+      const diag = 'nút gửi=' + (ss && ss.found ? (ss.disabled ? 'thấy(disabled)' : 'thấy(không bấm được)') : 'KHÔNG thấy');
+      return { ok: false, error: 'Đã gõ prompt nhưng không gửi được trên ' + cfg.name + ' [' + diag + ']. Giao diện web có thể vừa đổi.' };
     }
   }
 
@@ -305,4 +357,4 @@ async function logout(provider) {
   }
 }
 
-module.exports = { login, ask, openSession, openChat, logout, PROVIDERS };
+module.exports = { login, ask, openSession, openChat, logout, PROVIDERS, typedThreshold };
