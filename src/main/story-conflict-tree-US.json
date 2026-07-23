@@ -3907,6 +3907,664 @@
       "severity": 3,
       "requires": [],
       "avoid_with": []
+    },
+    {
+      "id": "F1_ganh_nang_khong_chia-01",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F1_ganh_nang_khong_chia",
+      "conflict": "one sibling has done all the caregiving for years while the others visit twice a year",
+      "tags": [
+        "caregiver_burden",
+        "sibling_rivalry",
+        "unequal_labor"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F1_ganh_nang_khong_chia-02",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F1_ganh_nang_khong_chia",
+      "conflict": "the siblings agree on a care schedule and only one of them ever shows up",
+      "tags": [
+        "caregiver_burden",
+        "sibling_rivalry",
+        "unequal_labor"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F1_ganh_nang_khong_chia-03",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F1_ganh_nang_khong_chia",
+      "conflict": "a distant sibling sends money and considers the matter settled",
+      "tags": [
+        "caregiver_burden",
+        "sibling_rivalry",
+        "unequal_labor"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F1_ganh_nang_khong_chia-04",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F1_ganh_nang_khong_chia",
+      "conflict": "the caregiving sibling loses a job and the others say nothing",
+      "tags": [
+        "caregiver_burden",
+        "sibling_rivalry",
+        "unequal_labor"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F1_ganh_nang_khong_chia-05",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F1_ganh_nang_khong_chia",
+      "conflict": "one sibling moves the parent into their home and the others treat it as convenient",
+      "tags": [
+        "caregiver_burden",
+        "sibling_rivalry",
+        "unequal_labor"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F1_ganh_nang_khong_chia-06",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F1_ganh_nang_khong_chia",
+      "conflict": "the siblings argue about hiring help while one of them is already doing the work unpaid",
+      "tags": [
+        "caregiver_burden",
+        "sibling_rivalry",
+        "unequal_labor"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F2_to_cao_lam_dung-01",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F2_to_cao_lam_dung",
+      "conflict": "the caregiving sibling is accused of living off the parent's pension",
+      "tags": [
+        "false_accusation",
+        "financial_suspicion",
+        "caregiver_burden"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F2_to_cao_lam_dung-02",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F2_to_cao_lam_dung",
+      "conflict": "a sibling suggests the caregiver has been influencing the parent's decisions",
+      "tags": [
+        "false_accusation",
+        "financial_suspicion",
+        "caregiver_burden"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F2_to_cao_lam_dung-03",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F2_to_cao_lam_dung",
+      "conflict": "the family demands a full accounting of every dollar the caregiver spent",
+      "tags": [
+        "false_accusation",
+        "financial_suspicion",
+        "caregiver_burden"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F2_to_cao_lam_dung-04",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F2_to_cao_lam_dung",
+      "conflict": "one sibling hires a lawyer to review what the caregiver has been doing",
+      "tags": [
+        "false_accusation",
+        "financial_suspicion",
+        "caregiver_burden"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F2_to_cao_lam_dung-05",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F2_to_cao_lam_dung",
+      "conflict": "an accusation of elder financial abuse is made in front of the whole family",
+      "tags": [
+        "false_accusation",
+        "financial_suspicion",
+        "caregiver_burden"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F3_tranh_quyet_dinh-01",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F3_tranh_quyet_dinh",
+      "conflict": "the siblings fight over whether to move the parent into assisted living",
+      "tags": [
+        "authority_dispute",
+        "medical_decision",
+        "sibling_rivalry"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F3_tranh_quyet_dinh-02",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F3_tranh_quyet_dinh",
+      "conflict": "one sibling overrules a medical decision the caregiver has already made",
+      "tags": [
+        "authority_dispute",
+        "medical_decision",
+        "sibling_rivalry"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F3_tranh_quyet_dinh-03",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F3_tranh_quyet_dinh",
+      "conflict": "the siblings disagree about end-of-life care and nobody asks the parent",
+      "tags": [
+        "authority_dispute",
+        "medical_decision",
+        "sibling_rivalry"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F3_tranh_quyet_dinh-04",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F3_tranh_quyet_dinh",
+      "conflict": "a sibling who has not visited in years insists on being the one to decide",
+      "tags": [
+        "authority_dispute",
+        "medical_decision",
+        "sibling_rivalry"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F3_tranh_quyet_dinh-05",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F3_tranh_quyet_dinh",
+      "conflict": "the family votes on something the caregiver has been handling alone for years",
+      "tags": [
+        "authority_dispute",
+        "medical_decision",
+        "sibling_rivalry"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F4_tai_san_va_loi_hua-01",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F4_tai_san_va_loi_hua",
+      "conflict": "the parent promised the house to the caregiving sibling and the others contest it",
+      "tags": [
+        "inheritance_pressure",
+        "promise_broken",
+        "property_control"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F4_tai_san_va_loi_hua-02",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F4_tai_san_va_loi_hua",
+      "conflict": "one sibling renovates the family home and then claims a larger share",
+      "tags": [
+        "inheritance_pressure",
+        "promise_broken",
+        "property_control"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F4_tai_san_va_loi_hua-03",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F4_tai_san_va_loi_hua",
+      "conflict": "the siblings discover the will names one of them and not the others",
+      "tags": [
+        "inheritance_pressure",
+        "promise_broken",
+        "property_control"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F4_tai_san_va_loi_hua-04",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F4_tai_san_va_loi_hua",
+      "conflict": "a sibling quietly takes items from the family home before anything is settled",
+      "tags": [
+        "inheritance_pressure",
+        "promise_broken",
+        "property_control"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F4_tai_san_va_loi_hua-05",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F4_tai_san_va_loi_hua",
+      "conflict": "the siblings sell the parent's house without telling the one who lived there",
+      "tags": [
+        "inheritance_pressure",
+        "promise_broken",
+        "property_control"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F5_cu_cham_tro_ve-01",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F5_cu_cham_tro_ve",
+      "conflict": "the sibling who left decades ago returns when there is something to divide",
+      "tags": [
+        "absent_sibling",
+        "estrangement",
+        "inheritance_pressure"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F5_cu_cham_tro_ve-02",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F5_cu_cham_tro_ve",
+      "conflict": "a sibling reappears at the funeral after years of silence",
+      "tags": [
+        "absent_sibling",
+        "estrangement",
+        "inheritance_pressure"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F5_cu_cham_tro_ve-03",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F5_cu_cham_tro_ve",
+      "conflict": "the estranged sibling asks to be included after the hard part is over",
+      "tags": [
+        "absent_sibling",
+        "estrangement",
+        "inheritance_pressure"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "F5_cu_cham_tro_ve-04",
+      "theme": "F_anh_chi_em",
+      "subgroup": "F5_cu_cham_tro_ve",
+      "conflict": "a sibling who was the favorite returns expecting the same standing",
+      "tags": [
+        "absent_sibling",
+        "estrangement",
+        "inheritance_pressure"
+      ],
+      "severity": 4,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G1_nguoi_ngoai_cham_soc-01",
+      "theme": "G_cong_dong",
+      "subgroup": "G1_nguoi_ngoai_cham_soc",
+      "conflict": "a neighbor becomes the real caregiver while the children live far away",
+      "tags": [
+        "neighbor_help",
+        "chosen_family",
+        "absent_family"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G1_nguoi_ngoai_cham_soc-02",
+      "theme": "G_cong_dong",
+      "subgroup": "G1_nguoi_ngoai_cham_soc",
+      "conflict": "a paid caregiver understands the elder better than the biological children do",
+      "tags": [
+        "neighbor_help",
+        "chosen_family",
+        "absent_family"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G1_nguoi_ngoai_cham_soc-03",
+      "theme": "G_cong_dong",
+      "subgroup": "G1_nguoi_ngoai_cham_soc",
+      "conflict": "the mail carrier is the one who notices something is wrong",
+      "tags": [
+        "neighbor_help",
+        "chosen_family",
+        "absent_family"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G1_nguoi_ngoai_cham_soc-04",
+      "theme": "G_cong_dong",
+      "subgroup": "G1_nguoi_ngoai_cham_soc",
+      "conflict": "a church volunteer has been driving them to appointments for three years",
+      "tags": [
+        "neighbor_help",
+        "chosen_family",
+        "absent_family"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G1_nguoi_ngoai_cham_soc-05",
+      "theme": "G_cong_dong",
+      "subgroup": "G1_nguoi_ngoai_cham_soc",
+      "conflict": "a former student stops by every week when no relative does",
+      "tags": [
+        "neighbor_help",
+        "chosen_family",
+        "absent_family"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G2_gia_dinh_lua_chon-01",
+      "theme": "G_cong_dong",
+      "subgroup": "G2_gia_dinh_lua_chon",
+      "conflict": "a step-grandparent with no blood tie is the one the child actually calls",
+      "tags": [
+        "chosen_family",
+        "belonging",
+        "inheritance_pressure"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G2_gia_dinh_lua_chon-02",
+      "theme": "G_cong_dong",
+      "subgroup": "G2_gia_dinh_lua_chon",
+      "conflict": "the person named in the will is a friend, not a relative",
+      "tags": [
+        "chosen_family",
+        "belonging",
+        "inheritance_pressure"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G2_gia_dinh_lua_chon-03",
+      "theme": "G_cong_dong",
+      "subgroup": "G2_gia_dinh_lua_chon",
+      "conflict": "friends and neighbors are the ones present at the end of life",
+      "tags": [
+        "chosen_family",
+        "belonging",
+        "inheritance_pressure"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G2_gia_dinh_lua_chon-04",
+      "theme": "G_cong_dong",
+      "subgroup": "G2_gia_dinh_lua_chon",
+      "conflict": "a chosen family member is not invited to the funeral by the blood relatives",
+      "tags": [
+        "chosen_family",
+        "belonging",
+        "inheritance_pressure"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G2_gia_dinh_lua_chon-05",
+      "theme": "G_cong_dong",
+      "subgroup": "G2_gia_dinh_lua_chon",
+      "conflict": "the neighbor who kept the spare key is treated as an outsider when it matters",
+      "tags": [
+        "chosen_family",
+        "belonging",
+        "inheritance_pressure"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G3_cong_dong_bi_de_doa-01",
+      "theme": "G_cong_dong",
+      "subgroup": "G3_cong_dong_bi_de_doa",
+      "conflict": "a trailer park or neighborhood is bought out and the residents are displaced",
+      "tags": [
+        "displacement",
+        "community",
+        "housing_pressure"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G3_cong_dong_bi_de_doa-02",
+      "theme": "G_cong_dong",
+      "subgroup": "G3_cong_dong_bi_de_doa",
+      "conflict": "the community fights a rent increase that will scatter people who have lived there for decades",
+      "tags": [
+        "displacement",
+        "community",
+        "housing_pressure"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G3_cong_dong_bi_de_doa-03",
+      "theme": "G_cong_dong",
+      "subgroup": "G3_cong_dong_bi_de_doa",
+      "conflict": "a longtime resident is pushed out of the only place they know",
+      "tags": [
+        "displacement",
+        "community",
+        "housing_pressure"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G3_cong_dong_bi_de_doa-04",
+      "theme": "G_cong_dong",
+      "subgroup": "G3_cong_dong_bi_de_doa",
+      "conflict": "the town changes and the people who built it are treated as in the way",
+      "tags": [
+        "displacement",
+        "community",
+        "housing_pressure"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G4_hieu_lam_ca_thi_tran-01",
+      "theme": "G_cong_dong",
+      "subgroup": "G4_hieu_lam_ca_thi_tran",
+      "conflict": "an old rumor made the whole town misread one person for decades",
+      "tags": [
+        "misjudged",
+        "community_trust",
+        "hidden_past"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G4_hieu_lam_ca_thi_tran-02",
+      "theme": "G_cong_dong",
+      "subgroup": "G4_hieu_lam_ca_thi_tran",
+      "conflict": "a quiet donation is misunderstood as something shameful",
+      "tags": [
+        "misjudged",
+        "community_trust",
+        "hidden_past"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G4_hieu_lam_ca_thi_tran-03",
+      "theme": "G_cong_dong",
+      "subgroup": "G4_hieu_lam_ca_thi_tran",
+      "conflict": "the community judges someone for a decision they never explained",
+      "tags": [
+        "misjudged",
+        "community_trust",
+        "hidden_past"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G4_hieu_lam_ca_thi_tran-04",
+      "theme": "G_cong_dong",
+      "subgroup": "G4_hieu_lam_ca_thi_tran",
+      "conflict": "a person is misjudged because they never defended themselves publicly",
+      "tags": [
+        "misjudged",
+        "community_trust",
+        "hidden_past"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G5_nguoi_ngoai_dung_len-01",
+      "theme": "G_cong_dong",
+      "subgroup": "G5_nguoi_ngoai_dung_len",
+      "conflict": "someone with no obligation to help is the only one who does",
+      "tags": [
+        "quiet_help",
+        "community",
+        "witness_speaks"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G5_nguoi_ngoai_dung_len-02",
+      "theme": "G_cong_dong",
+      "subgroup": "G5_nguoi_ngoai_dung_len",
+      "conflict": "a stranger intervenes when the family will not",
+      "tags": [
+        "quiet_help",
+        "community",
+        "witness_speaks"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G5_nguoi_ngoai_dung_len-03",
+      "theme": "G_cong_dong",
+      "subgroup": "G5_nguoi_ngoai_dung_len",
+      "conflict": "a coworker or neighbor speaks up at the moment the family stays silent",
+      "tags": [
+        "quiet_help",
+        "community",
+        "witness_speaks"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
+    },
+    {
+      "id": "G5_nguoi_ngoai_dung_len-04",
+      "theme": "G_cong_dong",
+      "subgroup": "G5_nguoi_ngoai_dung_len",
+      "conflict": "the person who helps has nothing to gain by helping",
+      "tags": [
+        "quiet_help",
+        "community",
+        "witness_speaks"
+      ],
+      "severity": 3,
+      "requires": [],
+      "avoid_with": []
     }
   ],
   "selection_policy": {
@@ -3933,6 +4591,79 @@
     "B_veteran": 0.22,
     "C_co_dau": 0.18,
     "D_vo_phan_boi": 0.18,
-    "E_ngheo_vs_giau": 0.18
+    "E_ngheo_vs_giau": 0.18,
+    "F_anh_chi_em": 8,
+    "G_cong_dong": 8
+  },
+  "F_anh_chi_em": {
+    "F1_ganh_nang_khong_chia": [
+      "one sibling has done all the caregiving for years while the others visit twice a year",
+      "the siblings agree on a care schedule and only one of them ever shows up",
+      "a distant sibling sends money and considers the matter settled",
+      "the caregiving sibling loses a job and the others say nothing",
+      "one sibling moves the parent into their home and the others treat it as convenient",
+      "the siblings argue about hiring help while one of them is already doing the work unpaid"
+    ],
+    "F2_to_cao_lam_dung": [
+      "the caregiving sibling is accused of living off the parent's pension",
+      "a sibling suggests the caregiver has been influencing the parent's decisions",
+      "the family demands a full accounting of every dollar the caregiver spent",
+      "one sibling hires a lawyer to review what the caregiver has been doing",
+      "an accusation of elder financial abuse is made in front of the whole family"
+    ],
+    "F3_tranh_quyet_dinh": [
+      "the siblings fight over whether to move the parent into assisted living",
+      "one sibling overrules a medical decision the caregiver has already made",
+      "the siblings disagree about end-of-life care and nobody asks the parent",
+      "a sibling who has not visited in years insists on being the one to decide",
+      "the family votes on something the caregiver has been handling alone for years"
+    ],
+    "F4_tai_san_va_loi_hua": [
+      "the parent promised the house to the caregiving sibling and the others contest it",
+      "one sibling renovates the family home and then claims a larger share",
+      "the siblings discover the will names one of them and not the others",
+      "a sibling quietly takes items from the family home before anything is settled",
+      "the siblings sell the parent's house without telling the one who lived there"
+    ],
+    "F5_cu_cham_tro_ve": [
+      "the sibling who left decades ago returns when there is something to divide",
+      "a sibling reappears at the funeral after years of silence",
+      "the estranged sibling asks to be included after the hard part is over",
+      "a sibling who was the favorite returns expecting the same standing"
+    ]
+  },
+  "G_cong_dong": {
+    "G1_nguoi_ngoai_cham_soc": [
+      "a neighbor becomes the real caregiver while the children live far away",
+      "a paid caregiver understands the elder better than the biological children do",
+      "the mail carrier is the one who notices something is wrong",
+      "a church volunteer has been driving them to appointments for three years",
+      "a former student stops by every week when no relative does"
+    ],
+    "G2_gia_dinh_lua_chon": [
+      "a step-grandparent with no blood tie is the one the child actually calls",
+      "the person named in the will is a friend, not a relative",
+      "friends and neighbors are the ones present at the end of life",
+      "a chosen family member is not invited to the funeral by the blood relatives",
+      "the neighbor who kept the spare key is treated as an outsider when it matters"
+    ],
+    "G3_cong_dong_bi_de_doa": [
+      "a trailer park or neighborhood is bought out and the residents are displaced",
+      "the community fights a rent increase that will scatter people who have lived there for decades",
+      "a longtime resident is pushed out of the only place they know",
+      "the town changes and the people who built it are treated as in the way"
+    ],
+    "G4_hieu_lam_ca_thi_tran": [
+      "an old rumor made the whole town misread one person for decades",
+      "a quiet donation is misunderstood as something shameful",
+      "the community judges someone for a decision they never explained",
+      "a person is misjudged because they never defended themselves publicly"
+    ],
+    "G5_nguoi_ngoai_dung_len": [
+      "someone with no obligation to help is the only one who does",
+      "a stranger intervenes when the family will not",
+      "a coworker or neighbor speaks up at the moment the family stays silent",
+      "the person who helps has nothing to gain by helping"
+    ]
   }
 }

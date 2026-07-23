@@ -275,7 +275,20 @@
         "step_family",
         "belonging"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03"
+      ],
       "reveal_affinity": [
         "ordinary_witness",
         "self_disclosure"
@@ -284,8 +297,7 @@
         "hero_choice",
         "private_resolution"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C01S08": {
       "category_id": "CAT01",
@@ -329,7 +341,33 @@
         "sibling_rivalry",
         "inheritance_pressure"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "F1_ganh_nang_khong_chia-01",
+        "F1_ganh_nang_khong_chia-02",
+        "F1_ganh_nang_khong_chia-03",
+        "F1_ganh_nang_khong_chia-04",
+        "F1_ganh_nang_khong_chia-05",
+        "F1_ganh_nang_khong_chia-06",
+        "F2_to_cao_lam_dung-01",
+        "F2_to_cao_lam_dung-02",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-04",
+        "F2_to_cao_lam_dung-05",
+        "F3_tranh_quyet_dinh-01",
+        "F3_tranh_quyet_dinh-02",
+        "F3_tranh_quyet_dinh-03",
+        "F3_tranh_quyet_dinh-04",
+        "F3_tranh_quyet_dinh-05",
+        "F4_tai_san_va_loi_hua-01",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-03",
+        "F4_tai_san_va_loi_hua-04",
+        "F4_tai_san_va_loi_hua-05",
+        "F5_cu_cham_tro_ve-01",
+        "F5_cu_cham_tro_ve-02",
+        "F5_cu_cham_tro_ve-03",
+        "F5_cu_cham_tro_ve-04"
+      ],
       "reveal_affinity": [
         "document_evidence",
         "ordinary_witness"
@@ -338,8 +376,7 @@
         "procedural",
         "private_resolution"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C02S02": {
       "category_id": "CAT02",
@@ -352,7 +389,33 @@
         "money_vs_presence",
         "caregiver_burden"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "F1_ganh_nang_khong_chia-01",
+        "F1_ganh_nang_khong_chia-02",
+        "F1_ganh_nang_khong_chia-03",
+        "F1_ganh_nang_khong_chia-04",
+        "F1_ganh_nang_khong_chia-05",
+        "F1_ganh_nang_khong_chia-06",
+        "F2_to_cao_lam_dung-01",
+        "F2_to_cao_lam_dung-02",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-04",
+        "F2_to_cao_lam_dung-05",
+        "F3_tranh_quyet_dinh-01",
+        "F3_tranh_quyet_dinh-02",
+        "F3_tranh_quyet_dinh-03",
+        "F3_tranh_quyet_dinh-04",
+        "F3_tranh_quyet_dinh-05",
+        "F4_tai_san_va_loi_hua-01",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-03",
+        "F4_tai_san_va_loi_hua-04",
+        "F4_tai_san_va_loi_hua-05",
+        "F5_cu_cham_tro_ve-01",
+        "F5_cu_cham_tro_ve-02",
+        "F5_cu_cham_tro_ve-03",
+        "F5_cu_cham_tro_ve-04"
+      ],
       "reveal_affinity": [
         "self_disclosure",
         "natural_consequence"
@@ -361,8 +424,7 @@
         "private_resolution",
         "hero_choice"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C02S03": {
       "category_id": "CAT02",
@@ -375,7 +437,21 @@
         "caregiver_burden",
         "financial_suspicion"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "F1_ganh_nang_khong_chia-01",
+        "F1_ganh_nang_khong_chia-02",
+        "F1_ganh_nang_khong_chia-03",
+        "F1_ganh_nang_khong_chia-04",
+        "F1_ganh_nang_khong_chia-05",
+        "F1_ganh_nang_khong_chia-06",
+        "F2_to_cao_lam_dung-01",
+        "F2_to_cao_lam_dung-02",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-04",
+        "F2_to_cao_lam_dung-05",
+        "F3_tranh_quyet_dinh-02",
+        "F3_tranh_quyet_dinh-05"
+      ],
       "reveal_affinity": [
         "document_evidence",
         "ordinary_witness"
@@ -384,8 +460,7 @@
         "procedural",
         "walk_away_dignity"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C02S04": {
       "category_id": "CAT02",
@@ -398,7 +473,31 @@
         "sibling_rivalry",
         "authority_dispute"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "F1_ganh_nang_khong_chia-01",
+        "F1_ganh_nang_khong_chia-02",
+        "F1_ganh_nang_khong_chia-03",
+        "F1_ganh_nang_khong_chia-04",
+        "F1_ganh_nang_khong_chia-05",
+        "F1_ganh_nang_khong_chia-06",
+        "F2_to_cao_lam_dung-01",
+        "F2_to_cao_lam_dung-02",
+        "F2_to_cao_lam_dung-04",
+        "F3_tranh_quyet_dinh-01",
+        "F3_tranh_quyet_dinh-02",
+        "F3_tranh_quyet_dinh-03",
+        "F3_tranh_quyet_dinh-04",
+        "F3_tranh_quyet_dinh-05",
+        "F4_tai_san_va_loi_hua-01",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-03",
+        "F4_tai_san_va_loi_hua-04",
+        "F4_tai_san_va_loi_hua-05",
+        "F5_cu_cham_tro_ve-01",
+        "F5_cu_cham_tro_ve-02",
+        "F5_cu_cham_tro_ve-03",
+        "F5_cu_cham_tro_ve-04"
+      ],
       "reveal_affinity": [
         "document_evidence",
         "natural_consequence"
@@ -407,8 +506,7 @@
         "procedural",
         "private_resolution"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C02S05": {
       "category_id": "CAT02",
@@ -421,7 +519,20 @@
         "outsider_cares",
         "caregiver_bond"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03"
+      ],
       "reveal_affinity": [
         "ordinary_witness",
         "self_disclosure"
@@ -430,8 +541,7 @@
         "hero_choice",
         "private_resolution"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C02S06": {
       "category_id": "CAT02",
@@ -457,7 +567,17 @@
         "E-07-03",
         "E-08-03",
         "E-09-03",
-        "E-10-03"
+        "E-10-03",
+        "F1_ganh_nang_khong_chia-04",
+        "F4_tai_san_va_loi_hua-01",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-03",
+        "F4_tai_san_va_loi_hua-04",
+        "F4_tai_san_va_loi_hua-05",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04"
       ],
       "reveal_affinity": [
         "natural_consequence",
@@ -491,7 +611,22 @@
         "E-08-06",
         "E-09-06",
         "E-10-06",
-        "E-NEW-02"
+        "E-NEW-02",
+        "F1_ganh_nang_khong_chia-01",
+        "F1_ganh_nang_khong_chia-02",
+        "F1_ganh_nang_khong_chia-03",
+        "F1_ganh_nang_khong_chia-04",
+        "F1_ganh_nang_khong_chia-05",
+        "F1_ganh_nang_khong_chia-06",
+        "F2_to_cao_lam_dung-01",
+        "F2_to_cao_lam_dung-02",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-04",
+        "F2_to_cao_lam_dung-05",
+        "F3_tranh_quyet_dinh-02",
+        "F3_tranh_quyet_dinh-05",
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02"
       ],
       "reveal_affinity": [
         "self_disclosure",
@@ -514,7 +649,17 @@
         "promise_broken",
         "property_control"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "F4_tai_san_va_loi_hua-01",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-03",
+        "F4_tai_san_va_loi_hua-04",
+        "F4_tai_san_va_loi_hua-05",
+        "F5_cu_cham_tro_ve-01",
+        "F5_cu_cham_tro_ve-02",
+        "F5_cu_cham_tro_ve-03",
+        "F5_cu_cham_tro_ve-04"
+      ],
       "reveal_affinity": [
         "document_evidence",
         "ordinary_witness"
@@ -523,8 +668,7 @@
         "procedural",
         "hero_choice"
       ],
-      "status_dynamic": "caregiver_vs_inheritors",
-      "needs_category_fallback": true
+      "status_dynamic": "caregiver_vs_inheritors"
     },
     "C03S01": {
       "category_id": "CAT03",
@@ -598,7 +742,33 @@
         "sibling_rivalry",
         "financial_leverage"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "F1_ganh_nang_khong_chia-01",
+        "F1_ganh_nang_khong_chia-02",
+        "F1_ganh_nang_khong_chia-03",
+        "F1_ganh_nang_khong_chia-04",
+        "F1_ganh_nang_khong_chia-05",
+        "F1_ganh_nang_khong_chia-06",
+        "F2_to_cao_lam_dung-01",
+        "F2_to_cao_lam_dung-02",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-04",
+        "F2_to_cao_lam_dung-05",
+        "F3_tranh_quyet_dinh-01",
+        "F3_tranh_quyet_dinh-02",
+        "F3_tranh_quyet_dinh-03",
+        "F3_tranh_quyet_dinh-04",
+        "F3_tranh_quyet_dinh-05",
+        "F4_tai_san_va_loi_hua-01",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-03",
+        "F4_tai_san_va_loi_hua-04",
+        "F4_tai_san_va_loi_hua-05",
+        "F5_cu_cham_tro_ve-01",
+        "F5_cu_cham_tro_ve-02",
+        "F5_cu_cham_tro_ve-03",
+        "F5_cu_cham_tro_ve-04"
+      ],
       "reveal_affinity": [
         "natural_consequence",
         "document_evidence"
@@ -607,8 +777,7 @@
         "procedural",
         "hero_choice"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C03S04": {
       "category_id": "CAT03",
@@ -772,7 +941,19 @@
         "E-10-06",
         "B-NEW-18",
         "D-NEW-02",
-        "E-NEW-03"
+        "E-NEW-03",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04",
+        "G5_nguoi_ngoai_dung_len-01",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03",
+        "G5_nguoi_ngoai_dung_len-04"
       ],
       "reveal_affinity": [
         "ordinary_witness",
@@ -826,7 +1007,24 @@
         "chosen_family",
         "promise_kept"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03"
+      ],
       "reveal_affinity": [
         "document_evidence",
         "ordinary_witness"
@@ -835,8 +1033,7 @@
         "private_resolution",
         "procedural"
       ],
-      "status_dynamic": "caregiver_vs_inheritors",
-      "needs_category_fallback": true
+      "status_dynamic": "caregiver_vs_inheritors"
     },
     "C04S01": {
       "category_id": "CAT04",
@@ -996,7 +1193,11 @@
         "E-10-02",
         "A-NEW-08",
         "B-NEW-18",
-        "D-NEW-03"
+        "D-NEW-03",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04"
       ],
       "reveal_affinity": [
         "self_disclosure",
@@ -1141,7 +1342,37 @@
         "C-NEW-03",
         "D-NEW-03",
         "E-NEW-02",
-        "E-NEW-03"
+        "E-NEW-03",
+        "F1_ganh_nang_khong_chia-02",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-05",
+        "F3_tranh_quyet_dinh-03",
+        "F3_tranh_quyet_dinh-05",
+        "F4_tai_san_va_loi_hua-01",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-03",
+        "F4_tai_san_va_loi_hua-04",
+        "F4_tai_san_va_loi_hua-05",
+        "F5_cu_cham_tro_ve-01",
+        "F5_cu_cham_tro_ve-02",
+        "F5_cu_cham_tro_ve-03",
+        "F5_cu_cham_tro_ve-04",
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -1408,7 +1639,28 @@
         "D-NEW-02",
         "D-NEW-03",
         "E-NEW-02",
-        "E-NEW-03"
+        "E-NEW-03",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-05",
+        "F3_tranh_quyet_dinh-05",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-04",
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -1651,7 +1903,25 @@
         "E-02-06",
         "D-NEW-01",
         "D-NEW-02",
-        "D-NEW-03"
+        "D-NEW-03",
+        "F4_tai_san_va_loi_hua-01",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-03",
+        "F4_tai_san_va_loi_hua-04",
+        "F4_tai_san_va_loi_hua-05",
+        "F5_cu_cham_tro_ve-01",
+        "F5_cu_cham_tro_ve-02",
+        "F5_cu_cham_tro_ve-03",
+        "F5_cu_cham_tro_ve-04",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -1849,7 +2119,24 @@
         "D-NEW-02",
         "D-NEW-03",
         "E-NEW-02",
-        "E-NEW-03"
+        "E-NEW-03",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-05",
+        "F3_tranh_quyet_dinh-05",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-04",
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -2047,7 +2334,28 @@
         "D-NEW-02",
         "D-NEW-03",
         "E-NEW-02",
-        "E-NEW-03"
+        "E-NEW-03",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-05",
+        "F3_tranh_quyet_dinh-05",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-04",
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -2164,7 +2472,11 @@
         "E-10-06",
         "C-NEW-01",
         "D-NEW-02",
-        "E-NEW-03"
+        "E-NEW-03",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04"
       ],
       "reveal_affinity": [
         "ordinary_witness",
@@ -2583,7 +2895,8 @@
         "D-03-03",
         "D-03-04",
         "D-03-05",
-        "A-NEW-08"
+        "A-NEW-08",
+        "F2_to_cao_lam_dung-03"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -2623,7 +2936,19 @@
         "E-08-04",
         "E-09-04",
         "E-10-04",
-        "A-NEW-08"
+        "A-NEW-08",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04",
+        "G5_nguoi_ngoai_dung_len-01",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03",
+        "G5_nguoi_ngoai_dung_len-04"
       ],
       "reveal_affinity": [
         "ordinary_witness",
@@ -2836,7 +3161,9 @@
         "D-04-03",
         "D-04-04",
         "D-04-05",
-        "C-NEW-01"
+        "C-NEW-01",
+        "F1_ganh_nang_khong_chia-05",
+        "F3_tranh_quyet_dinh-01"
       ],
       "reveal_affinity": [
         "self_disclosure",
@@ -2859,7 +3186,20 @@
       ],
       "conflict_ids": [
         "A3_lam_nhuc-05",
-        "A5_hoi_han-04"
+        "A5_hoi_han-04",
+        "F1_ganh_nang_khong_chia-06",
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-05",
+        "G3_cong_dong_bi_de_doa-01",
+        "G5_nguoi_ngoai_dung_len-01",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03",
+        "G5_nguoi_ngoai_dung_len-04"
       ],
       "reveal_affinity": [
         "ordinary_witness",
@@ -2869,8 +3209,7 @@
         "public_recognition",
         "private_resolution"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C08S03": {
       "category_id": "CAT08",
@@ -2946,7 +3285,25 @@
         "D-11-02",
         "D-12-02",
         "C-NEW-02",
-        "D-NEW-01"
+        "D-NEW-01",
+        "F4_tai_san_va_loi_hua-01",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-03",
+        "F4_tai_san_va_loi_hua-04",
+        "F4_tai_san_va_loi_hua-05",
+        "F5_cu_cham_tro_ve-01",
+        "F5_cu_cham_tro_ve-02",
+        "F5_cu_cham_tro_ve-03",
+        "F5_cu_cham_tro_ve-04",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04"
       ],
       "reveal_affinity": [
         "natural_consequence",
@@ -3091,7 +3448,37 @@
         "C-NEW-03",
         "D-NEW-03",
         "E-NEW-02",
-        "E-NEW-03"
+        "E-NEW-03",
+        "F1_ganh_nang_khong_chia-02",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-05",
+        "F3_tranh_quyet_dinh-03",
+        "F3_tranh_quyet_dinh-05",
+        "F4_tai_san_va_loi_hua-01",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-03",
+        "F4_tai_san_va_loi_hua-04",
+        "F4_tai_san_va_loi_hua-05",
+        "F5_cu_cham_tro_ve-01",
+        "F5_cu_cham_tro_ve-02",
+        "F5_cu_cham_tro_ve-03",
+        "F5_cu_cham_tro_ve-04",
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03"
       ],
       "reveal_affinity": [
         "natural_consequence",
@@ -3113,7 +3500,19 @@
         "community"
       ],
       "conflict_ids": [
-        "A5_hoi_han-04"
+        "A5_hoi_han-04",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04",
+        "G5_nguoi_ngoai_dung_len-01",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03",
+        "G5_nguoi_ngoai_dung_len-04"
       ],
       "reveal_affinity": [
         "ordinary_witness",
@@ -3123,8 +3522,7 @@
         "public_recognition",
         "private_resolution"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C08S08": {
       "category_id": "CAT08",
@@ -3312,7 +3710,28 @@
         "D-NEW-02",
         "D-NEW-03",
         "E-NEW-02",
-        "E-NEW-03"
+        "E-NEW-03",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-05",
+        "F3_tranh_quyet_dinh-05",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-04",
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -3554,7 +3973,23 @@
         "chosen_family",
         "absent_family"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G3_cong_dong_bi_de_doa-01",
+        "G5_nguoi_ngoai_dung_len-01",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03",
+        "G5_nguoi_ngoai_dung_len-04"
+      ],
       "reveal_affinity": [
         "ordinary_witness",
         "self_disclosure"
@@ -3563,8 +3998,7 @@
         "private_resolution",
         "hero_choice"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C10S02": {
       "category_id": "CAT10",
@@ -3577,7 +4011,27 @@
       ],
       "conflict_ids": [
         "A3_lam_nhuc-05",
-        "A5_hoi_han-04"
+        "A5_hoi_han-04",
+        "F1_ganh_nang_khong_chia-06",
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-05",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04",
+        "G5_nguoi_ngoai_dung_len-01",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03",
+        "G5_nguoi_ngoai_dung_len-04"
       ],
       "reveal_affinity": [
         "external_public_validator",
@@ -3587,8 +4041,7 @@
         "public_recognition",
         "private_resolution"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C10S03": {
       "category_id": "CAT10",
@@ -3626,7 +4079,26 @@
         "E-07-01",
         "E-08-01",
         "E-09-01",
-        "E-10-01"
+        "E-10-01",
+        "F1_ganh_nang_khong_chia-06",
+        "F4_tai_san_va_loi_hua-04",
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04",
+        "G5_nguoi_ngoai_dung_len-01",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03",
+        "G5_nguoi_ngoai_dung_len-04"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -3665,7 +4137,33 @@
         "D-11-02",
         "D-12-02",
         "C-NEW-02",
-        "D-NEW-01"
+        "D-NEW-01",
+        "F4_tai_san_va_loi_hua-01",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-03",
+        "F4_tai_san_va_loi_hua-04",
+        "F4_tai_san_va_loi_hua-05",
+        "F5_cu_cham_tro_ve-01",
+        "F5_cu_cham_tro_ve-02",
+        "F5_cu_cham_tro_ve-03",
+        "F5_cu_cham_tro_ve-04",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04",
+        "G5_nguoi_ngoai_dung_len-01",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03",
+        "G5_nguoi_ngoai_dung_len-04"
       ],
       "reveal_affinity": [
         "natural_consequence",
@@ -3688,7 +4186,24 @@
         "chosen_family",
         "promise_kept"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03"
+      ],
       "reveal_affinity": [
         "document_evidence",
         "ordinary_witness"
@@ -3697,8 +4212,7 @@
         "private_resolution",
         "procedural"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C10S06": {
       "category_id": "CAT10",
@@ -3725,7 +4239,19 @@
         "E-07-03",
         "E-08-03",
         "E-09-03",
-        "E-10-03"
+        "E-10-03",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04",
+        "G5_nguoi_ngoai_dung_len-01",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03",
+        "G5_nguoi_ngoai_dung_len-04"
       ],
       "reveal_affinity": [
         "ordinary_witness",
@@ -3768,7 +4294,19 @@
         "E-08-03",
         "E-09-03",
         "E-10-03",
-        "E-NEW-02"
+        "E-NEW-02",
+        "G3_cong_dong_bi_de_doa-01",
+        "G3_cong_dong_bi_de_doa-02",
+        "G3_cong_dong_bi_de_doa-03",
+        "G3_cong_dong_bi_de_doa-04",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04",
+        "G5_nguoi_ngoai_dung_len-01",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03",
+        "G5_nguoi_ngoai_dung_len-04"
       ],
       "reveal_affinity": [
         "self_disclosure",
@@ -3791,7 +4329,20 @@
         "end_of_life",
         "absent_family"
       ],
-      "conflict_ids": [],
+      "conflict_ids": [
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03"
+      ],
       "reveal_affinity": [
         "ordinary_witness",
         "self_disclosure"
@@ -3800,8 +4351,7 @@
         "hero_choice",
         "walk_away_dignity"
       ],
-      "status_dynamic": null,
-      "needs_category_fallback": true
+      "status_dynamic": null
     },
     "C11S01": {
       "category_id": "CAT11",
@@ -3821,7 +4371,12 @@
         "A2_cuop_tai_san-06",
         "A2_cuop_tai_san-07",
         "A-NEW-08",
-        "D-NEW-01"
+        "D-NEW-01",
+        "F2_to_cao_lam_dung-01",
+        "F2_to_cao_lam_dung-02",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-04",
+        "F2_to_cao_lam_dung-05"
       ],
       "reveal_affinity": [
         "self_disclosure",
@@ -3921,7 +4476,21 @@
         "C-NEW-02",
         "D-NEW-01",
         "D-NEW-02",
-        "D-NEW-03"
+        "D-NEW-03",
+        "F2_to_cao_lam_dung-01",
+        "F2_to_cao_lam_dung-02",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-04",
+        "F2_to_cao_lam_dung-05",
+        "F4_tai_san_va_loi_hua-01",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-03",
+        "F4_tai_san_va_loi_hua-04",
+        "F4_tai_san_va_loi_hua-05",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04"
       ],
       "reveal_affinity": [
         "document_evidence",
@@ -4012,7 +4581,12 @@
         "A2_cuop_tai_san-05",
         "A2_cuop_tai_san-06",
         "A2_cuop_tai_san-07",
-        "A-NEW-08"
+        "A-NEW-08",
+        "F2_to_cao_lam_dung-01",
+        "F2_to_cao_lam_dung-02",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-04",
+        "F2_to_cao_lam_dung-05"
       ],
       "reveal_affinity": [
         "natural_consequence",
@@ -4188,7 +4762,31 @@
         "C-NEW-03",
         "D-NEW-03",
         "E-NEW-02",
-        "E-NEW-03"
+        "E-NEW-03",
+        "F2_to_cao_lam_dung-01",
+        "F2_to_cao_lam_dung-02",
+        "F2_to_cao_lam_dung-03",
+        "F2_to_cao_lam_dung-04",
+        "F2_to_cao_lam_dung-05",
+        "F3_tranh_quyet_dinh-05",
+        "F4_tai_san_va_loi_hua-02",
+        "F4_tai_san_va_loi_hua-04",
+        "G1_nguoi_ngoai_cham_soc-01",
+        "G1_nguoi_ngoai_cham_soc-02",
+        "G1_nguoi_ngoai_cham_soc-03",
+        "G1_nguoi_ngoai_cham_soc-04",
+        "G1_nguoi_ngoai_cham_soc-05",
+        "G2_gia_dinh_lua_chon-01",
+        "G2_gia_dinh_lua_chon-02",
+        "G2_gia_dinh_lua_chon-03",
+        "G2_gia_dinh_lua_chon-04",
+        "G2_gia_dinh_lua_chon-05",
+        "G4_hieu_lam_ca_thi_tran-01",
+        "G4_hieu_lam_ca_thi_tran-02",
+        "G4_hieu_lam_ca_thi_tran-03",
+        "G4_hieu_lam_ca_thi_tran-04",
+        "G5_nguoi_ngoai_dung_len-02",
+        "G5_nguoi_ngoai_dung_len-03"
       ],
       "reveal_affinity": [
         "self_disclosure",
