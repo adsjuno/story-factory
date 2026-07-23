@@ -237,7 +237,7 @@
     "cold daughter-in-law",
     "status-obsessed grandson's fiancee",
     "greedy son-in-law",
-    "ashamed celebrity-chef son",
+    "a son who runs a well-known restaurant and is ashamed of where he came from",
     "materialistic daughter",
     "arrogant nephew",
     "snobbish new in-laws",
@@ -470,8 +470,8 @@
     "former trauma surgeon",
     "retired judge",
     "ex-military officer",
-    "former teacher of a famous person",
-    "medal of honor recipient",
+    "the teacher who kept a struggling student in school when everyone else gave up",
+    "a decorated combat veteran who never told anyone what the citation said",
     "retired firefighter who saved lives",
     "former nurse in a MASH unit",
     "secret philanthropist",
@@ -479,7 +479,7 @@
     "former business owner who went broke helping family",
     "retired police detective",
     "Vietnam War hero",
-    "former Olympic athlete",
+    "a state-champion athlete who gave up a scholarship to care for family",
     "the one who built the family fortune",
     "the anonymous donor who kept the local clinic open",
     "the person who paid the villain's first mortgage payment",
@@ -604,7 +604,7 @@
     "a powerful stranger the narrator once helped recognizes them publicly",
     "the narrator turns out to be the only one who can save the day (medical, crisis)",
     "an old letter or document reveals a secret sacrifice the narrator made",
-    "a respected authority figure (general, judge, doctor) vouches for the narrator",
+    "someone the wrongdoer respects quietly confirms the narrator's version",
     "the community rallies and publicly honors the narrator",
     "the villain's own words are exposed / recorded / read back to them",
     "the narrator's hidden accomplished past is revealed to the shocked room",
@@ -990,6 +990,38 @@
         "secretly_wealthy_reveal_percent": 20
       },
       "reason": "Most justice should come from dignity, sacrifice, competence, or community—not hidden wealth."
+    },
+    {
+      "id": "R06",
+      "when": {
+        "any": true
+      },
+      "avoid": {
+        "oversized_credential_keywords": [
+          "Medal of Honor",
+          "four-star general",
+          "four star general",
+          "Olympic gold",
+          "Olympic medal",
+          "Nobel",
+          "Pulitzer",
+          "Oscar",
+          "Academy Award",
+          "senator",
+          "governor",
+          "congressman",
+          "billionaire",
+          "astronaut",
+          "Supreme Court",
+          "world-famous",
+          "bestselling author",
+          "movie star",
+          "celebrity chef",
+          "NFL star",
+          "NBA star"
+        ]
+      },
+      "reason": "Tranh chi tiet 'qua lon' hiem gap trong doi that. Medal of Honor chi khoang 60 nguoi con song tren toan nuoc My; tuong 4 sao, huy chuong Olympic, nghi si deu cuc hiem. Doc gia 55+ co rat nhieu nguoi tung phuc vu quan doi hoac quen nguoi tung phuc vu, ho nhan ra ngay va mat tin vao ca bai. Dung phien ban DOI THUONG ma van nang: cuu binh co Bronze Star, trung ta ve huu, chu doanh nghiep dia phuong, hieu truong, bac si phong kham, thay giao cu. Nguyen tac: nguoi doc phai thay 'chuyen nay CO THE xay ra o thi tran cua toi'."
     }
   ],
   "dedup_policy": {

@@ -401,6 +401,15 @@ function compatOk(bp, extra) {
     if (r.require_one_of && r.require_one_of.evidence_source) {
       if (!affinityMatch(bp.evidence_source || bp.conflict || '', r.require_one_of.evidence_source)) return { ok: false, reason: `${r.id}: thiếu evidence_source` };
     }
+    // R06: cam CHI TIET QUA LON (Medal of Honor, 4-sao, Olympic, Nobel, ty phu...) o BAT KY truc nao.
+    // Doc gia 55+ nhan ra ngay chi tiet hiem gap -> mat tin ca bai. Dung phien ban DOI THUONG.
+    if (av.oversized_credential_keywords) {
+      const hay = [bp.twist, bp.occupation, bp.conflict, bp.icon_object, bp.humiliation_type,
+        bp.opening_scene, bp.dominant_emotion, bp.villain_type, bp.relationship, bp.ending, bp.justice_type]
+        .filter(Boolean).join(' | ');
+      const hit = av.oversized_credential_keywords.find((k) => affinityMatch(hay, [k]));
+      if (hit) return { ok: false, reason: `${r.id}: chi tiết quá lớn "${hit}" — dùng phiên bản đời thường` };
+    }
   }
 
   // R-GEO: location x town x season x weather (LOP 1 v2, town la khong biet VAN validate)
@@ -847,6 +856,6 @@ module.exports = {
   // phan loai (cho test)
   isAuthorityRescueJustice, isHiddenWealthTwist, isReconciliationEnding,
   townCompatLocation, seasonWeatherOk, locationWeatherOk, geoOfState, geoOfTown, geoComboOk,
-  requiredGenders, requiredRelFamily,
+  requiredGenders, requiredRelFamily, compatOk,
   revealFamily, justiceFamily, relationshipFamily,
 };
