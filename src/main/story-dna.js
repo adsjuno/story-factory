@@ -729,12 +729,13 @@ function buildDnaBlock(bp, country) {
   const g = (k) => (bp && bp[k] ? bp[k] : '(bất kỳ)');
   const lines = [
     `[STORY DNA — ${String(country || DEFAULT_COUNTRY).toUpperCase()} | theme=${g('theme')}]`,
-    'BẮT BUỘC dùng ĐÚNG các yếu tố sau, KHÔNG đổi tên/vật/nút lật:',
+    'BẮT BUỘC dùng ĐÚNG các yếu tố sau, KHÔNG đổi tên/vật/nút lật/QUAN HỆ/BỐI CẢNH:',
     `- hero_full_name = ${g('hero_full_name')} (tuổi ${g('hero_age')})`,
     `- villain_full_name = ${g('villain_full_name')}`,
-    `- relationship = ${g('relationship')}`,
+    `- ⛔ relationship = ${g('relationship')} — KHÓA CỨNG. Nhân vật chính PHẢI đúng vai này (${g('relationship')}). KHÔNG đổi sang vai khác (vd caregiver, mother/son, con nuôi...) dù conflict text có nhắc vai khác.`,
     `- occupation = ${g('occupation')}`,
-    `- location = ${g('location')} | town = ${g('town_setting')} | dịp = ${g('season_event')} | không khí = ${g('weather_mood')}`,
+    `- ⛔ location = ${g('location')} | town = ${g('town_setting')} — KHÓA CỨNG. Câu chuyện PHẢI đặt tại ${g('location')} (${g('town_setting')}). KHÔNG chuyển sang bang/vùng khác. Trường "setting" trong DEDUP_CONFIG phải ghi đúng "${g('location')} — ${g('town_setting')}".`,
+    `- dịp = ${g('season_event')} | không khí = ${g('weather_mood')}`,
     `- icon_object = ${g('icon_object')}`,
     `- opening_scene = ${g('opening_scene')}`,
     `- humiliation = ${g('humiliation_type')}`,
@@ -772,11 +773,18 @@ function buildDnaBlock(bp, country) {
     lines.push(`- Core conflict premise: ${bp.conflict_premise || bp.conflict || ''}`);
     // status_dynamic: sac thai cang thang giai tang, ap xuyen category. CHI in khi co gia tri.
     if (bp.status_dynamic) lines.push(`- Class/status tension: ${bp.status_dynamic}`);
-    lines.push(`- Relationship: ${bp.relationship || ''}`);
-    lines.push(`- Location/town/season/weather: ${ctx}`);
+    lines.push(`- Relationship (LOCKED): ${bp.relationship || ''}`);
+    lines.push(`- Location/town/season/weather (LOCKED): ${ctx}`);
     lines.push(`- Reveal family: ${bp.reveal_family || ''}`);
     lines.push(`- Justice family: ${bp.justice_family || ''}`);
     lines.push('');
+    // Conflict text (legacy catalog) co the dung danh tu vai KHAC voi relationship da khoa
+    // (vd conflict noi "the mother" nhung relationship la "grandmother"). Bao Claude anh xa
+    // moi danh tu vai chung ve DUNG quan he da khoa, khong tao them nhan vat/quan he moi.
+    if (bp.required_rel_family && bp.relationship) {
+      lines.push(`ROLE MAPPING: The locked relationship is "${bp.relationship}". If the conflict text uses a different role word (e.g. "the mother", "the child", "the parent"), treat it as THIS locked relationship — do NOT introduce a different family role. Every character role in the story must fit "${bp.relationship}".`);
+    }
+    lines.push(`SETTING LOCK: The story MUST take place in ${bp.location}${bp.town_setting ? ' (' + bp.town_setting + ')' : ''}. Do NOT move it to another state or region. The DEDUP_CONFIG "setting" field must equal this location.`);
     if (bp.conflict_scope === 'category') {
       lines.push('NOTE: the reference conflict above is only a suggestion. If it does not fit the core conflict premise, ignore it and build the story from the premise.');
     }
