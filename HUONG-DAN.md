@@ -56,6 +56,17 @@ Sau khi Claude viết xong bài, phần mềm **không mở chat mới** mà là
 
 Tắt QA để nhanh hơn — nhưng **bước kiểm tiêu đề (2b) vẫn chạy** (chỉ dùng Claude khi tiêu đề lỗi).
 
+**2c. Kiểm cold open bằng CODE** (luôn chạy): 3 thẻ `<p>` đầu sau `<h2>Part 1</h2>`. Đoạn đầu
+>40 từ hoặc 3 đoạn >120 từ → lỗi → bắt Claude viết lại phần mở đầu (`===COLD_OPEN===`), chèn vào
+đầu Part 1 giữ nguyên phần còn lại, tối đa 2 lần. Hết lượt vẫn lỗi → giữ nguyên bài gốc (không tự chèn).
+
+**2d. Kiểm CTA bằng CODE** (luôn chạy): FAIL nếu đòi comment/type YES ("type yes", "for part 2"…)
+hoặc lộ người/vật sẽ xuất hiện ("what the man", "who walked in"…) → bắt viết lại, tối đa 2 lần.
+Hết lượt → thay bằng câu mặc định an toàn "The rest of the story is in the first comment."
+
+**HOOK_VARIANTS** (nếu skill xuất): parse + ghi vào Log để xem 3 phương án caption + điểm. Không có
+cũng không lỗi. Chưa thêm cột Sheet.
+
 **Đẩy Sheet từng bài một**, không gom đến cuối. Nếu đang chạy 10 bài mà máy tắt ở bài thứ 7
 thì 6 bài đầu đã nằm trên Sheet rồi. Bài nào đẩy lỗi thì log báo rõ và chạy tiếp bài sau.
 

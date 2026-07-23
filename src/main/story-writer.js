@@ -98,6 +98,7 @@ const KNOWN_KEYS = [
   'DEDUP_CONFIG', 'STORY_DNA', 'KPI_SCORES', 'END',
   'WEB_IMAGE_PROMPT', 'REVEAL_TYPE', // ten cu
   'QA_REPORT', 'TITLE', 'CTA',       // skill QA tieu de (chay o buoc 2)
+  'COLD_OPEN', 'HOOK_VARIANTS',      // cold open viet lai (buoc 2c) + hook variants (tuy chon)
 ];
 
 // Chuan hoa chuoi nhan: hoa het, khoang trang/gach ngang -> gach duoi, bo ky tu la
@@ -432,6 +433,81 @@ Ví dụ đúng: "They Made Her Use the Side Door So the Guests Wouldn't See the
 Chỉ xuất: ===TITLE=== rồi tiêu đề mới.`;
 }
 
+// ==================== KIEM COLD OPEN (dau web_body) BANG CODE ====================
+// Skill yeu cau mo bai bang 3-4 dong ngan dam thang; Claude hay mo bang doan van dai ta canh.
+const COLD_FIRST_MAX = 40;      // <p> dau tien > 40 tu -> khong phai cold open
+const COLD_THREE_MAX = 120;     // 3 doan dau cong lai > 120 tu -> qua dai
+function wc(html) { return wordCount(html); }  // dung lai bo dem tu (bo the HTML)
+// Lay noi dung cac the <p> dau tien SAU <h2>Part 1...</h2> (hoac dau bai neu khong co h2).
+function firstParagraphs(html, n) {
+  let src = String(html || '');
+  const h2 = src.search(/<h2[^>]*>\s*part\s*1\b/i);
+  if (h2 >= 0) { const close = src.indexOf('</h2>', h2); src = src.slice(close >= 0 ? close + 5 : h2); }
+  const ps = [];
+  const re = /<p\b[^>]*>([\s\S]*?)<\/p>/gi;
+  let m;
+  while ((m = re.exec(src)) !== null && ps.length < n) ps.push(m[1]);
+  return ps;
+}
+function checkColdOpen(html) {
+  const ps = firstParagraphs(html, 3);
+  if (!ps.length) return { ok: true, first: 0, three: 0, note: 'khong thay <p> dau -> bo qua' };
+  const first = wc(ps[0]);
+  const three = ps.reduce((a, p) => a + wc(p), 0);
+  const ok = first <= COLD_FIRST_MAX && three <= COLD_THREE_MAX;
+  return { ok, first, three };
+}
+function coldOpenRewritePrompt(firstWords) {
+  return `Bài vừa rồi mở đầu bằng đoạn văn ${firstWords} từ — không phải cold open.
+Viết lại 3-4 dòng MỞ ĐẦU cho Part 1, mỗi dòng một thẻ <p>, mỗi dòng dưới 35 từ:
+- Dòng 1: sự xúc phạm cụ thể (câu thoại hoặc hành động), KHÔNG tả thời tiết/căn phòng.
+- Dòng 2: phản ứng im lặng của nhân vật.
+- Dòng 3: dấu hiệu sắp có chuyện xảy ra — KHÔNG nói ai xuất hiện, KHÔNG nói chuyện gì, KHÔNG nói kết cục.
+Mẫu đúng:
+<p>They told the seventy-three-year-old bus driver to use the side door so the guests would not see her.</p>
+<p>She carried in the food, said nothing, and took her usual place near the kitchen.</p>
+<p>Twenty minutes later, one man stood up — and the expression on her grandson's face told her everything she needed to know.</p>
+Chỉ xuất: ===COLD_OPEN=== rồi 3-4 thẻ <p>. Không viết lại phần còn lại của bài.`;
+}
+// Chen cold open MOI vao ngay sau <h2>Part 1...</h2> (hoac dau bai). Giu nguyen phan con lai.
+function insertColdOpen(html, coldOpen) {
+  const co = String(coldOpen || '').trim();
+  if (!co) return html;
+  let src = String(html || '');
+  const h2 = src.search(/<h2[^>]*>\s*part\s*1\b/i);
+  if (h2 >= 0) {
+    const close = src.indexOf('</h2>', h2);
+    const at = close >= 0 ? close + 5 : h2;
+    return src.slice(0, at) + '\n' + co + '\n' + src.slice(at);
+  }
+  return co + '\n' + src;                       // khong co h2 -> chen dau bai
+}
+
+// ==================== KIEM CTA BANG CODE ====================
+// CTA phai keo click ve web, KHONG doi comment/type YES, KHONG lo nguoi/vat se xuat hien.
+const CTA_BEG_PHRASES = ['type yes', 'comment yes', 'write yes', 'type ja', 'say yes', 'drop a yes', 'comment below to', 'for part 2', 'part two'];
+const CTA_SPOIL_PHRASES = ['what the man', 'what the woman', 'what he said next', 'what she said next', 'the man in the', 'the woman in the', 'who walked in', 'who stood up'];
+const CTA_SAFE_DEFAULT = 'The rest of the story is in the first comment.';
+function checkCta(cta) {
+  const s = String(cta || '').toLowerCase();
+  const beg = CTA_BEG_PHRASES.find((p) => s.includes(p));
+  const spoil = CTA_SPOIL_PHRASES.find((p) => s.includes(p));
+  const reasons = [];
+  if (beg) reasons.push(`đòi tương tác: "${beg}"`);
+  if (spoil) reasons.push(`lộ nội dung sau: "${spoil}"`);
+  return { ok: !beg && !spoil, beg: beg || '', spoil: spoil || '', reason: reasons.join('; ') };
+}
+function ctaRewritePrompt(reason) {
+  return `CTA vừa rồi vi phạm: ${reason}.
+Viết lại CTA theo đúng khuôn:
+- MỘT câu ngắn mời đọc tiếp ở link, KHÔNG đòi comment/type YES.
+- KHÔNG nói ai sẽ xuất hiện, KHÔNG nói chuyện gì xảy ra tiếp.
+- Chỉ được hứa mơ hồ MỘT điều.
+Mẫu đúng: "The rest of what happened that morning is in the first comment."
+Mẫu đúng: "What she did next is in the link below."
+Chỉ xuất: ===CTA=== rồi CTA mới.`;
+}
+
 // Dung prompt cuoi = KHOI DNA (bat buoc dung to hop) + cau lenh goi skill.
 // @param dna { combo, country } da chon san (co the null -> khong nhet DNA)
 // @param topicLabel chu de gui cho Claude: "<category_name> — <subcategory_name>"
@@ -735,6 +811,79 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
         onProgress({ message: `🏷️ Tiêu đề: ${origWords}→${titleWordCount(s.WEB_TITLE)} từ, viết lại ${rewrites} lần${origLeak ? `, lỗi gốc: "${origLeak}"` : ', không lỗi gốc'}.` });
       }
 
+      // ---- BUOC 2c: KIEM COLD OPEN (dau web_body) BANG CODE ----
+      {
+        let co = checkColdOpen(s.WEB_BODY || '');
+        const origFirst = co.first, origThree = co.three;
+        let rewrites = 0;
+        while (!co.ok && rewrites < 2) {
+          rewrites++;
+          onProgress({ message: `🥶 Cold open lỗi (đoạn đầu ${co.first} từ, 3 đoạn ${co.three} từ) — yêu cầu Claude viết lại phần mở đầu (lần ${rewrites})...` });
+          let rw = null;
+          try { rw = await chat.send(coldOpenRewritePrompt(co.first), { sameChat: true, timeoutMs: 120000 }); }
+          catch (e) { rw = { ok: false, error: e.message }; }
+          if (!rw || !rw.ok) { onProgress({ message: `⚠️ Không nhận được cold open mới (${(rw && rw.error) || '?'}).` }); break; }
+          const block = (parseSections(rw.text).COLD_OPEN || '').trim();
+          if (!/<p\b/i.test(block)) { onProgress({ message: '⚠️ Claude không xuất ===COLD_OPEN=== có <p>.' }); continue; }
+          s.WEB_BODY = insertColdOpen(s.WEB_BODY || '', block);
+          co = checkColdOpen(s.WEB_BODY);
+        }
+        if (!co.ok) {
+          // KHONG tu chen gi -> giu nguyen bai goc, chi canh bao.
+          onProgress({ message: `⚠️ Cold open vẫn lỗi sau ${rewrites} lần — giữ nguyên bài gốc (đoạn đầu ${co.first} từ).` });
+        }
+        store.writeRawLog('', {
+          at: new Date().toISOString(), niche: nicheLabel, attempt, phase: 'cold_open_check',
+          origFirst, origThree, finalFirst: co.first, finalThree: co.three, rewrites, passed: co.ok,
+        });
+        onProgress({ message: `🧊 Cold open: đoạn đầu ${origFirst}→${co.first} từ, viết lại ${rewrites} lần.` });
+      }
+
+      // ---- BUOC 2d: KIEM CTA BANG CODE (khong doi comment/type YES, khong lo noi dung sau) ----
+      {
+        let cc = checkCta(s.FB_CTA || '');
+        const origReason = cc.reason, origCta = s.FB_CTA || '';
+        let rewrites = 0;
+        while (!cc.ok && rewrites < 2) {
+          rewrites++;
+          onProgress({ message: `📣 CTA lỗi (${cc.reason}) — yêu cầu Claude viết lại (lần ${rewrites})...` });
+          let rw = null;
+          try { rw = await chat.send(ctaRewritePrompt(cc.reason), { sameChat: true, timeoutMs: 90000 }); }
+          catch (e) { rw = { ok: false, error: e.message }; }
+          if (!rw || !rw.ok) { onProgress({ message: `⚠️ Không nhận được CTA mới (${(rw && rw.error) || '?'}).` }); break; }
+          const nc = (parseSections(rw.text).CTA || '').trim();
+          if (!nc) { onProgress({ message: '⚠️ Claude không xuất ===CTA===.' }); continue; }
+          s.FB_CTA = nc;
+          cc = checkCta(s.FB_CTA);
+        }
+        if (!cc.ok) {
+          s.FB_CTA = CTA_SAFE_DEFAULT;             // het luot -> cau mac dinh an toan
+          cc = checkCta(s.FB_CTA);
+          onProgress({ message: `🔁 CTA vẫn lỗi sau ${rewrites} lần — thay bằng câu mặc định: "${CTA_SAFE_DEFAULT}"` });
+        }
+        store.writeRawLog('', {
+          at: new Date().toISOString(), niche: nicheLabel, attempt, phase: 'cta_check',
+          origReason, origCta, finalCta: s.FB_CTA, rewrites, passed: cc.ok,
+        });
+        onProgress({ message: `📢 CTA: viết lại ${rewrites} lần${origReason ? `, lỗi gốc: ${origReason}` : ', không lỗi gốc'}.` });
+      }
+
+      // ---- HOOK_VARIANTS (tuy chon): parse neu co -> ghi log. Khong co cung khong loi. ----
+      if (s.HOOK_VARIANTS) {
+        let parsed = null;
+        try { parsed = JSON.parse(s.HOOK_VARIANTS); } catch (_) {
+          const m = String(s.HOOK_VARIANTS).match(/[[{][\s\S]*[\]}]/);
+          if (m) { try { parsed = JSON.parse(m[0]); } catch (_) {} }
+        }
+        store.writeRawLog(s.HOOK_VARIANTS, {
+          at: new Date().toISOString(), niche: nicheLabel, attempt, phase: 'hook_variants',
+          got: true, valid: !!parsed, count: Array.isArray(parsed) ? parsed.length : (parsed ? 1 : 0),
+        });
+        onProgress({ message: `🪝 Nhận HOOK_VARIANTS${parsed ? ` (${Array.isArray(parsed) ? parsed.length : 1} phương án, đã ghi Log)` : ' (không parse được JSON, đã ghi thô)'}.` });
+      } else {
+        onProgress({ message: 'ℹ️ Không có HOOK_VARIANTS (bỏ qua, không lỗi).' });
+      }
+
       // Cap story_id (bo dem local, +1 moi bai)
       const storyId = store.nextStoryId();
 
@@ -867,6 +1016,8 @@ module.exports = {
   DEFAULT_NICHES,
   // exported for tests / reuse
   titleWordCount, findTitleLeak, checkTitle, truncateTitle, titleRewritePrompt,
+  firstParagraphs, checkColdOpen, insertColdOpen, coldOpenRewritePrompt,
+  checkCta, ctaRewritePrompt, CTA_SAFE_DEFAULT,
   parseSections,
   missingSections,
   checkLeakedLabels,
