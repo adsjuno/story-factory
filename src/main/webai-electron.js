@@ -115,7 +115,11 @@ function login(provider, { timeoutMs = 600000 } = {}) {
  * LOI: gui 1 prompt tren cua so ĐÃ MO SAN trang chat (composer đã sẵn sàng),
  * đợi câu trả lời và lấy text. Tách riêng để dùng cho cả ask() 1 phát lẫn phiên tab tái dùng.
  */
-async function runPrompt(wc, cfg, prompt, timeoutMs) {
+async function runPrompt(wc, cfg, prompt, timeoutMs, opts = {}) {
+  // waitBaseline: khi gui prompt TIEP trong CUNG doan chat, cau tra loi cu VAN o tren trang.
+  // Phai doi den khi tin nhan tro ly MOI khac baseline moi coi la xong -> tranh tra nham
+  // lai bai cu (dang "on dinh, khong stream") ngay khi vua gui prompt thu hai.
+  const baseline = (opts && typeof opts.waitBaseline === 'string') ? opts.waitBaseline : null;
   // Chen prompt NGAY TRONG trang bang execCommand('insertText') — cach nay an voi
   // ProseMirror/contenteditable cua UI moi (wc.insertText bi UI moi bo qua -> o trong,
   // nut gui khong bao gio hien, tool ngoi cho vo ich). Co KIEM TRA + du phong.
@@ -174,7 +178,8 @@ async function runPrompt(wc, cfg, prompt, timeoutMs) {
   while (Date.now() < deadline) {
     const streaming = await isStreaming(wc, cfg.stopButton);
     const txt = await lastText(wc, cfg.assistant);
-    if (!streaming && txt && txt === prev) {
+    const isNew = !baseline || txt !== baseline;   // co baseline: text phai KHAC bai cu moi tinh
+    if (!streaming && txt && isNew && txt === prev) {
       stable++;
       if (stable >= 2) break; // 2 lan lien tiep text khong doi + het stream -> coi nhu xong
     } else {
@@ -187,6 +192,9 @@ async function runPrompt(wc, cfg, prompt, timeoutMs) {
   const text = await lastText(wc, cfg.assistant);
   if (!text || text.length < 10) {
     return { ok: false, error: 'Không lấy được câu trả lời từ ' + cfg.name + ' (có thể bị chặn hoặc giao diện đổi).' };
+  }
+  if (baseline && text === baseline) {
+    return { ok: false, error: 'Không thấy phản hồi MỚI từ ' + cfg.name + ' cho prompt tiếp theo (cùng đoạn chat).' };
   }
   return { ok: true, text };
 }
@@ -243,6 +251,48 @@ async function openSession(provider, { show = false } = {}) {
   };
 }
 
+/**
+ * Mo 1 CUA SO giu mo de gui NHIEU prompt. Khac openSession o cho: .send({sameChat:true})
+ * KHONG load lai URL -> prompt sau nam TRONG CUNG doan chat, thay duoc ket qua prompt truoc
+ * (skill thu 2 doc bai skill thu 1 ngay trong chat). Dung cho luong: viet bai -> QA tieu de.
+ *
+ *   const chat = await webai.openChat('claude');
+ *   const a = await chat.send(promptViet, { timeoutMs: 420000 });     // doan chat MOI
+ *   const b = await chat.send('/story-title-qa', { sameChat: true }); // CUNG chat, thay bai tren
+ *   chat.close();
+ */
+async function openChat(provider, { show = false } = {}) {
+  const cfg = cfgOf(provider);
+  const win = makeWindow(cfg.partition, show);
+  const wc = win.webContents;
+  let closed = false;
+  let lastAnswer = '';                       // baseline cho prompt tiep theo cung chat
+  win.on('closed', () => { closed = true; });
+  return {
+    provider,
+    name: cfg.name,
+    async send(prompt, { timeoutMs = 300000, sameChat = false } = {}) {
+      if (closed || win.isDestroyed()) return { ok: false, error: 'Cửa sổ ' + cfg.name + ' đã đóng.' };
+      try {
+        if (!sameChat) {
+          await win.loadURL(cfg.url).catch(() => {});   // doan chat moi (mac dinh)
+          lastAnswer = '';
+        }
+        // sameChat: KHONG load lai -> giu nguyen doan chat + lich su bai truoc
+        if (!(await waitForComposer(wc, cfg.composer, 20000))) {
+          return { ok: false, error: 'Chưa đăng nhập ' + cfg.name + ' (không thấy ô nhập). Vào Cài đặt → "Đăng nhập ' + cfg.name + '" trước.' };
+        }
+        const r = await runPrompt(wc, cfg, prompt, timeoutMs, sameChat ? { waitBaseline: lastAnswer } : {});
+        if (r.ok) lastAnswer = r.text;         // cap nhat baseline cho lan send tiep theo
+        return r;
+      } catch (e) {
+        return { ok: false, error: e.message };
+      }
+    },
+    close() { if (!win.isDestroyed()) win.close(); },
+  };
+}
+
 async function logout(provider) {
   const cfg = cfgOf(provider);
   try {
@@ -255,4 +305,4 @@ async function logout(provider) {
   }
 }
 
-module.exports = { login, ask, openSession, logout, PROVIDERS };
+module.exports = { login, ask, openSession, openChat, logout, PROVIDERS };

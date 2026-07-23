@@ -28,12 +28,24 @@ File cài nằm trong thư mục `dist/`.
 ```
 Nhân viên bấm "Viết bài"
    → phần mềm gửi câu lệnh gọi skill "story-us-senior-viral" vào cửa sổ Claude login
-   → Claude chạy pipeline 11 bước, trả về theo khuôn ===CỘT===
-   → phần mềm bóc tách thành 21 cột
+   → Claude chạy pipeline, trả về theo khuôn ===CỘT===
+   → (nếu bật QA) gõ tiếp "/story-title-qa" TRONG CÙNG đoạn chat để soát tiêu đề/CTA
+   → phần mềm bóc tách thành 22 cột
    → phần mềm tự tạo 5 ảnh bằng Cloudflare Workers AI (FLUX 2 klein-9b), up lên R2,
      chèn link ảnh vào bài, rồi đẩy bài đó lên Google Sheet NGAY
    → (n8n đọc Sheet → đăng WordPress + Facebook + thả link comment)
 ```
+
+## QA tiêu đề (bước 2, chạy chung đoạn chat)
+
+Mặc định BẬT (Cài đặt → "Chạy QA tiêu đề sau khi viết"). Sau khi Claude viết xong bài,
+phần mềm **không mở chat mới** mà gõ tiếp `/story-title-qa` **ngay trong đoạn chat đó**, nên
+skill QA đọc được nguyên bài vừa viết ở trên.
+- QA trả về khối `===QA_REPORT===` (luôn có) — ghi vào Log để xem QA nhận xét gì.
+- Nếu QA trả `===TITLE===` mới → **ghi đè** web_title. Nếu trả `===CTA===` mới → **ghi đè** fb_cta.
+- Không trả khối nào → giữ nguyên bài gốc.
+- QA lỗi/timeout → dùng nguyên bài gốc, chỉ log cảnh báo, **không làm hỏng bài**.
+- Tắt QA để viết nhanh hơn (bỏ hẳn bước 2).
 
 **Đẩy Sheet từng bài một**, không gom đến cuối. Nếu đang chạy 10 bài mà máy tắt ở bài thứ 7
 thì 6 bài đầu đã nằm trên Sheet rồi. Bài nào đẩy lỗi thì log báo rõ và chạy tiếp bài sau.

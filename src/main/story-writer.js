@@ -97,6 +97,7 @@ const KNOWN_KEYS = [
   'FB_IMAGE_PROMPT', 'THUMB_PROMPT', 'WEB_P1_PROMPT', 'WEB_P2_PROMPT', 'WEB_P3_PROMPT',
   'DEDUP_CONFIG', 'STORY_DNA', 'KPI_SCORES', 'END',
   'WEB_IMAGE_PROMPT', 'REVEAL_TYPE', // ten cu
+  'QA_REPORT', 'TITLE', 'CTA',       // skill QA tieu de (chay o buoc 2)
 ];
 
 // Chuan hoa chuoi nhan: hoa het, khoang trang/gach ngang -> gach duoi, bo ky tu la
@@ -357,6 +358,18 @@ function getSkillTemplate(country) {
   return usable ? saved : DEFAULT_SKILL_COMMAND;
 }
 
+// ---- QA TIEU DE (skill thu 2 chay TRONG CUNG doan chat, doc bai o tren) ----
+const DEFAULT_QA_COMMAND = '/story-title-qa';
+// Bat/tat + cau lenh QA (co the tuy bien). Mac dinh BAT.
+function getQaConfig() {
+  let s = {};
+  try { s = store.read('settings.json'); } catch (_) {}
+  const st = s.story || {};
+  const enabled = !(st.titleQa === false);                 // mac dinh true
+  const cmd = (typeof st.qaCommand === 'string' && st.qaCommand.trim()) ? st.qaCommand.trim() : DEFAULT_QA_COMMAND;
+  return { enabled, command: cmd };
+}
+
 // Dung prompt cuoi = KHOI DNA (bat buoc dung to hop) + cau lenh goi skill.
 // @param dna { combo, country } da chon san (co the null -> khong nhet DNA)
 // @param topicLabel chu de gui cho Claude: "<category_name> — <subcategory_name>"
@@ -542,9 +555,14 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
   let prompt = basePrompt;
   let lastErr = null;
 
+  const qaCfg = getQaConfig();
+  // MOT cua so cho ca bai: moi attempt = doan chat MOI (sameChat=false); QA chay sameChat=true
+  // ngay tren bai vua viet. Dong cua so o finally.
+  const chat = await webai.openChat(engine, { show: false });
+  try {
   for (let attempt = 1; attempt <= LENGTH_MAX_ATTEMPTS; attempt++) {
     onProgress({ message: `Ngách "${nicheLabel}"${attempt > 1 ? ` (thử lại lần ${attempt})` : ''}: Claude đang chạy skill viết truyện...` });
-    const res = await webai.ask(engine, { prompt, show: false, timeoutMs: 420000 }); // skill dai -> cho 7 phut
+    const res = await chat.send(prompt, { timeoutMs: 420000 }); // doan chat MOI, skill dai -> cho 7 phut
     if (!res.ok) {
       lastErr = new Error(res.error || 'Claude không trả về');
       // Van ghi log de biet Claude tra ve gi (co the la thong bao loi cua trang)
@@ -591,6 +609,39 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
           + `\n\n[LẦN TRƯỚC QUÁ NGẮN: chỉ ${words} từ] Viết LẠI DÀI HƠN HẲN, 2200-2800 từ: thêm hồi tưởng quá khứ, đối thoại chi tiết, mô tả cảm xúc và bối cảnh. Đủ 3 phần, mỗi phần dày dặn.`;
         await delay(800);
         continue;
+      }
+
+      // ---- BUOC 2: QA TIEU DE trong CUNG doan chat (skill doc bai o tren) ----
+      // Loi/timeout/khong ra khoi nao -> giu nguyen bai goc, chi canh bao. KHONG lam sap bai.
+      let qaReport = '';
+      if (qaCfg.enabled) {
+        onProgress({ message: `🔎 Chạy QA tiêu đề (${qaCfg.command}) trong cùng đoạn chat...` });
+        let qa = null;
+        try {
+          qa = await chat.send(qaCfg.command, { sameChat: true, timeoutMs: 180000 });
+        } catch (e) {
+          qa = { ok: false, error: e.message };
+        }
+        if (qa && qa.ok) {
+          const q = parseSections(qa.text);
+          qaReport = q.QA_REPORT || '';
+          let changed = [];
+          if (q.TITLE && q.TITLE.trim()) { s.WEB_TITLE = q.TITLE.trim(); changed.push('web_title'); }
+          if (q.CTA && q.CTA.trim()) { s.FB_CTA = q.CTA.trim(); changed.push('fb_cta'); }
+          store.writeRawLog(qa.text, {
+            at: new Date().toISOString(), niche: nicheLabel, attempt,
+            ok: true, phase: 'title_qa', qaReport, overrode: changed,
+          });
+          onProgress({ message: changed.length
+            ? `✏️ QA sửa ${changed.join(' + ')}${qaReport ? ' — ' + qaReport.slice(0, 160) : ''}`
+            : `✓ QA: tiêu đề/CTA đạt, giữ nguyên${qaReport ? ' — ' + qaReport.slice(0, 160) : ''}` });
+        } else {
+          onProgress({ message: `⚠️ QA skill không chạy được (${(qa && qa.error) || 'không rõ'}) — dùng nguyên bài gốc.` });
+          store.writeRawLog((qa && qa.text) || '', {
+            at: new Date().toISOString(), niche: nicheLabel, attempt,
+            ok: false, phase: 'title_qa', error: (qa && qa.error) || 'QA không trả về',
+          });
+        }
       }
 
       // Cap story_id (bo dem local, +1 moi bai)
@@ -644,7 +695,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
         onProgress({ message: `ℹ️ Test nhanh: ghi sổ TẠM trong phiên (${memory.sessionCount()} bài) — sổ chống trùng dài hạn giữ nguyên.` });
       }
 
-      return { ok: true, row, raw: res.text, sections: s, storyId, status, dnaCombo: dnaComboJson };
+      return { ok: true, row, raw: res.text, sections: s, storyId, status, dnaCombo: dnaComboJson, qaReport };
     }
     // BAO RO thieu mang nao + tim thay mang nao + do dai ket qua tho
     const rawLen = String(res.text || '').length;
@@ -658,6 +709,9 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
     await delay(1000);
   }
   return { ok: false, error: lastErr ? lastErr.message : 'không rõ' };
+  } finally {
+    try { chat.close(); } catch (_) {}     // luon dong cua so Claude, ke ca khi loi
+  }
 }
 
 /**

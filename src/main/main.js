@@ -90,6 +90,7 @@ ipcMain.handle('settings:get', () => {
       niches: (s.story && s.story.niches) || storyWriter.DEFAULT_NICHES,
       skillCommand: (s.story && s.story.skillCommand) || storyWriter.DEFAULT_SKILL_COMMAND,
       cleanupClaudeChats: !(s.story && s.story.cleanupClaudeChats === false), // mac dinh bat
+      titleQa: !(s.story && s.story.titleQa === false),                       // QA tieu de, mac dinh bat
     },
     image: {
       cfAccountId: dec(img.cfAccountId),
@@ -140,13 +141,14 @@ ipcMain.handle('settings:saveSheets', (_e, { webhookUrl }) => {
   return { ok: true };
 });
 // Tuy bien: sua danh sach ngach + cau lenh goi skill (Cach 1 gon, nhung sua duoc)
-ipcMain.handle('settings:saveStory', (_e, { niches, skillCommand, cleanupClaudeChats }) => {
+ipcMain.handle('settings:saveStory', (_e, { niches, skillCommand, cleanupClaudeChats, titleQa }) => {
   requireAuth();
   const s = loadSettings();
   s.story = s.story || {};
   if (Array.isArray(niches)) s.story.niches = niches;
   if (typeof skillCommand === 'string' && skillCommand.trim()) s.story.skillCommand = skillCommand;
   if (typeof cleanupClaudeChats === 'boolean') s.story.cleanupClaudeChats = cleanupClaudeChats;
+  if (typeof titleQa === 'boolean') s.story.titleQa = titleQa;
   saveSettings(s);
   return { ok: true };
 });
