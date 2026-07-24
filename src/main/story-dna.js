@@ -335,7 +335,8 @@ function classifyJustice(j) {
   if (/only one who can save|competence saves|saves the very person|goes to charity/.test(s)) return 'hero_choice';
   if (/official records|audit|legal review|records prove|careful records|controls the only key document|patent|property right|formally apologi|recorded|read back|letter or document reveals/.test(s)) return 'procedural';
   if (/publicly|community rallies|honors|standing ovation|plaque|award|recognizes them|authority figure|someone the villain respects|takes the narrator's side|shocked room|comes out|stands up and tells|repeats the villain|chooses the narrator|identifies the narrator/.test(s)) return 'public_recognition';
-  if (/finally tells the truth|least expected to speak/.test(s)) return 'private_resolution';
+  // cong ly RIENG TU: noi that giua hai nguoi, khong khan gia, khong thu tuc
+  if (/private conversation|finally said between|quietly accepts|comes back and admits/.test(s)) return 'private_resolution';
   return '';                                  // KHONG khop -> guard bao loi
 }
 function justiceFamily(j) {
@@ -352,7 +353,9 @@ function classifyRelationship(rel) {
   if (/\bveteran\b/.test(r)) return 'veteran_vs_civilian';
   if (/sibling|brother|sister/.test(r)) return 'sibling_rivalry';
   if (/employee|boss|founder/.test(r)) return 'work_hierarchy';
-  if (/aunt|uncle|niece|nephew|caregiver and relatives/.test(r)) return 'extended_family';
+  // ho hang / nguoi cham soc vs nha nguoi ta. Dat TRUOC parent vi "stepchildren" se bi
+  // parent nuot mat (vo/chong DA MAT thi khong con phan boi hon nhan — la xung dot ho hang).
+  if (/aunt|uncle|niece|nephew|caregiver and relatives|live-in caregiver|caregiver and the family|late-life spouse|stepchildren from the first marriage|late spouse's/.test(r)) return 'extended_family';
   if (/mother|father|parent|son|daughter|stepchild|stepdaughter/.test(r)) return 'parent_vs_adult_child';
   return '';                                  // KHONG khop -> guard bao loi
 }
@@ -404,8 +407,13 @@ const REL_FAM_HINTS = [
 ];
 function requiredRelFamily(input) {
   if (!input) return null;
+  // status_dynamic la tin hieu MANH nhat: "caregiver_vs_inheritors" = nguoi cham soc vs ho hang
+  // -> extended_family. Truoc day C03S08 tra null nen engine boc nham bride_vs_inlaws (loi ST31).
+  if (input.status_dynamic === 'caregiver_vs_inheritors') return 'extended_family';
   const t = lc([input.subcategory_name, input.conflict_premise, input.category_name].filter(Boolean).join(' | '));
   if (!t) return null;
+  // dau hieu nguoi cham soc / nguoi thua ke khong cung huyet thong
+  if (/chosen heir|blood relative|caregiver or neighbor|live-in caregiver/.test(t)) return 'extended_family';
   for (const [re, fam] of REL_FAM_HINTS) if (re.test(t)) return fam;
   return null;                                              // khong co dau hieu -> khong rang buoc
 }
@@ -939,5 +947,6 @@ module.exports = {
   isAuthorityRescueJustice, isHiddenWealthTwist, isReconciliationEnding,
   townCompatLocation, seasonWeatherOk, locationWeatherOk, geoOfState, geoOfTown, geoComboOk,
   requiredGenders, requiredRelFamily, compatOk,
+  classifyReveal, classifyJustice, classifyRelationship, poolFamilyOf,
   revealFamily, justiceFamily, relationshipFamily,
 };
