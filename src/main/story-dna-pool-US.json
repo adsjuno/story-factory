@@ -682,7 +682,14 @@
     "the institution that ignored the victim formally apologizes",
     "a private conversation where the truth is finally said between two people",
     "the narrator sets one condition and the family quietly accepts it",
-    "years later, one person comes back and admits what they did"
+    "years later, one person comes back and admits what they did",
+    "a routine audit turns up what the family kept off the books",
+    "the county recorder's office confirms what was signed and when",
+    "an insurance claim review contradicts the story everyone repeated",
+    "the narrator stops paying for something and lets it collapse on its own",
+    "the narrator declines to attend, and the absence says everything",
+    "the narrator gives the thing away to someone outside the family",
+    "the narrator chooses the smaller life and does not look back"
   ],
   "dominant_emotion": [
     "quiet vindication - satisfaction without gloating",
@@ -1255,7 +1262,14 @@
       "the institution that ignored the victim formally apologizes": "procedural",
       "a private conversation where the truth is finally said between two people": "private_resolution",
       "the narrator sets one condition and the family quietly accepts it": "private_resolution",
-      "years later, one person comes back and admits what they did": "private_resolution"
+      "years later, one person comes back and admits what they did": "private_resolution",
+      "a routine audit turns up what the family kept off the books": "procedural",
+      "the county recorder's office confirms what was signed and when": "procedural",
+      "an insurance claim review contradicts the story everyone repeated": "procedural",
+      "the narrator stops paying for something and lets it collapse on its own": "walk_away_dignity",
+      "the narrator declines to attend, and the absence says everything": "walk_away_dignity",
+      "the narrator gives the thing away to someone outside the family": "hero_choice",
+      "the narrator chooses the smaller life and does not look back": "hero_choice"
     },
     "relationship": {
       "mother and ungrateful adult son": "parent_vs_adult_child",

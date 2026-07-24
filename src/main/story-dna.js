@@ -331,9 +331,9 @@ function revealFamily(twist) {
 function classifyJustice(j) {
   const s = lc(j);
   if (!s) return '';
-  if (/quietly walks away|refusing to beg|declines money|calmly ends the arrangement|walks away with|and leaves\b/.test(s)) return 'walk_away_dignity';
-  if (/only one who can save|competence saves|saves the very person|goes to charity/.test(s)) return 'hero_choice';
-  if (/official records|audit|legal review|records prove|careful records|controls the only key document|patent|property right|formally apologi|recorded|read back|letter or document reveals/.test(s)) return 'procedural';
+  if (/quietly walks away|refusing to beg|declines money|calmly ends the arrangement|walks away with|and leaves\b|stops paying|lets it collapse|declines to attend|the absence says/.test(s)) return 'walk_away_dignity';
+  if (/only one who can save|competence saves|saves the very person|goes to charity|gives the thing away|chooses the smaller life|does not look back/.test(s)) return 'hero_choice';
+  if (/official records|audit|legal review|claim review|records prove|careful records|controls the only key document|patent|property right|formally apologi|recorded|recorder's office|county recorder|read back|letter or document reveals|confirms what was signed|kept off the books/.test(s)) return 'procedural';
   if (/publicly|community rallies|honors|standing ovation|plaque|award|recognizes them|authority figure|someone the villain respects|takes the narrator's side|shocked room|comes out|stands up and tells|repeats the villain|chooses the narrator|identifies the narrator/.test(s)) return 'public_recognition';
   // cong ly RIENG TU: noi that giua hai nguoi, khong khan gia, khong thu tuc
   if (/private conversation|finally said between|quietly accepts|comes back and admits/.test(s)) return 'private_resolution';
