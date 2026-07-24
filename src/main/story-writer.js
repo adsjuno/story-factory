@@ -68,7 +68,14 @@ QUAN TRỌNG — xuất kết quả theo ĐÚNG khuôn nhãn dưới đây để
 ===FB_CAPTION_B===
 <caption Facebook bản B ngắn ~300-400 từ, đấm nhanh>
 ===FB_CTA===
-<câu CTA kiểu "Type YES...", KHÔNG kèm link>
+<MỘT câu ngắn: [hứa mơ hồ về đúng MỘT bí mật] + [ở link bên dưới].
+ ⛔ TUYỆT ĐỐI KHÔNG xin bình luận: không "Type YES", không "Comment YES", không "comment the word...", không mọi biến thể xin tương tác (Facebook xếp là engagement bait, hạ phân phối).
+ ⛔ KHÔNG "Part 2 in the comments" / "I'll post Part 2" — mô hình cũ đã bỏ.
+ ⛔ KHÔNG nói ai sẽ xuất hiện, chuyện gì xảy ra tiếp, con số cụ thể, hay liệt kê bằng "and... and...".
+ ✅ Mẫu: "What I found on that answering machine is in the link below."
+ ✅ Mẫu: "What happened at that table is in the link below."
+ CÓ THỂ thêm MỘT câu mời chia sẻ chân thành phía sau (mời kể trải nghiệm, KHÔNG bắt gõ chữ):
+ ✅ "...is in the link below. If this sounds like your family, I'd like to hear about it.">
 ===FB_IMAGE_PROMPT===
 <Prompt ảnh mồi Facebook, TIẾNG ANH, theo công thức Human Conflict 3 lớp: khuôn mặt nhân vật chính là trung tâm, kẻ gây bất công, người chứng kiến, và một vật biểu tượng phụ. KHÔNG spoil twist/reveal. Kết thúc BẮT BUỘC bằng đúng câu: Square 1:1, restrained emotion, natural facial expressions, believable body language, not theatrical, no text, no watermark>
 ===THUMB_PROMPT===
@@ -1119,6 +1126,7 @@ module.exports = {
   titleWordCount, findTitleLeak, checkTitle, truncateTitle, titleRewritePrompt,
   firstParagraphs, checkColdOpen, insertColdOpen, coldOpenRewritePrompt,
   findBannedImageTerm, checkImagePrompts, imagePromptRewritePrompt, IMAGE_BANNED, IMAGE_PROMPT_KEYS,
+  CTA_BEG_PHRASES, CTA_SPOIL_PHRASES, RESCUER_NOUNS, ENDING_PHRASES, TITLE_MAX_WORDS,
   checkCta, ctaRewritePrompt, CTA_SAFE_DEFAULT,
   parseSections,
   missingSections,
