@@ -1300,5 +1300,32 @@
       "late-life spouse and adult stepchildren from the first marriage": "extended_family",
       "live-in caregiver and the family who appears at the end": "extended_family"
     }
+  },
+  "ending_tone": {
+    "public recognition without any money changing hands": "public_ceremonial",
+    "a brass plaque honoring their quiet service": "public_ceremonial",
+    "the villain publicly shamed while the victim keeps their dignity": "public_factual",
+    "a community rallying around them": "public_ceremonial",
+    "the truth revealed by an unexpected witness": "neutral",
+    "a letter read aloud that changes everything": "public_factual",
+    "quiet reconciliation on the victim's terms": "private",
+    "the victim walks away with their head high, refusing an apology": "walk_away",
+    "a stranger's kindness repaid decades later": "neutral",
+    "the inheritance going to charity instead of the greedy relative": "hero_choice",
+    "the grandchild choosing the grandparent over the money": "hero_choice",
+    "a standing ovation from unlikely people": "public_ceremonial",
+    "the villain left to face their own conscience": "neutral",
+    "recognition from someone powerful the victim once helped": "public_ceremonial",
+    "the victim's competence saving the day publicly": "public_ceremonial",
+    "the family business survives only after the victim sets firm conditions": "hero_choice",
+    "the victim chooses a modest independent life over returning to the family": "walk_away",
+    "the younger generation breaks the cycle and apologizes publicly": "public_ceremonial",
+    "the truth changes the community's view, but the victim refuses revenge": "public_factual",
+    "the villain loses social standing rather than money": "neutral",
+    "a private apology arrives, but forgiveness remains uncertain": "private",
+    "the symbolic object is passed to someone who proved worthy": "hero_choice",
+    "the victim creates a scholarship or community fund in someone else's name": "hero_choice",
+    "the family gathers again under new rules set by the victim": "private",
+    "the final victory is simply being believed": "neutral"
   }
 }

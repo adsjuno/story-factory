@@ -343,6 +343,40 @@ function justiceFamily(j) {
   return poolFamilyOf('justice_type', j) || classifyJustice(j);
 }
 
+// ==================== MA TRAN justice_family x ending ====================
+// Truoc day KHONG co ma tran nao -> ST35 ra private_resolution + "villain publicly shamed"
+// (hai lenh danh nhau). Tone cua ending khai trong pool.ending_tone (data khai, engine doc).
+// public tach lam 2: ceremonial (vo tay/vinh danh) vs factual (su that duoc cong bo)
+//   -> procedural ghep duoc factual (he qua cua thu tuc) nhung KHONG ghep ceremonial.
+const JUSTICE_ENDING_ALLOW = {
+  public_recognition: ['public_ceremonial', 'public_factual', 'neutral', 'hero_choice'],
+  procedural:         ['public_factual', 'neutral', 'private'],
+  hero_choice:        ['hero_choice', 'neutral', 'private', 'walk_away'],
+  walk_away_dignity:  ['walk_away', 'private', 'neutral'],
+  private_resolution: ['private', 'neutral', 'walk_away'],
+};
+function endingTone(ending) {
+  const key = String(ending || '').trim();
+  if (!key) return '';
+  try {
+    const pools = readUserPools();
+    const p = (pools[DEFAULT_COUNTRY] || POOL_BUNDLED[DEFAULT_COUNTRY] || {});
+    const tbl = p.ending_tone || {};
+    if (Object.prototype.hasOwnProperty.call(tbl, key)) return tbl[key];
+    const lk = lc(key);
+    for (const k of Object.keys(tbl)) if (lc(k) === lk) return tbl[k];
+  } catch (_) {}
+  return '';                                   // khong khai -> guard bao loi
+}
+function endingOkForJustice(justiceFam, ending) {
+  if (!justiceFam || !ending) return true;     // thieu ve nao -> khong ket luan
+  const allow = JUSTICE_ENDING_ALLOW[justiceFam];
+  if (!allow) return true;                     // justice la -> khong rang buoc
+  const tone = endingTone(ending);
+  if (!tone) return true;                      // tone chua khai -> guard lo, khong chan oan o day
+  return allow.indexOf(tone) >= 0;
+}
+
 // --- A: relationship_family. Khong con thung mac dinh parent_vs_adult_child. ---
 function classifyRelationship(rel) {
   const r = lc(rel);
@@ -501,6 +535,12 @@ function compatOk(bp, extra) {
   }
   if (ng.villain && bp.villain_first && nameGender.gender(bp.villain_first) !== ng.villain) {
     return { ok: false, reason: `R-GENDER: villain "${bp.villain_first}" không khớp giới tính ${ng.villain} mà conflict yêu cầu` };
+  }
+
+  // R-JE: ending phai hop tone voi justice_family (vd private_resolution KHONG duoc ending
+  // "villain publicly shamed" — hai lenh danh nhau, loi ST35).
+  if (bp.justice_family && bp.ending && !endingOkForJustice(bp.justice_family, bp.ending)) {
+    return { ok: false, reason: `R-JE: justice "${bp.justice_family}" không hợp ending tone "${endingTone(bp.ending)}" ("${String(bp.ending).slice(0, 46)}")` };
   }
 
   // R-REL: relationship_family phai khop subcategory (LOP 4)
@@ -739,6 +779,7 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   assertMapped('twist', bp.twist, bp.reveal_family, H);
   assertMapped('justice_type', bp.justice_type, bp.justice_family, H);
   assertMapped('relationship', bp.relationship, bp.relationship_family, H);
+  assertMapped('ending', bp.ending, endingTone(bp.ending), 'Khai tone trong pool.ending_tone.');
 
   // 12) ending — plot: tranh total reconciliation (avoid_total_reconciliation_rate)
   const recRate = memory.rateRecent(country, 20, (c) => isReconciliationEnding(c.ending)).rate;
@@ -747,7 +788,16 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   if (recRate >= maxRecon) {
     for (const e of (pool.ending || [])) if (isReconciliationEnding(e)) excludeEnd.add(e);
   }
+  // MA TRAN justice x ending: loai ending co tone khong hop justice_family vua chon.
+  // Chi ap khi con it nhat 1 ung vien — khong de tu lam can kiet.
+  const toneFit = (pool.ending || []).filter((e) => !excludeEnd.has(e) && endingOkForJustice(bp.justice_family, e));
+  if (toneFit.length) {
+    for (const e of (pool.ending || [])) if (!toneFit.includes(e)) excludeEnd.add(e);
+  } else {
+    bp.ending_tone_widened = `khong con ending hop tone cho justice_family "${bp.justice_family}" — nới ra`;
+  }
   bp.ending = chooseWeighted(pool.ending || [], { country, field: 'ending', softDays: soft.ending, wr, exclude: excludeEnd }) || '';
+  bp.ending_tone = endingTone(bp.ending);
 
   // 13) emotion (affinity)
   bp.dominant_emotion = chooseWeighted(pool.dominant_emotion || [], { country, field: 'dominant_emotion', affinityKeywords: aff.preferred_emotions, affinityHard: true, wr }) || '';
@@ -949,5 +999,6 @@ module.exports = {
   townCompatLocation, seasonWeatherOk, locationWeatherOk, geoOfState, geoOfTown, geoComboOk,
   requiredGenders, requiredRelFamily, compatOk,
   classifyReveal, classifyJustice, classifyRelationship, poolFamilyOf,
+  endingTone, endingOkForJustice, JUSTICE_ENDING_ALLOW,
   revealFamily, justiceFamily, relationshipFamily,
 };
