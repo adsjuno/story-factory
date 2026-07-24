@@ -668,6 +668,17 @@ function isComplete(s) {
   return missingSections(s).length === 0;
 }
 
+// DU KHUON tu VAN BAN THO — dung cho vong doi cua webai ("du khuon moi la xong").
+// Dung CHUNG REQUIRED/parseSections cua file nay, KHONG chep lai danh sach nhan.
+// Ngoai 4 mang bat buoc, doi them DAU HIEU CUOI KHUON (===END=== hoac WEB_P3_PROMPT) de khong
+// cat som khi Claude moi viet xong than bai ma chua xuat cac khoi prompt anh / JSON phia sau.
+function isCompleteRaw(raw) {
+  const txt = String(raw || '');
+  if (txt.length < 400) return false;                       // bai that ~15.000 ky tu
+  if (missingSections(parseSections(txt)).length) return false;
+  return /={2,}\s*END\s*={2,}/i.test(txt) || /={2,}\s*WEB_P3_PROMPT\s*={2,}/i.test(txt);
+}
+
 // Dem so tu trong web_body (bo the HTML). Tieng Anh -> tach theo khoang trang.
 function wordCount(html) {
   const text = String(html || '').replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/gi, ' ').replace(/\s+/g, ' ').trim();
@@ -772,7 +783,18 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
   try {
   for (let attempt = 1; attempt <= LENGTH_MAX_ATTEMPTS; attempt++) {
     onProgress({ message: `${runLabel}${attempt > 1 ? ` (thử lại lần ${attempt})` : ''}: Claude đang chạy skill viết truyện...` });
-    const res = await chat.send(prompt, { timeoutMs: 420000 }); // doan chat MOI, skill dai -> cho 7 phut
+    const res = await chat.send(prompt, {
+      timeoutMs: 420000,                                   // skill dai -> cho 7 phut
+      // DU KHUON moi la xong: Claude con chay tool (dem tu/cat bai/QA) thi nut Stop bien mat va
+      // text dung yen — cho cu, dung doc som. isComplete dung CHUNG REQUIRED cua file nay.
+      isComplete: (txt) => { try { return isCompleteRaw(txt); } catch (_) { return false; } },
+      shouldStop,
+    });
+    // BAM DUNG giua luot Claude -> thoat NGAY, khong thu lai, khong QA, khong anh, khong day Sheet.
+    if (res.stopped || shouldStop()) {
+      onProgress({ message: '⏹ Đã dừng — huỷ lượt Claude đang chạy, bài này KHÔNG đẩy Sheet.' });
+      return { ok: false, stopped: true, error: 'Đã dừng theo yêu cầu.' };
+    }
     if (!res.ok) {
       lastErr = new Error(res.error || 'Claude không trả về');
       // Van ghi log de biet Claude tra ve gi (co the la thong bao loi cua trang)
@@ -828,7 +850,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
         onProgress({ message: `🔎 Chạy QA (CTA/số liệu) (${qaCfg.command}) trong cùng đoạn chat...` });
         let qa = null;
         try {
-          qa = await chat.send(qaCfg.command, { sameChat: true, timeoutMs: 180000 });
+          qa = await chat.send(qaCfg.command, { sameChat: true, timeoutMs: 180000, shouldStop });
         } catch (e) {
           qa = { ok: false, error: e.message };
         }
@@ -863,7 +885,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
           rewrites++;
           onProgress({ message: `📛 Tiêu đề lỗi (${chk.words} từ${chk.leak ? `, lộ kết: "${chk.leak}"` : ''}) — yêu cầu Claude viết lại (lần ${rewrites})...` });
           let rw = null;
-          try { rw = await chat.send(titleRewritePrompt(chk.words, chk.leak), { sameChat: true, timeoutMs: 120000 }); }
+          try { rw = await chat.send(titleRewritePrompt(chk.words, chk.leak), { sameChat: true, timeoutMs: 120000, shouldStop }); }
           catch (e) { rw = { ok: false, error: e.message }; }
           if (!rw || !rw.ok) { onProgress({ message: `⚠️ Không nhận được tiêu đề mới (${(rw && rw.error) || '?'}).` }); break; }
           const nt = (parseSections(rw.text).TITLE || '').trim();
@@ -892,7 +914,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
           rewrites++;
           onProgress({ message: `🥶 Cold open lỗi (${co.reason}) — yêu cầu Claude viết lại phần mở đầu 5 dòng (lần ${rewrites})...` });
           let rw = null;
-          try { rw = await chat.send(coldOpenRewritePrompt(co), { sameChat: true, timeoutMs: 120000 }); }
+          try { rw = await chat.send(coldOpenRewritePrompt(co), { sameChat: true, timeoutMs: 120000, shouldStop }); }
           catch (e) { rw = { ok: false, error: e.message }; }
           if (!rw || !rw.ok) { onProgress({ message: `⚠️ Không nhận được cold open mới (${(rw && rw.error) || '?'}).` }); break; }
           const block = (parseSections(rw.text).COLD_OPEN || '').trim();
@@ -920,7 +942,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
           rewrites++;
           onProgress({ message: `📣 CTA lỗi (${cc.reason}) — yêu cầu Claude viết lại (lần ${rewrites})...` });
           let rw = null;
-          try { rw = await chat.send(ctaRewritePrompt(cc.reason), { sameChat: true, timeoutMs: 90000 }); }
+          try { rw = await chat.send(ctaRewritePrompt(cc.reason), { sameChat: true, timeoutMs: 90000, shouldStop }); }
           catch (e) { rw = { ok: false, error: e.message }; }
           if (!rw || !rw.ok) { onProgress({ message: `⚠️ Không nhận được CTA mới (${(rw && rw.error) || '?'}).` }); break; }
           const nc = (parseSections(rw.text).CTA || '').trim();
@@ -949,7 +971,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
           rewrites++;
           onProgress({ message: `🚫 Prompt ảnh vi phạm (${bad.map((b) => `${b.key}="${b.term}"`).join('; ')}) — yêu cầu viết lại (lần ${rewrites})...` });
           let rw = null;
-          try { rw = await chat.send(imagePromptRewritePrompt(bad), { sameChat: true, timeoutMs: 120000 }); }
+          try { rw = await chat.send(imagePromptRewritePrompt(bad), { sameChat: true, timeoutMs: 120000, shouldStop }); }
           catch (e) { rw = { ok: false, error: e.message }; }
           if (!rw || !rw.ok) { onProgress({ message: `⚠️ Không nhận được prompt ảnh mới (${(rw && rw.error) || '?'}).` }); break; }
           const q = parseSections(rw.text);
@@ -1050,7 +1072,7 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
     lastErr = new Error(
       'Claude trả về THIẾU KHUÔN. Thiếu: ' + missing.join('; ') + '. '
       + 'Các mảnh tìm thấy: ' + (found.length ? found.join(', ') : 'KHÔNG có mảnh nào')
-      + `. (Claude trả về ${rawLen} ký tự — mở mục "Log" để xem nguyên văn.)`
+      + `. (Claude trả về ${rawLen} ký tự${res.waitedFull ? ', HẾT GIỜ CHỜ 7 phút mà vẫn chưa đủ khuôn — nhiều khả năng Claude còn đang chạy dở' : ''} — mở mục "Log" để xem nguyên văn.)`
     );
     onProgress({ message: '✗ ' + lastErr.message });
     onProgress({ message: 'ℹ️ Đã lưu nguyên văn kết quả Claude vào mục "Log" (bên trái) để chẩn đoán.' });
@@ -1089,6 +1111,7 @@ async function writeBatch({ niche, count, pushRow = null, shouldStop = () => fal
     }
     onProgress({ message: `Bài ${i + 1}/${total} — đang chọn page & viết...`, done: i, total });
     const r = await writeOne(nicheLabel, nicheCode, onProgress, shouldStop);
+    if (r.stopped) { stopped = true; onProgress({ message: `⏹ Đã dừng giữa bài ${i + 1} — bài này không đẩy Sheet. Còn ${total - i - 1} bài chưa chạy.` }); break; }
     if (!r.ok) { failed.push({ index: i + 1, error: r.error }); continue; }
     rows.push(r.row);
     // DAY SHEET NGAY tung bai: crash giua chung chi mat bai dang do, khong mat ca loat.
@@ -1133,6 +1156,7 @@ module.exports = {
   checkLeakedLabels,
   cleanBlock,
   isComplete,
+  isCompleteRaw,
   generateArticleImages,
   normalizeJson,
   normalizeKpi,

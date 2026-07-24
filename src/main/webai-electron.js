@@ -77,6 +77,16 @@ async function lastText(wc, assistant) {
   return (await jsEval(wc, `(function(){var a=document.querySelectorAll(${JSON.stringify(assistant)}); if(!a.length) return ''; return a[a.length-1].innerText||'';})()`)) || '';
 }
 
+// TAT CA tin nhan tro ly (khong chi cai cuoi). Claude tach khoi "suy nghi" thanh phan tu rieng,
+// nen phan tu CUOI co the la dong nghi ngan ("Backup before trimming") chu khong phai bai.
+async function allTexts(wc, assistant) {
+  const arr = await jsEval(wc, `(function(){
+    var a=document.querySelectorAll(${JSON.stringify(assistant)});
+    return Array.prototype.map.call(a, function(e){ return e.innerText||''; });
+  })()`);
+  return Array.isArray(arr) ? arr : [];
+}
+
 async function isStreaming(wc, stop) {
   return !!(await jsEval(wc, `!!document.querySelector(${JSON.stringify(stop)})`));
 }
@@ -222,33 +232,59 @@ async function runPrompt(wc, cfg, prompt, timeoutMs, opts = {}) {
     }
   }
 
-  // Doi tra loi: stream chay roi dung + text on dinh. (Cat bot cho thua -> nhanh hon)
+  // ---- DOI TRA LOI ----
+  // isComplete(text) (tuy chon, do NGUOI GOI truyen xuong — vd story-writer dung REQUIRED cua no):
+  //   co  -> "DU KHUON moi la xong". Chua du khuon thi VAN CHO, du nut Stop bien mat va text
+  //          dung yen — vi do chinh la luc Claude dang chay tool (dem tu / cat bai / QA).
+  //   khong -> giu NGUYEN hanh vi cu (het stream + text on dinh 2 vong) cho ask()/openSession().
+  // shouldStop(): bam Dung -> thoat NGAY, khong doi het luot.
+  const isComplete = (opts && typeof opts.isComplete === 'function') ? opts.isComplete : null;
+  const shouldStop = (opts && typeof opts.shouldStop === 'function') ? opts.shouldStop : (() => false);
+
+  // Lay ban text "tot nhat" trong tat ca tin nhan tro ly: uu tien ban DU KHUON, khong thi lay DAI NHAT.
+  const pickBest = async () => {
+    const texts = (await allTexts(wc, cfg.assistant)).filter((x) => x && (!baseline || x !== baseline));
+    if (!texts.length) return '';
+    if (isComplete) { const done = texts.find((x) => { try { return isComplete(x); } catch (_) { return false; } }); if (done) return done; }
+    return texts.reduce((a, b) => (b.length > a.length ? b : a), '');
+  };
+
   await delay(1500);
   const deadline = Date.now() + timeoutMs;
   let prev = '';
   let stable = 0;
+  let waitedFull = true;                       // het deadline ma chua dat dieu kien xong?
   while (Date.now() < deadline) {
+    if (shouldStop()) return { ok: false, stopped: true, error: 'Đã dừng theo yêu cầu — huỷ lượt ' + cfg.name + ' đang chạy.' };
     const streaming = await isStreaming(wc, cfg.stopButton);
-    const txt = await lastText(wc, cfg.assistant);
-    const isNew = !baseline || txt !== baseline;   // co baseline: text phai KHAC bai cu moi tinh
-    if (!streaming && txt && isNew && txt === prev) {
-      stable++;
-      if (stable >= 2) break; // 2 lan lien tiep text khong doi + het stream -> coi nhu xong
+    const txt = await pickBest();
+    if (isComplete) {
+      // DU KHUON moi tinh; du roi van cho on dinh 2 vong de chac khoi cuoi da viet xong.
+      let done = false;
+      try { done = !!(txt && isComplete(txt)); } catch (_) { done = false; }
+      if (done && txt === prev) { stable++; if (stable >= 2) { waitedFull = false; break; } }
+      else { stable = 0; prev = txt; }
     } else {
-      stable = 0;
-      prev = txt;
+      const isNew = !baseline || txt !== baseline;
+      if (!streaming && txt && isNew && txt === prev) {
+        stable++;
+        if (stable >= 2) { waitedFull = false; break; }
+      } else { stable = 0; prev = txt; }
     }
     await delay(900);
   }
+  if (shouldStop()) return { ok: false, stopped: true, error: 'Đã dừng theo yêu cầu — huỷ lượt ' + cfg.name + ' đang chạy.' };
 
-  const text = await lastText(wc, cfg.assistant);
+  const text = await pickBest();
   if (!text || text.length < 10) {
     return { ok: false, error: 'Không lấy được câu trả lời từ ' + cfg.name + ' (có thể bị chặn hoặc giao diện đổi).' };
   }
   if (baseline && text === baseline) {
     return { ok: false, error: 'Không thấy phản hồi MỚI từ ' + cfg.name + ' cho prompt tiếp theo (cùng đoạn chat).' };
   }
-  return { ok: true, text };
+  // waitedFull = het gio ma chua du khuon -> bao len de nguoi goi ghi log ro (doc duoc bao nhieu,
+  // thieu nhan nao) thay vi tuong Claude tra sai khuon.
+  return { ok: true, text, waitedFull };
 }
 
 // Hoi 1 phat: mo cua so, load trang, gui prompt, dong cua so. (giu cho cac cho dung le)
@@ -323,8 +359,9 @@ async function openChat(provider, { show = false } = {}) {
   return {
     provider,
     name: cfg.name,
-    async send(prompt, { timeoutMs = 300000, sameChat = false } = {}) {
+    async send(prompt, { timeoutMs = 300000, sameChat = false, isComplete = null, shouldStop = null } = {}) {
       if (closed || win.isDestroyed()) return { ok: false, error: 'Cửa sổ ' + cfg.name + ' đã đóng.' };
+      if (shouldStop && shouldStop()) return { ok: false, stopped: true, error: 'Đã dừng theo yêu cầu.' };
       try {
         if (!sameChat) {
           await win.loadURL(cfg.url).catch(() => {});   // doan chat moi (mac dinh)
@@ -334,7 +371,10 @@ async function openChat(provider, { show = false } = {}) {
         if (!(await waitForComposer(wc, cfg.composer, 20000))) {
           return { ok: false, error: 'Chưa đăng nhập ' + cfg.name + ' (không thấy ô nhập). Vào Cài đặt → "Đăng nhập ' + cfg.name + '" trước.' };
         }
-        const r = await runPrompt(wc, cfg, prompt, timeoutMs, sameChat ? { waitBaseline: lastAnswer } : {});
+        const ro = sameChat ? { waitBaseline: lastAnswer } : {};
+        if (isComplete) ro.isComplete = isComplete;
+        if (shouldStop) ro.shouldStop = shouldStop;
+        const r = await runPrompt(wc, cfg, prompt, timeoutMs, ro);
         if (r.ok) lastAnswer = r.text;         // cap nhat baseline cho lan send tiep theo
         return r;
       } catch (e) {

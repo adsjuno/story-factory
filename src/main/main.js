@@ -229,7 +229,7 @@ ipcMain.handle('story:write', async (_e, { niche, count }) => {
 ipcMain.handle('story:stop', () => {
   requireAuth();
   STOP_REQUESTED = true;
-  mainWindow.webContents.send('story:progress', { message: '⏹ Đã nhận lệnh Dừng — hoàn tất bài đang viết dở rồi dừng...' });
+  mainWindow.webContents.send('story:progress', { message: '⏹ Đã nhận lệnh Dừng — huỷ ngay lượt Claude đang chạy...' });
   return { ok: true };
 });
 
