@@ -72,13 +72,13 @@ QUAN TRỌNG — xuất kết quả theo ĐÚNG khuôn nhãn dưới đây để
 ===FB_IMAGE_PROMPT===
 <Prompt ảnh mồi Facebook, TIẾNG ANH, theo công thức Human Conflict 3 lớp: khuôn mặt nhân vật chính là trung tâm, kẻ gây bất công, người chứng kiến, và một vật biểu tượng phụ. KHÔNG spoil twist/reveal. Kết thúc BẮT BUỘC bằng đúng câu: Square 1:1, restrained emotion, natural facial expressions, believable body language, not theatrical, no text, no watermark>
 ===THUMB_PROMPT===
-<Prompt ảnh THUMBNAIL WEB NGANG (16:9), TIẾNG ANH, tối ưu CTR. Cùng phong cách candid/documentary và "cú tát" cảm xúc như ảnh FB nhưng BỐ CỤC NGANG: khoảnh khắc cao trào nhất, khuôn mặt nhân vật rõ, có khoảng trống hai bên cho bố cục ngang. KHÔNG spoil twist. Kết thúc BẮT BUỘC bằng: Horizontal 16:9, candid documentary photo, natural available light, authentic skin texture, restrained emotion, not cinematic, no text, no watermark>
+<Prompt ảnh THUMBNAIL WEB NGANG (16:9), TIẾNG ANH, tối ưu CTR. Cùng phong cách candid/documentary và "cú tát" cảm xúc như ảnh FB nhưng BỐ CỤC NGANG: khoảnh khắc cao trào nhất, khuôn mặt nhân vật rõ, có khoảng trống hai bên cho bố cục ngang. KHÔNG spoil twist. Kết thúc BẮT BUỘC bằng: Horizontal 16:9, candid documentary photo, natural available light, authentic skin texture, restrained emotion, not staged, no text, no watermark>
 ===WEB_P1_PROMPT===
-<Prompt ảnh minh hoạ Part 1, TIẾNG ANH, đúng ngữ cảnh Part 1, cinematic, 16:9 aspect ratio, no text>
+<Prompt ảnh minh hoạ Part 1, TIẾNG ANH, đúng ngữ cảnh Part 1, candid documentary photo, natural available light, 16:9 aspect ratio, no text, no watermark>
 ===WEB_P2_PROMPT===
-<Prompt ảnh minh hoạ Part 2, TIẾNG ANH, đúng ngữ cảnh Part 2, cinematic, 16:9 aspect ratio, no text>
+<Prompt ảnh minh hoạ Part 2, TIẾNG ANH, đúng ngữ cảnh Part 2, candid documentary photo, natural available light, 16:9 aspect ratio, no text, no watermark>
 ===WEB_P3_PROMPT===
-<Prompt ảnh minh hoạ Part 3, TIẾNG ANH, đúng ngữ cảnh Part 3, cinematic, 16:9 aspect ratio, no text>
+<Prompt ảnh minh hoạ Part 3, TIẾNG ANH, đúng ngữ cảnh Part 3, candid documentary photo, natural available light, 16:9 aspect ratio, no text, no watermark>
 ===DEDUP_CONFIG===
 {"victim":"","villain":"","theme":"","emotion":"","justice":"","object":"","setting":"","ending":""}
 ===STORY_DNA===
@@ -519,6 +519,51 @@ Mẫu đúng: "What she did next is in the link below."
 Chỉ xuất: ===CTA=== rồi CTA mới.`;
 }
 
+// ==================== KIEM PROMPT ANH BANG CODE (lop thu 5) ====================
+// Cac tu "dien anh/studio" lam bo loc noi dung cua ChatGPT/Gemini tu choi ve (ST35: p2 bi tu choi).
+// Nguon goc loi: chinh TEMPLATE cua app tung ghi "cinematic" o WEB_P1/P2/P3 -> Claude lam dung lenh.
+const IMAGE_BANNED = ['cinematic lighting', 'cinematic', 'film still', 'movie still',
+  'dramatic lighting', 'photorealistic', 'studio lighting', 'professional photography'];
+const IMAGE_PROMPT_KEYS = ['FB_IMAGE_PROMPT', 'THUMB_PROMPT', 'WEB_P1_PROMPT', 'WEB_P2_PROMPT', 'WEB_P3_PROMPT'];
+// Tim tu cam. Bo qua khi dung o dang PHU DINH ("not cinematic" / "no dramatic lighting")
+// vi do la loi dan cho AI ve, khong phai yeu cau phong cach.
+function findBannedImageTerm(prompt) {
+  const s = String(prompt || '').toLowerCase();
+  for (const term of IMAGE_BANNED) {
+    let i = -1;
+    while ((i = s.indexOf(term, i + 1)) !== -1) {
+      const before = s.slice(Math.max(0, i - 12), i);
+      if (/\b(not|no|avoid|without)\s+$/.test(before)) continue;   // phu dinh -> khong tinh
+      return term;
+    }
+  }
+  return '';
+}
+// Tra ve danh sach {key, term} vi pham; rong = dat.
+function checkImagePrompts(sections) {
+  const bad = [];
+  for (const k of IMAGE_PROMPT_KEYS) {
+    const v = sections && sections[k];
+    if (!v) continue;
+    const term = findBannedImageTerm(v);
+    if (term) bad.push({ key: k, term });
+  }
+  return bad;
+}
+function imagePromptRewritePrompt(bad) {
+  const lines = bad.map((b) => `- ${b.key}: chứa "${b.term}"`).join('\n');
+  const keys = bad.map((b) => b.key).join(', ');
+  return `${bad.length} prompt ảnh vi phạm — chứa từ bị CẤM tuyệt đối:
+${lines}
+Các từ CẤM ở MỌI prompt ảnh: cinematic, cinematic lighting, film still, movie still, dramatic lighting, photorealistic, studio lighting, professional photography.
+Lý do: bộ lọc nội dung của công cụ vẽ từ chối các prompt mang hơi hướng dựng phim/studio.
+Viết lại ${bad.length === 1 ? 'prompt' : 'các prompt'} trên theo phong cách ảnh chụp đời thường:
+- candid documentary photo, natural available light, authentic skin texture, restrained emotion, not staged
+- giữ nguyên nội dung/bối cảnh đã mô tả, CHỈ đổi phần mô tả phong cách/ánh sáng.
+- KHÔNG dùng bất kỳ từ cấm nào ở trên, kể cả dạng phủ định.
+Chỉ xuất đúng các khối sau, không thêm gì: ${keys}`;
+}
+
 // Dung prompt cuoi = KHOI DNA (bat buoc dung to hop) + cau lenh goi skill.
 // @param dna { combo, country } da chon san (co the null -> khong nhet DNA)
 // @param topicLabel chu de gui cho Claude: "<category_name> — <subcategory_name>"
@@ -888,6 +933,42 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
         onProgress({ message: `📢 CTA: viết lại ${rewrites} lần${origReason ? `, lỗi gốc: ${origReason}` : ', không lỗi gốc'}.` });
       }
 
+      // ---- BUOC 2e: KIEM 5 PROMPT ANH (tu cam lam bo loc AI ve tu choi) ----
+      {
+        let bad = checkImagePrompts(s);
+        const origBad = bad.map((b) => `${b.key}:"${b.term}"`).join(', ');
+        let rewrites = 0;
+        while (bad.length && rewrites < 2) {
+          rewrites++;
+          onProgress({ message: `🚫 Prompt ảnh vi phạm (${bad.map((b) => `${b.key}="${b.term}"`).join('; ')}) — yêu cầu viết lại (lần ${rewrites})...` });
+          let rw = null;
+          try { rw = await chat.send(imagePromptRewritePrompt(bad), { sameChat: true, timeoutMs: 120000 }); }
+          catch (e) { rw = { ok: false, error: e.message }; }
+          if (!rw || !rw.ok) { onProgress({ message: `⚠️ Không nhận được prompt ảnh mới (${(rw && rw.error) || '?'}).` }); break; }
+          const q = parseSections(rw.text);
+          let applied = 0;
+          for (const b of bad) { const nv = (q[b.key] || '').trim(); if (nv) { s[b.key] = nv; applied++; } }
+          if (!applied) { onProgress({ message: '⚠️ Claude không xuất khối prompt ảnh nào.' }); continue; }
+          bad = checkImagePrompts(s);
+        }
+        if (bad.length) {
+          // Con vi pham -> TU CAT tu cam (giu nguyen phan noi dung), tranh anh bi tu choi
+          for (const b of bad) {
+            let v = s[b.key] || '';
+            for (const term of IMAGE_BANNED) v = v.replace(new RegExp('[,;]?\\s*' + reEsc(term), 'gi'), '');
+            s[b.key] = v.replace(/\s{2,}/g, ' ').replace(/\s*,\s*,/g, ',').trim();
+          }
+          const still = checkImagePrompts(s);
+          onProgress({ message: `✂️ Prompt ảnh vẫn vi phạm sau ${rewrites} lần — tự cắt từ cấm (còn lại: ${still.length}).` });
+          bad = still;
+        }
+        store.writeRawLog('', {
+          at: new Date().toISOString(), niche: nicheLabel, attempt, phase: 'image_prompt_check',
+          origBad, rewrites, remaining: bad.map((b) => `${b.key}:${b.term}`), passed: bad.length === 0,
+        });
+        onProgress({ message: `🖼️ Prompt ảnh: ${origBad ? 'lỗi gốc ' + origBad : 'không lỗi gốc'}, viết lại ${rewrites} lần, còn vi phạm ${bad.length}.` });
+      }
+
       // ---- HOOK_VARIANTS (tuy chon): parse neu co -> ghi log. Khong co cung khong loi. ----
       if (s.HOOK_VARIANTS) {
         let parsed = null;
@@ -1037,6 +1118,7 @@ module.exports = {
   // exported for tests / reuse
   titleWordCount, findTitleLeak, checkTitle, truncateTitle, titleRewritePrompt,
   firstParagraphs, checkColdOpen, insertColdOpen, coldOpenRewritePrompt,
+  findBannedImageTerm, checkImagePrompts, imagePromptRewritePrompt, IMAGE_BANNED, IMAGE_PROMPT_KEYS,
   checkCta, ctaRewritePrompt, CTA_SAFE_DEFAULT,
   parseSections,
   missingSections,

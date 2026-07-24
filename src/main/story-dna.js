@@ -935,6 +935,7 @@ function comboToSheetJson(bp, country, theme) {
     evidence_source: c.evidence_source || '',
     reveal_family: c.reveal_family || '',
     justice_family: c.justice_family || '',
+    relationship_family: c.relationship_family || '',   // TRUOC DAY THIEU -> cot Sheet luon rong
     story_signature: c.story_signature || '',
   });
 }
