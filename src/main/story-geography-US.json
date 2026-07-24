@@ -171,6 +171,9 @@
       "generic",
       "new_england",
       "rural_farming"
+    ],
+    "a military town near an Army base": [
+      "generic"
     ]
   },
   "state_geo": {
@@ -494,7 +497,17 @@
     "a graduation": "late_spring",
     "a county fair": "summer",
     "a church anniversary": "any",
-    "a hospital stay": "any"
+    "a hospital stay": "any",
+    "a high-school graduation": "late_spring",
+    "a church homecoming": "autumn",
+    "a funeral reception": "any",
+    "a retirement dinner": "any",
+    "a milestone birthday": "any",
+    "military reunion": "any",
+    "funeral reception": "any",
+    "wedding weekend": "any",
+    "family reunion": "any",
+    "graduation": "late_spring"
   },
   "weather_season": {
     "steady winter snow": [
@@ -555,6 +568,24 @@
     ],
     "overcast and still": [
       "any"
+    ],
+    "a humid Southern evening": [
+      "summer",
+      "late_summer",
+      "late_spring"
+    ],
+    "bright autumn sunlight": [
+      "autumn"
+    ],
+    "early-morning fog": [
+      "any"
+    ],
+    "a clear freezing night": [
+      "winter",
+      "late_autumn"
+    ],
+    "a gray overcast morning": [
+      "any"
     ]
   },
   "no_snow_geo": [
@@ -566,7 +597,8 @@
   "snow_weather": [
     "steady winter snow",
     "the first snow of winter",
-    "a hard frost overnight"
+    "a hard frost overnight",
+    "a clear freezing night"
   ],
   "fallback_rules": {
     "town_setting_unknown": "coi la 'generic' -> chi hop voi state co 'generic' (hau het bang deu co)",

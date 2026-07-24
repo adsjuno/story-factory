@@ -246,6 +246,24 @@ function townCompatLocation(town, loc) {
 }
 function seasonOf(season) { return geoLookup(GEO_SEASON_MONTH, season) || 'any'; }
 function weatherSeasonsOf(weather) { return geoLookup(GEO_WEATHER_SEASON, weather) || ['any']; }
+// Co tra duoc trong BANG LUAT khong? (dung cho GUARD — phan biet "tra duoc" vs "roi fallback any")
+function weatherInTable(w) { return geoLookup(GEO_WEATHER_SEASON, w) !== null; }
+function seasonInTable(s) { return geoLookup(GEO_SEASON_MONTH, s) !== null; }
+function townInTable(t) { return geoLookup(GEO_TOWN, t) !== null || resolveTownKey(t) !== null; }
+
+// ==================== GUARD: khong tra duoc bang luat -> DUNG + BAO LOI TO ====================
+// Truoc day cac gia tri nay am tham roi fallback ('any' / thung mac dinh) lam thong ke sai
+// hang thang ma khong ai biet. Nay bat loi ngay tai cho.
+function assertMapped(field, value, mapped, hint) {
+  if (!value) return;                       // rong la hop le (vd weather_mood co the de trong)
+  if (mapped) return;
+  const e = new Error(
+    `[DNA GUARD] Trường "${field}" có giá trị "${value}" KHÔNG tra được trong bảng luật — `
+    + `dừng bài để tránh thống kê sai. ${hint}`
+  );
+  e.dnaGuard = true;
+  throw e;
+}
 function seasonWeatherOk(season, weather) {
   const s = seasonOf(season);
   const ws = weatherSeasonsOf(weather);
@@ -269,35 +287,77 @@ function geoComboOk(loc, town, season, weather) {
 }
 
 // ==================== LOP 2: FAMILY (ngu nghia, khong theo text) ====================
-function revealFamily(twist) {
+// ==================== PHAN LOAI FAMILY ====================
+// B (CHINH): pool khai thang nhan cho tung gia tri -> engine CHI DOC.
+// A (DU PHONG): chi chay khi pool CHUA khai. Khong co "thung mac dinh": khong khop
+//               -> tra '' -> guard o buildOnce BAO LOI TO va dung bai.
+// Bang khai trong pool (tuy chon): pool.family_map = { twist:{...}, justice_type:{...}, relationship:{...} }
+function poolFamilyOf(field, value) {
+  try {
+    const pools = readUserPools();
+    const country = DEFAULT_COUNTRY;
+    const p = (pools[country] || POOL_BUNDLED[country] || {});
+    const fm = p.family_map || {};
+    const tbl = fm[field] || {};
+    const key = String(value || '').trim();
+    if (Object.prototype.hasOwnProperty.call(tbl, key)) return tbl[key];
+    const lk = lc(key);
+    for (const k of Object.keys(tbl)) if (lc(k) === lk) return tbl[k];
+  } catch (_) { /* pool hong -> de A lo */ }
+  return '';
+}
+
+// --- A: reveal_family. Thu tu quan trong (cu the -> chung chung). ---
+function classifyReveal(twist) {
   const t = lc(twist);
   if (!t) return 'no_major_reveal';
-  if (/sealed legal document|beneficiary|will|letter|record|deed|patent/.test(t)) return 'document_evidence';
-  if (/witness|foster parent|neighbor|the person who paid|paid the villain|paid their tuition|kept the local clinic|whose recipe built/.test(t)) return 'ordinary_witness';
-  if (/veteran|judge|surgeon|officer|medal|olympic|war hero|detective|firefighter|nurse|commander|philanthropist|donor|owner of the land|inventor|built the family|fortune|business owner/.test(t)) return 'external_public_validator';
-  return 'self_disclosure';
+  if (/^(no|nothing)\b/.test(t)) return 'no_major_reveal';
+  // nan nhan TU noi ra (narrator la chu the)
+  if (/\bthe narrator (has|made|left|set|kept|gave|stopped|did|once told)\b|\bwhat the narrator\b|\bwhy the narrator\b|\bthe real reason the narrator\b|\ban apology the narrator\b|\bthe condition the narrator\b|\bsaid out loud\b|\bsaid plainly\b|\bfinally (explained|delivers)\b/.test(t)) return 'self_disclosure';
+  // hau qua TU DEN, khong ai tiet lo (ke sai tu lam lo)
+  if (/\bwrongdoer\b|\bcomes due\b|\bunravels\b|\bfailing without\b|\bdoes not add up\b|\bcannot explain away\b|\bcannot keep\b/.test(t)) return 'natural_consequence';
+  // bang chung VAT / giay to
+  if (/\b(ledger|receipt|bank record|records?|insurance form|signed form|form|checks?|deed|patent|voicemail|diary|letter|sealed legal document|beneficiary|will|photograph|phone|hospital bill|bill|lease|scrapbook|pawn ticket|postcards?|work log|log)\b/.test(t)) return 'document_evidence';
+  // NGUOI THUONG chung kien / tung giup (ben thu ba, khong chuc danh lon)
+  if (/\b(teacher|coworker|neighbour|neighbor|waitress|mechanic|hairdresser|clerk|bus driver|volunteer|foster parent|witness)\b|\bthe person who paid\b|\bperson whose recipe\b|\bused to deliver\b|\bnight-shift nurse\b|\bthe child the narrator\b/.test(t)) return 'ordinary_witness';
+  // NGUOI CO VI THE CONG (chuc danh, thanh tich)
+  if (/\b(veteran|surgeon|judge|officer|firefighter|philanthropist|donor|detective|medic|athlete|inventor|public defender|business owner|nurse|commander|champion)\b|\bowner of the land\b|\bbuilt the family\b|\bfortune\b/.test(t)) return 'external_public_validator';
+  return '';                                  // KHONG khop -> guard bao loi
+}
+function revealFamily(twist) {
+  return poolFamilyOf('twist', twist) || classifyReveal(twist);
+}
+// --- A: justice_family. Khong con thung mac dinh private_resolution. ---
+function classifyJustice(j) {
+  const s = lc(j);
+  if (!s) return '';
+  if (/quietly walks away|refusing to beg|declines money|calmly ends the arrangement|walks away with|and leaves\b/.test(s)) return 'walk_away_dignity';
+  if (/only one who can save|competence saves|saves the very person|goes to charity/.test(s)) return 'hero_choice';
+  if (/official records|audit|legal review|records prove|careful records|controls the only key document|patent|property right|formally apologi|recorded|read back|letter or document reveals/.test(s)) return 'procedural';
+  if (/publicly|community rallies|honors|standing ovation|plaque|award|recognizes them|authority figure|someone the villain respects|takes the narrator's side|shocked room|comes out|stands up and tells|repeats the villain|chooses the narrator|identifies the narrator/.test(s)) return 'public_recognition';
+  if (/finally tells the truth|least expected to speak/.test(s)) return 'private_resolution';
+  return '';                                  // KHONG khop -> guard bao loi
 }
 function justiceFamily(j) {
-  const s = lc(j);
-  if (!s) return 'private_resolution';
-  if (/official records|audit|legal review|records prove|careful records dismantle|controls the only key document|patent|property right/.test(s)) return 'procedural';
-  if (/saves the very person|competence saves|only one who can save|calmly ends the arrangement|quietly walks away|refusing to beg|declines money|walks away with/.test(s)) {
-    if (/walks away|refusing to beg|declines money|calmly ends/.test(s)) return 'walk_away_dignity';
-    return 'hero_choice';
-  }
-  if (/publicly|community rallies|honors|standing ovation|plaque|award|recognizes them publicly|authority figure|someone the villain respects|someone powerful the victim once helped|tells the whole story|repeats the villain|chooses the narrator/.test(s)) return 'public_recognition';
-  return 'private_resolution';
+  return poolFamilyOf('justice_type', j) || classifyJustice(j);
+}
+
+// --- A: relationship_family. Khong con thung mac dinh parent_vs_adult_child. ---
+function classifyRelationship(rel) {
+  const r = lc(rel);
+  if (!r) return '';
+  if (/grandparent|grandchild|grandson|granddaughter|grandmother|grandfather/.test(r)) return 'grandparent_vs_grandchild';
+  if (/\bbride\b|mother-in-law|father-in-law|new husband/.test(r)) return 'bride_vs_inlaws';
+  if (/betrayed wife|widow|widower|late spouse|double life/.test(r)) return 'spouse_betrayal';
+  if (/\bveteran\b/.test(r)) return 'veteran_vs_civilian';
+  if (/sibling|brother|sister/.test(r)) return 'sibling_rivalry';
+  if (/employee|boss|founder/.test(r)) return 'work_hierarchy';
+  if (/aunt|uncle|niece|nephew|caregiver and relatives/.test(r)) return 'extended_family';
+  if (/mother|father|parent|son|daughter|stepchild|stepdaughter/.test(r)) return 'parent_vs_adult_child';
+  return '';                                  // KHONG khop -> guard bao loi
 }
 function relationshipFamily(rel) {
-  const r = lc(rel);
-  if (/grandparent|grandchild|grandson|granddaughter/.test(r)) return 'grandparent_vs_grandchild';
-  if (/veteran/.test(r)) return 'veteran_vs_civilian';
-  if (/bride|mother-in-law|father-in-law|new husband/.test(r)) return 'bride_vs_inlaws';
-  if (/wife|husband|spouse|widow/.test(r)) return 'spouse_betrayal';
-  if (/sibling|brother|sister/.test(r)) return 'sibling_rivalry';
-  if (/aunt|uncle|niece|nephew/.test(r)) return 'extended_family';
-  if (/employee|boss|founder/.test(r)) return 'work_hierarchy';
-  return 'parent_vs_adult_child';
+  return poolFamilyOf('relationship', rel) || classifyRelationship(rel);
 }
 // ==================== LOP 3: GIOI TINH VAI (hero/villain phai khop conflict) ====================
 // Doc giao tu TEXT cua conflict + relationship. Chi ket luan khi co dau hieu RO RANG;
@@ -594,6 +654,12 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   const weatherCands = (extra.weather_mood || []).filter((w) => seasonWeatherOk(bp.season_event, w) && locationWeatherOk(bp.location, w));
   bp.weather_mood = weatherCands.length ? pickOne(weatherCands) : '';
 
+  // ---- GUARD (2): 3 truong tra bang GEOGRAPHY phai co trong bang, khong duoc roi 'any' ----
+  const HG = 'Bổ sung dòng tương ứng vào story-geography-US.json.';
+  assertMapped('town_setting', bp.town_setting, townInTable(bp.town_setting), HG);
+  assertMapped('season_event', bp.season_event, seasonInTable(bp.season_event), HG);
+  assertMapped('weather_mood', bp.weather_mood, weatherInTable(bp.weather_mood), HG);
+
   // 6) occupation (affinity)
   bp.occupation = chooseWeighted(pool.occupation || [], { country, field: 'occupation', affinityKeywords: aff.preferred_occupations, affinityHard: true, softDays: soft.occupation, wr }) || '';
 
@@ -659,6 +725,12 @@ function buildOnce(country, theme, pool, extra, conf, cfg, input) {
   bp.justice_type = chooseWeighted(pool.justice_type || [], { country, field: 'justice_type', softDays: soft.justice_type, wr, exclude: excludeJust, familyOf: justiceFamily, softFamilies: justSoftFam, hardFamilies: justHardFam, bonusFamilies: justBonus }) || '';
   bp.justice_family = justiceFamily(bp.justice_type);
   bp.relationship_family = relationshipFamily(bp.relationship);
+
+  // ---- GUARD (1): 3 truong phan loai family PHAI tra duoc nhan ----
+  const H = 'Khai nhãn trong pool.family_map hoặc bổ sung luật trong story-dna.js.';
+  assertMapped('twist', bp.twist, bp.reveal_family, H);
+  assertMapped('justice_type', bp.justice_type, bp.justice_family, H);
+  assertMapped('relationship', bp.relationship, bp.relationship_family, H);
 
   // 12) ending — plot: tranh total reconciliation (avoid_total_reconciliation_rate)
   const recRate = memory.rateRecent(country, 20, (c) => isReconciliationEnding(c.ending)).rate;
