@@ -55,6 +55,8 @@ const DEFAULT_SKILL_COMMAND =
 
 Chạy đầy đủ pipeline tự động (tự sinh idea, 20 hook, chấm KPI, đóng vai độc giả 55-75 chọn hook, viết caption A/B, viết bài web Part 1/2/3, 7 reviewer, adaptive threshold). Chống lặp với các bài đã sinh.
 
+⛔ Xuất TOÀN BỘ các khối ===...=== TRỰC TIẾP trong tin nhắn chat. TUYỆT ĐỐI KHÔNG tạo artifact, KHÔNG dùng canvas, KHÔNG gói bài vào ô/file riêng. Phần mềm chỉ đọc được nội dung trong bong bóng chat — bài trong artifact = không đọc được = phải viết lại. Dù bài dài 4000 từ vẫn viết thẳng ra chat.
+
 QUAN TRỌNG — xuất kết quả theo ĐÚNG khuôn nhãn dưới đây để phần mềm bóc tách (mỗi nhãn 1 dòng riêng, KHÔNG lời dẫn thừa). Ba nhãn cuối (DEDUP_CONFIG, STORY_DNA, KPI_SCORES) phải là JSON hợp lệ đúng khoá như mẫu.
 
 ===WEB_TITLE===
@@ -1161,9 +1163,17 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
     lastErr = new Error(
       'Claude trả về THIẾU KHUÔN. Thiếu: ' + missing.join('; ') + '. '
       + 'Các mảnh tìm thấy: ' + (found.length ? found.join(', ') : 'KHÔNG có mảnh nào')
-      + `. (Claude trả về ${rawLen} ký tự${res.waitedFull ? ', HẾT GIỜ CHỜ 7 phút mà vẫn chưa đủ khuôn — nhiều khả năng Claude còn đang chạy dở' : ''} — mở mục "Log" để xem nguyên văn.)`
+      + `. (Claude trả về ${rawLen} ký tự — mở mục "Log" để xem nguyên văn.)`
     );
     onProgress({ message: '✗ ' + lastErr.message });
+    // CHUAN BI B: bong bong chat ngan + co panel artifact -> nhieu kha nang Claude viet vao ARTIFACT.
+    if (res.artifactDiag && res.artifactDiag.found) {
+      const h = res.artifactDiag.hits.map((x) => `${x.sel}[${x.len} ký tự, class="${x.cls}"]`).join(' ; ');
+      onProgress({ message: `🔬 NGHI ARTIFACT: chat chỉ ${rawLen} ký tự nhưng DOM có panel dài — ${h}. (Claude có thể đã viết bài vào artifact; gửi log này để sửa cách đọc.)` });
+      store.writeRawLog(JSON.stringify(res.artifactDiag), {
+        at: new Date().toISOString(), niche: nicheLabel, attempt, phase: 'artifact_diag', chatLen: rawLen,
+      });
+    }
     onProgress({ message: 'ℹ️ Đã lưu nguyên văn kết quả Claude vào mục "Log" (bên trái) để chẩn đoán.' });
     await delay(1000);
   }

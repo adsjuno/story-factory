@@ -59,13 +59,27 @@ function scanTitleRules(text, sourceName, out) {
   }
 }
 
+// Cum KHUYEN KHICH artifact/canvas — template TUYET DOI khong duoc day (app doc chat, khong
+// doc artifact). Xu ly phu dinh -> "KHONG tao artifact" hop le, chi bat khi DAY dung.
+const ARTIFACT_BANNED = ['create an artifact', 'use an artifact', 'as an artifact', 'in a canvas',
+  'use the canvas', 'as a document', 'in a document', 'tạo artifact', 'dùng canvas', 'dùng artifact',
+  'gói vào artifact', 'xuất ra artifact', 'viết vào artifact'];
+
 function scanTemplate(text, sourceName) {
   const out = [];
   scanPhrases('CTA.BEG (xin tương tác)', text, sw.CTA_BEG_PHRASES || [], sourceName, out);
   scanPhrases('CTA.SPOIL (lộ nội dung sau)', text, sw.CTA_SPOIL_PHRASES || [], sourceName, out);
   scanPhrases('IMAGE (bộ lọc AI vẽ)', text, sw.IMAGE_BANNED || [], sourceName, out);
+  scanPhrases('ARTIFACT (app chỉ đọc chat)', text, ARTIFACT_BANNED, sourceName, out);
   scanTitleRules(text, sourceName, out);
   return out;
+}
+
+// Dam bao DEFAULT_SKILL_COMMAND CO dong cam artifact (thieu -> canh bao, khong fail).
+function checkAntiArtifactPresent() {
+  const t = sw.DEFAULT_SKILL_COMMAND || '';
+  const has = /KHÔNG tạo artifact/i.test(t) || /không.*artifact.*không.*canvas/i.test(t);
+  return has;
 }
 
 // ---- Nguon template: DEFAULT + ban da luu trong settings (neu co) ----
@@ -92,7 +106,13 @@ const counts = (sw.CTA_BEG_PHRASES || []).length + (sw.CTA_SPOIL_PHRASES || []).
 
 console.log('=== GUARD TEMPLATE ===');
 console.log('Nguồn quét : ' + sources.map((s) => s[0]).join(' | '));
-console.log('Cụm cấm    : ' + counts + ' (đọc thẳng từ story-writer.js, không chép lại)');
+console.log('Cụm cấm    : ' + (counts + ARTIFACT_BANNED.length) + ' (đọc thẳng từ story-writer.js, không chép lại)');
+// Canh bao (khong fail) neu THIEU dong cam artifact — de template luon co lop chan thu 2.
+if (!checkAntiArtifactPresent()) {
+  console.log('⚠️  CẢNH BÁO : DEFAULT_SKILL_COMMAND THIẾU dòng cấm artifact — nên thêm "KHÔNG tạo artifact".');
+} else {
+  console.log('Anti-artifact: ✓ template có dòng cấm artifact/canvas.');
+}
 if (!all.length) {
   console.log('KẾT QUẢ    : ✓ SẠCH — template không dạy Claude thứ mà app đang cấm.');
   process.exit(0);

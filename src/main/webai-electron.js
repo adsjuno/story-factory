@@ -77,18 +77,32 @@ async function lastText(wc, assistant) {
   return (await jsEval(wc, `(function(){var a=document.querySelectorAll(${JSON.stringify(assistant)}); if(!a.length) return ''; return a[a.length-1].innerText||'';})()`)) || '';
 }
 
-// TAT CA tin nhan tro ly (khong chi cai cuoi). Claude tach khoi "suy nghi" thanh phan tu rieng,
-// nen phan tu CUOI co the la dong nghi ngan ("Backup before trimming") chu khong phai bai.
-async function allTexts(wc, assistant) {
-  const arr = await jsEval(wc, `(function(){
-    var a=document.querySelectorAll(${JSON.stringify(assistant)});
-    return Array.prototype.map.call(a, function(e){ return e.innerText||''; });
-  })()`);
-  return Array.isArray(arr) ? arr : [];
-}
-
 async function isStreaming(wc, stop) {
   return !!(await jsEval(wc, `!!document.querySelector(${JSON.stringify(stop)})`));
+}
+
+// CHUAN BI B: khi bong bong chat ngan bat thuong, khao sat DOM xem co panel ARTIFACT/CANVAS
+// khong (Claude co the viet bai vao do thay vi vao chat). Tra {found, hits:[{sel,len,cls}], iframes}.
+// KHONG doc/dung noi dung — chi CHAN DOAN de sau nay biet selector dung ma sua (khong doan mo).
+async function artifactDom(wc) {
+  const code = `(function(){
+    var out={hits:[],iframes:document.querySelectorAll('iframe').length};
+    // cac dau hieu artifact/canvas tren claude.ai (class/testid hay doi -> quet ROONG)
+    var sels=['[class*="artifact" i]','[data-testid*="artifact" i]','[class*="canvas" i]',
+      '[aria-label*="artifact" i]','[class*="preview" i]','[role="complementary"]','aside','main aside'];
+    for(var i=0;i<sels.length;i++){
+      var els=document.querySelectorAll(sels[i]);
+      for(var j=0;j<els.length;j++){
+        var e=els[j]; var len=(e.innerText||'').length;
+        if(len>=500){ out.hits.push({sel:sels[i], len:len, cls:String(e.className||'').slice(0,60)}); }
+      }
+    }
+    // giu 4 hit dai nhat
+    out.hits.sort(function(a,b){return b.len-a.len;}); out.hits=out.hits.slice(0,4);
+    out.found=out.hits.length>0;
+    return out;
+  })()`;
+  return (await jsEval(wc, code)) || null;
 }
 
 /**
@@ -232,59 +246,44 @@ async function runPrompt(wc, cfg, prompt, timeoutMs, opts = {}) {
     }
   }
 
-  // ---- DOI TRA LOI ----
-  // isComplete(text) (tuy chon, do NGUOI GOI truyen xuong — vd story-writer dung REQUIRED cua no):
-  //   co  -> "DU KHUON moi la xong". Chua du khuon thi VAN CHO, du nut Stop bien mat va text
-  //          dung yen — vi do chinh la luc Claude dang chay tool (dem tu / cat bai / QA).
-  //   khong -> giu NGUYEN hanh vi cu (het stream + text on dinh 2 vong) cho ask()/openSession().
-  // shouldStop(): bam Dung -> thoat NGAY, khong doi het luot.
-  const isComplete = (opts && typeof opts.isComplete === 'function') ? opts.isComplete : null;
+  // ---- DOI TRA LOI (BAN CU v1.13, on dinh 90%): het stream + text on dinh 2 vong ~1.8s ----
+  // REVERT (v1.25): bo "DU KHUON moi la xong" (b63bd38) — no doc nho giot / rong khi Claude
+  //   viet vao artifact -> hong gan 100%. Goc cua loi 10% (chop som luc Claude tu cat bai) da
+  //   duoc chua o SKILL: bo tran do dai + cam Claude tu cat -> khong con khoang im lang gia.
+  // GIU LAI shouldStop() (nut Dung huy NGAY luot Claude — khong lien quan cach nhan dien "xong").
   const shouldStop = (opts && typeof opts.shouldStop === 'function') ? opts.shouldStop : (() => false);
-
-  // Lay ban text "tot nhat" trong tat ca tin nhan tro ly: uu tien ban DU KHUON, khong thi lay DAI NHAT.
-  const pickBest = async () => {
-    const texts = (await allTexts(wc, cfg.assistant)).filter((x) => x && (!baseline || x !== baseline));
-    if (!texts.length) return '';
-    if (isComplete) { const done = texts.find((x) => { try { return isComplete(x); } catch (_) { return false; } }); if (done) return done; }
-    return texts.reduce((a, b) => (b.length > a.length ? b : a), '');
-  };
-
   await delay(1500);
   const deadline = Date.now() + timeoutMs;
   let prev = '';
   let stable = 0;
-  let waitedFull = true;                       // het deadline ma chua dat dieu kien xong?
   while (Date.now() < deadline) {
     if (shouldStop()) return { ok: false, stopped: true, error: 'Đã dừng theo yêu cầu — huỷ lượt ' + cfg.name + ' đang chạy.' };
     const streaming = await isStreaming(wc, cfg.stopButton);
-    const txt = await pickBest();
-    if (isComplete) {
-      // DU KHUON moi tinh; du roi van cho on dinh 2 vong de chac khoi cuoi da viet xong.
-      let done = false;
-      try { done = !!(txt && isComplete(txt)); } catch (_) { done = false; }
-      if (done && txt === prev) { stable++; if (stable >= 2) { waitedFull = false; break; } }
-      else { stable = 0; prev = txt; }
+    const txt = await lastText(wc, cfg.assistant);
+    const isNew = !baseline || txt !== baseline;   // co baseline: text phai KHAC bai cu moi tinh
+    if (!streaming && txt && isNew && txt === prev) {
+      stable++;
+      if (stable >= 2) break; // 2 lan lien tiep text khong doi + het stream -> coi nhu xong
     } else {
-      const isNew = !baseline || txt !== baseline;
-      if (!streaming && txt && isNew && txt === prev) {
-        stable++;
-        if (stable >= 2) { waitedFull = false; break; }
-      } else { stable = 0; prev = txt; }
+      stable = 0;
+      prev = txt;
     }
     await delay(900);
   }
   if (shouldStop()) return { ok: false, stopped: true, error: 'Đã dừng theo yêu cầu — huỷ lượt ' + cfg.name + ' đang chạy.' };
 
-  const text = await pickBest();
+  const text = await lastText(wc, cfg.assistant);
   if (!text || text.length < 10) {
     return { ok: false, error: 'Không lấy được câu trả lời từ ' + cfg.name + ' (có thể bị chặn hoặc giao diện đổi).' };
   }
   if (baseline && text === baseline) {
     return { ok: false, error: 'Không thấy phản hồi MỚI từ ' + cfg.name + ' cho prompt tiếp theo (cùng đoạn chat).' };
   }
-  // waitedFull = het gio ma chua du khuon -> bao len de nguoi goi ghi log ro (doc duoc bao nhieu,
-  // thieu nhan nao) thay vi tuong Claude tra sai khuon.
-  return { ok: true, text, waitedFull };
+  // CHUAN BI B: bong bong chat ngan bat thuong -> nhieu kha nang Claude viet vao ARTIFACT.
+  // Dump DOM de lan chay that lo ra panel artifact nam dau (class + do dai) -> sua doc dung cho.
+  let artifactDiag = null;
+  if (text.length < 500) artifactDiag = await artifactDom(wc);
+  return { ok: true, text, artifactDiag };
 }
 
 // Hoi 1 phat: mo cua so, load trang, gui prompt, dong cua so. (giu cho cac cho dung le)
