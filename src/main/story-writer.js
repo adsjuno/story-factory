@@ -311,6 +311,7 @@ function getImageConfig() {
     r2Endpoint: (img.r2Endpoint || '').trim(),
     r2Bucket: (img.r2Bucket || '').trim(),
     r2PublicDomain: (img.r2PublicDomain || '').trim(),
+    placeholderUrl: (img.placeholderUrl || '').trim(),      // TANG 1: anh du phong khi TAT CA loi
     // Nguon tao anh + thu tu uu tien + bat/tat + hien cua so
     source: {
       order: Array.isArray(src.order) && src.order.length ? src.order : imageRouter.DEFAULT_ORDER,
@@ -640,18 +641,15 @@ async function generateArticleImages(storyId, s, onProgress = () => {}, shouldSt
     { kind: 'p3', prompt: s.WEB_P3_PROMPT },
   ];
   let okCount = 0;
-  let madeAny = false; // da bat dau tao it nhat 1 anh chua -> de gian cach giua CAC LAN tao
+  const got = {};                          // kind -> url tao THANH CONG (de fallback cheo)
   for (const j of jobs) {
-    // DUNG giua chung khi dang tao anh: bo cac anh con lai -> bai se mang status need_image
+    // DUNG giua chung khi dang tao anh: bo cac anh con lai.
     if (shouldStop()) { result.errors.push(`${j.kind}: đã dừng theo yêu cầu`); result.stopped = true; continue; }
     if (!j.prompt) { result.errors.push(`${j.kind}: thiếu prompt`); continue; }
-    // TUAN TU: gian cach vai giay giua 2 lan tao anh (tranh gioi han tan suat Cloudflare)
-    if (madeAny) { onProgress({ message: 'Đợi 5 giây trước khi tạo ảnh tiếp (tránh giới hạn Cloudflare)...' }); await delay(5000); }
-    madeAny = true;
     if (j.kind === 'thumb' && j.fallback) onProgress({ message: 'ℹ️ Skill chưa xuất THUMB_PROMPT — dùng tạm web_p1_prompt cho thumbnail ngang.' });
     const r = await imageRouter.createAndUpload({ prompt: j.prompt, storyId, kind: j.kind, cfg }, logger);
     if (r.ok) {
-      okCount++;
+      okCount++; got[j.kind] = r.url;
       if (j.kind === 'fb') result.fbImageUrl = r.url;
       else if (j.kind === 'thumb') result.thumbnailUrl = r.url;   // thumbnail NGANG rieng
       else result.webUrls[j.kind] = r.url;
@@ -659,8 +657,93 @@ async function generateArticleImages(storyId, s, onProgress = () => {}, shouldSt
       result.errors.push(`${j.kind}: ${r.error}`);
     }
   }
-  result.allOk = okCount === jobs.length;   // du 5 anh
+  result.allOk = okCount === jobs.length;   // du 5 anh (khong dung fallback)
+
+  // ---- TANG 1: FALLBACK — mach KHONG BAO GIO dut. Bi dung giua chung thi KHONG fallback. ----
+  if (!result.stopped) {
+    const anyUrl = () => got.thumb || got.fb || got.p1 || got.p2 || got.p3 || (cfg.placeholderUrl || placeholderUrl(cfg));
+    const filled = [];
+    // fb loi -> thumb ; thumb loi -> p1 (hoac fb) ; p1/p2/p3 loi -> thumb (hoac anh bat ky)
+    if (!result.fbImageUrl) { result.fbImageUrl = got.thumb || anyUrl(); filled.push('fb←' + (got.thumb ? 'thumb' : 'ảnh khác')); }
+    if (!result.thumbnailUrl) { result.thumbnailUrl = got.p1 || got.fb || anyUrl(); filled.push('thumb←' + (got.p1 ? 'p1' : got.fb ? 'fb' : 'ảnh khác')); }
+    for (const k of ['p1', 'p2', 'p3']) {
+      if (!result.webUrls[k]) { result.webUrls[k] = got.thumb || anyUrl(); filled.push(k + '←' + (got.thumb ? 'thumb' : 'ảnh khác')); }
+    }
+    result.usedFallback = filled;
+    if (filled.length) onProgress({ message: `🩹 Fallback ảnh (${okCount}/5 tạo được): ${filled.join(', ')} — bài vẫn đủ ảnh, status = new.` });
+  }
+  // Sau fallback: LUON co fb + thumb + p1/p2/p3 -> khong bao gio ket need_image.
+  result.filledAll = !!(result.fbImageUrl && result.thumbnailUrl && result.webUrls.p1 && result.webUrls.p2 && result.webUrls.p3);
   return result;
+}
+
+// URL anh placeholder mac dinh khi TAT CA deu loi. Uu tien cau hinh nguoi dung;
+// khong co thi tro toi {r2PublicDomain}/placeholder.jpg (nguoi dung up 1 file vao do 1 lan).
+function placeholderUrl(cfg) {
+  const dom = (cfg && cfg.r2PublicDomain) ? String(cfg.r2PublicDomain).replace(/\/+$/, '') : '';
+  return dom ? dom + '/placeholder.jpg' : '';
+}
+
+// ---- TANG 2: so prompt anh theo story_id (de "Tao lai anh" khong can doc Sheet) ----
+const IMAGE_JOBS_FILE = 'image-jobs.json';
+const IMAGE_JOBS_MAX = 200;
+function readImageJobsDb() { try { return store.read(IMAGE_JOBS_FILE) || {}; } catch (_) { return {}; } }
+function saveImageJobs(storyId, s) {
+  const db = readImageJobsDb();
+  db[String(storyId)] = {
+    at: new Date().toISOString(),
+    fb: s.FB_IMAGE_PROMPT || '', thumb: s.THUMB_PROMPT || s.WEB_P1_PROMPT || '',
+    p1: s.WEB_P1_PROMPT || '', p2: s.WEB_P2_PROMPT || '', p3: s.WEB_P3_PROMPT || '',
+  };
+  const ids = Object.keys(db);
+  if (ids.length > IMAGE_JOBS_MAX) {                         // cat bot ban ghi cu nhat
+    ids.sort((a, b) => String(db[a].at).localeCompare(String(db[b].at)));
+    for (const id of ids.slice(0, ids.length - IMAGE_JOBS_MAX)) delete db[id];
+  }
+  store.write(IMAGE_JOBS_FILE, db);
+}
+function getImageJobs(storyId) {
+  const db = readImageJobsDb();
+  if (db[String(storyId)]) return db[String(storyId)];
+  // du phong: bai gan nhat co the lay tu last-run (co day du sections)
+  try {
+    const lr = store.readRawLog();
+    if (lr && lr.raw) {
+      const sec = parseSections(lr.raw);
+      if (sec.FB_IMAGE_PROMPT || sec.WEB_P1_PROMPT) {
+        return { fb: sec.FB_IMAGE_PROMPT || '', thumb: sec.THUMB_PROMPT || sec.WEB_P1_PROMPT || '',
+          p1: sec.WEB_P1_PROMPT || '', p2: sec.WEB_P2_PROMPT || '', p3: sec.WEB_P3_PROMPT || '', fromLastRun: true };
+      }
+    }
+  } catch (_) {}
+  return null;
+}
+
+/**
+ * TAO LAI CHI ANH cho 1 story_id da co (KHONG viet lai truyen).
+ * R2 key xac dinh theo storyId -> up de len CUNG key -> anh o CUNG URL duoc thay -> Sheet
+ * KHONG can cap nhat link. Giu nguyen web_body/caption/DNA.
+ * @returns {ok, storyId, urls:{fb,thumb,p1,p2,p3}, madeOk, usedFallback, filledAll, error?}
+ */
+async function regenerateImages(storyId, onProgress = () => {}, shouldStop = () => false) {
+  storyId = String(storyId || '').trim();
+  if (!storyId) return { ok: false, error: 'Thiếu story_id.' };
+  const jobs = getImageJobs(storyId);
+  if (!jobs) return { ok: false, error: `Không tìm thấy prompt ảnh của ${storyId} (chỉ lưu cho bài viết từ v1.24 trở đi, hoặc bài gần nhất).` };
+  // Dung lai generateArticleImages: dan prompt vao dang "sections" gia
+  const fake = {
+    FB_IMAGE_PROMPT: jobs.fb, THUMB_PROMPT: jobs.thumb,
+    WEB_P1_PROMPT: jobs.p1, WEB_P2_PROMPT: jobs.p2, WEB_P3_PROMPT: jobs.p3,
+  };
+  onProgress({ message: `🖼️ Tạo lại ảnh cho ${storyId}${jobs.fromLastRun ? ' (prompt lấy từ log bài gần nhất)' : ''}...` });
+  const imgs = await generateArticleImages(storyId, fake, onProgress, shouldStop);
+  if (!imgs.configured) return { ok: false, error: 'Chưa cấu hình Ảnh & Lưu trữ (Cài đặt).' };
+  return {
+    ok: true, storyId,
+    urls: { fb: imgs.fbImageUrl, thumb: imgs.thumbnailUrl, p1: imgs.webUrls.p1, p2: imgs.webUrls.p2, p3: imgs.webUrls.p3 },
+    madeOk: !imgs.errors || imgs.errors.length === 0, usedFallback: imgs.usedFallback || [],
+    filledAll: !!imgs.filledAll, stopped: !!imgs.stopped,
+  };
 }
 
 // Kiem tra bai co du cac phan quan trong khong (de thu lai neu Claude tra thieu khuon)
@@ -1032,12 +1115,18 @@ async function writeOne(nicheLabel, nicheCode, onProgress = () => {}, shouldStop
           imgs = { fbImageUrl: '', thumbnailUrl: '', webUrls: { p1: '', p2: '', p3: '' }, allOk: false, configured: true, errors: [e.message] };
           onProgress({ message: '⚠️ Lỗi tạo ảnh: ' + e.message + ' — vẫn đẩy bài (link ảnh để trống).' });
         }
-        status = (imgs.configured && !imgs.allOk) ? 'need_image' : 'new';
+        // TANG 1: sau fallback bai LUON du 5 anh (filledAll) -> status = new, khong ket need_image.
+        // Chi ket need_image khi: chua cau hinh anh, hoac BI DUNG giua chung (chua fallback).
+        if (imgs.stopped) status = 'need_image';
+        else if (!imgs.configured) status = 'new';           // khong cau hinh -> bai chu, van dang
+        else status = imgs.filledAll ? 'new' : 'need_image';
         if (status === 'need_image') {
-          onProgress({ message: `⚠️ Bài ${storyId}: tạo ảnh chưa đủ (${imgs.errors.join('; ')}). Đẩy bài, đánh dấu need_image để chạy lại.` });
+          onProgress({ message: `⚠️ Bài ${storyId}: ${imgs.stopped ? 'đã dừng giữa chừng' : 'không đủ ảnh kể cả fallback'} (${imgs.errors.join('; ')}) — need_image.` });
         } else {
-          onProgress({ message: `✓ Xong bài ${storyId} — ${runLabel}` });
+          onProgress({ message: `✓ Xong bài ${storyId} — ${runLabel}${imgs.usedFallback && imgs.usedFallback.length ? ' (có dùng fallback ảnh)' : ''}` });
         }
+        // TANG 2: luu 5 prompt anh theo story_id -> nut "Tao lai anh" dung lai duoc (khong can doc Sheet).
+        try { saveImageJobs(storyId, s); } catch (_) {}
       }
 
       // Thay {{IMG_Px}} trong web_body bang link that (thieu link thi go the img)
@@ -1158,6 +1247,7 @@ module.exports = {
   isComplete,
   isCompleteRaw,
   generateArticleImages,
+  regenerateImages, getImageJobs, saveImageJobs, placeholderUrl,
   normalizeJson,
   normalizeKpi,
   wordCount,

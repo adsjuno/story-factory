@@ -160,6 +160,29 @@ async function extractBestImage(wc, cfg) {
   return (await jsEval(wc, code)) || { status: 'none' };
 }
 
+// CHAN DOAN: khi khong tim thay anh, dump thuc te DOM co GI (moi img + kich thuoc + src prefix,
+// va co background-image lon nao khong). Giup lan chay that lo ra Gemini dat anh o dau.
+async function domImageDiag(wc) {
+  const code = `(function(){
+    var out={imgs:[],bg:0,iframes:0,shadow:0};
+    var all=document.querySelectorAll('img');
+    out.imgTotal=all.length;
+    for(var i=0;i<all.length;i++){var im=all[i];var s=im.currentSrc||im.src||'';
+      out.imgs.push({w:im.naturalWidth||0,h:im.naturalHeight||0,dw:im.width||0,dh:im.height||0,src:s.slice(0,42)});}
+    // giu lai 8 anh LON nhat de log gon
+    out.imgs.sort(function(a,b){return (b.w*b.h)-(a.w*a.h);}); out.imgs=out.imgs.slice(0,8);
+    // background-image lon (anh render dang CSS bg)
+    var els=document.querySelectorAll('*');
+    for(var j=0;j<els.length;j++){var bg=getComputedStyle(els[j]).backgroundImage;
+      if(bg&&bg.indexOf('url(')===0&&els[j].offsetWidth>=256&&els[j].offsetHeight>=256)out.bg++;}
+    out.iframes=document.querySelectorAll('iframe').length;
+    // dem host co shadowRoot (querySelectorAll khong xuyen qua)
+    for(var k=0;k<els.length;k++){ if(els[k].shadowRoot) out.shadow++; }
+    return out;
+  })()`;
+  return (await jsEval(wc, code)) || null;
+}
+
 function dataUrlToBuffer(dataUrl) {
   const m = String(dataUrl || '').match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.*)$/);
   if (!m) return null;
@@ -175,7 +198,7 @@ function hasAny(text, phrases) {
  * Tao 1 anh qua dieu khien cua so.
  * @returns {ok:true, buffer, mimeType} | {ok:false, error, quota?, flagged?}
  */
-async function generate(provider, prompt, { timeoutMs = 180000, show = false, log = () => {} } = {}) {
+async function generate(provider, prompt, { timeoutMs = 60000, show = false, log = () => {} } = {}) {
   const cfg = cfgOf(provider);
   if (!cfg) return { ok: false, error: 'Nguồn ảnh không hỗ trợ: ' + provider };
   if (!prompt || !String(prompt).trim()) return { ok: false, error: 'Prompt ảnh rỗng' };
@@ -196,6 +219,7 @@ async function generate(provider, prompt, { timeoutMs = 180000, show = false, lo
     const deadline = Date.now() + timeoutMs;
     let sawImage = false;      // da tung thay the <img> chua (de phan biet "khong render" vs "trich fail")
     let failStreak = 0;        // so lan lien tiep co anh nhung trich khong duoc
+    let lastDiag = 0;          // moc thoi gian dump DOM chan doan gan nhat
     while (Date.now() < deadline) {
       const ex = await extractBestImage(wc, cfg);
 
@@ -226,6 +250,16 @@ async function generate(provider, prompt, { timeoutMs = 180000, show = false, lo
         if (hasAny(txt, cfg.quotaPhrases)) {
           log(`[${cfg.name}] ⚠️ báo hết quota/giới hạn.`);
           return { ok: false, quota: true, error: cfg.name + ' hết quota/giới hạn ngày.' };
+        }
+        // CHAN DOAN: ~10s/lan, dump DOM thuc te co gi -> lan chay that lo ra anh nam dau
+        // (selector khong bat / la CSS background / trong shadow DOM / iframe).
+        if (Date.now() - lastDiag > 10000) {
+          lastDiag = Date.now();
+          const d = await domImageDiag(wc);
+          if (d) {
+            const top = (d.imgs || []).slice(0, 3).map((x) => `${x.w}x${x.h}(${x.src})`).join(' , ');
+            log(`[${cfg.name}] 🔍 DOM: ${d.imgTotal} <img> (lớn nhất: ${top || 'không có'}) | bg-image≥256: ${d.bg} | iframe: ${d.iframes} | shadowRoot: ${d.shadow}`);
+          }
         }
       }
       await delay(1800); // cho 1.8s roi thu lai (retry)

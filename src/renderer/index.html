@@ -96,6 +96,16 @@
         <div class="hint">Sổ tạm giúp test nhanh xoay đều P01→P10 giữa các lần chạy. Bấm để xoá và bắt đầu vòng xoay mới. Tự xoá khi tắt app.</div>
       </div>
 
+      <div class="card">
+        <div class="lbl big">🖼️ Tạo lại ảnh (không viết lại truyện)</div>
+        <p class="hint">Dùng cho bài lỡ kẹt need_image hoặc ảnh xấu. Nhập story_id — app tạo lại 5 ảnh và ghi đè lên đúng link cũ trên R2 (Sheet không đổi). Giữ nguyên nội dung/caption/DNA.</p>
+        <div class="row">
+          <input id="regenStoryId" class="in" placeholder="vd: ST00000038" autocomplete="off">
+          <button id="regenImgBtn" class="btn btn-primary btn-sm">🖼️ Tạo lại ảnh</button>
+        </div>
+        <div id="regenMsg" class="msg"></div>
+      </div>
+
       <div class="card log-card">
         <div class="log-head">
           <span class="lbl">Tiến trình</span>

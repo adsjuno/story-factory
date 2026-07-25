@@ -44,6 +44,7 @@ const api = {
   write: (p) => call('story:write', p),
   stopWrite: () => call('story:stop'),
   resetSession: () => call('story:resetSession'),
+  regenImages: (p) => call('story:regenImages', p),
   sheetsTest: () => call('sheets:test'),
   listJobs: () => call('jobs:list'),
 

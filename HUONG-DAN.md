@@ -94,6 +94,19 @@ bài thật). Nhưng các bài trong **cùng một lần bấm "Bắt đầu vi�
 **sổ tạm trong phiên**, nên vẫn xoay page và không lặp subcategory / vật biểu tượng /
 kiểu reveal / kiểu công lý. Sổ tạm xoá khi kết thúc lượt chạy.
 
+## Ảnh: fallback + tạo lại (sản xuất số lượng lớn, không sợ lỗi lẻ)
+
+**Fallback — bài luôn đủ ảnh:** ảnh nào tạo hỏng sau khi thử hết nguồn thì lấy ảnh khác của
+chính bài đó thay vào (fb←thumb, thumb←p1, p1/p2/p3←thumb). Tất cả hỏng → 1 ảnh placeholder
+mặc định (`{r2PublicDomain}/placeholder.jpg` — **nên upload sẵn 1 file vào đó một lần**, hoặc
+đặt link riêng ở `settings.image.placeholderUrl`). Nhờ vậy `fb_image_url`/`thumbnail_url` **không
+bao giờ rỗng** và status **luôn về `new`**, không kẹt `need_image` (trừ khi bấm Dừng giữa chừng).
+
+**Nút "🖼️ Tạo lại ảnh":** nhập story_id → app tạo lại 5 ảnh, ghi đè lên **đúng R2 key cũ** nên
+ảnh mới nằm ở **cùng URL** (Sheet không cần đổi). Giữ nguyên nội dung/caption/DNA. Dùng cho bài
+ảnh xấu hoặc bài cũ lỡ kẹt. (Chỉ chạy lại được bài đã lưu prompt — bài viết từ v1.24 trở đi, hoặc
+bài gần nhất.)
+
 ## Yêu cầu QUAN TRỌNG
 
 - **Tài khoản Claude đang đăng nhập trong phần mềm PHẢI đã "Save skill" `story-us-senior-viral`.**

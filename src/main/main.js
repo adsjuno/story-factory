@@ -241,6 +241,21 @@ ipcMain.handle('story:resetSession', () => {
   return { ok: true, cleared: n };
 });
 
+// TANG 2: TAO LAI ANH cho 1 story_id (KHONG viet lai truyen). Anh len CUNG R2 key -> CUNG URL.
+let REGEN_STOP = false;
+ipcMain.handle('story:regenImages', async (_e, { storyId }) => {
+  requireAuth();
+  REGEN_STOP = false;
+  try {
+    const r = await storyWriter.regenerateImages(String(storyId || ''), (p) => {
+      mainWindow.webContents.send('story:progress', p);
+    }, () => REGEN_STOP);
+    return r;
+  } catch (e) { return { ok: false, error: e.message }; }
+  finally { REGEN_STOP = false; }
+});
+ipcMain.handle('story:regenStop', () => { requireAuth(); REGEN_STOP = true; return { ok: true }; });
+
 ipcMain.handle('sheets:test', async () => {
   requireAuth();
   const s = loadSettings();

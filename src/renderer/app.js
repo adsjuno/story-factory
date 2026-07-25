@@ -224,6 +224,24 @@ $('resetSessionBtn').onclick=async()=>{
   logLine(r&&r.ok?('🧹 Đã reset sổ tạm test ('+(r.cleared||0)+' bản ghi) — vòng xoay page bắt đầu lại.'):'⚠️ Không reset được sổ tạm.', r&&r.ok?'ok':'err');
 };
 
+$('regenImgBtn').onclick=async()=>{
+  const id=($('regenStoryId').value||'').trim();
+  if(!id){ $('regenMsg').textContent='Nhập story_id (vd ST00000038).'; return; }
+  const btn=$('regenImgBtn'); btn.disabled=true; const old=btn.textContent; btn.textContent='⏳ Đang tạo...';
+  $('regenMsg').textContent=''; $('log').innerHTML=''; $('progBadge').classList.remove('hidden');
+  const off=api.onProgress(p=>{if(p&&p.message)logLine(p.message);});
+  const r=await api.regenImages({storyId:id});
+  off&&off(); $('progBadge').classList.add('hidden'); btn.disabled=false; btn.textContent=old;
+  if(r&&r.ok){
+    const fb=r.usedFallback&&r.usedFallback.length?(' (fallback: '+r.usedFallback.join(', ')+')'):'';
+    logLine('✅ Đã tạo lại ảnh '+r.storyId+' — ảnh được ghi đè lên link cũ.'+fb,'ok');
+    $('regenMsg').textContent='Xong. Ảnh mới đã ở đúng URL cũ trên R2 (làm mới trang web/xoá cache CDN nếu chưa thấy).';
+  }else{
+    logLine('❌ '+((r&&r.error)||'Không tạo lại được ảnh'),'err');
+    $('regenMsg').textContent=(r&&r.error)||'Lỗi.';
+  }
+};
+
 // ---------- CAI DAT ----------
 async function loadSettings(){
   const r=await api.getSettings();
