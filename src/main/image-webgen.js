@@ -34,9 +34,10 @@ const PROVIDERS = {
     quotaPhrases: ["you've reached your limit", 'you have reached your limit', 'try again later',
       'daily limit', 'come back later', 'upgrade to', 'limit for', 'quota'],
     // Cau TU CHOI tao anh (bo loc noi dung)
+    // CUM tu MODEL that tu choi. BO 'against'/'policy' tran trui (qua rong -> tung bao nham).
     refusePhrases: ["i can't create", "i'm unable to create", 'i cannot create', 'unable to generate',
-      "can't generate that image", 'against', 'policy', 'not able to help with that image',
-      "i can't help with that", 'violates'],
+      "can't generate that image", 'content policy', 'not able to help with that image',
+      "i can't help with that", 'violates our', 'against our'],
     wrap: (p) => 'Generate a single image. Do not add any text explanation. Image prompt: ' + p,
   },
   chatgpt: {
@@ -52,8 +53,9 @@ const PROVIDERS = {
     genPlaceholder: [],
     quotaPhrases: ["you've reached", 'reached your limit', 'try again later', 'usage limit',
       'come back later', 'upgrade to', 'image generation limit', 'rate limit'],
+    // BO 'against'/'policy' tran trui (qua rong -> tung bao nham tu dong 'Privacy Policy' cua trang).
     refusePhrases: ["i can't create", "i'm unable", 'i cannot create', 'unable to generate',
-      "can't generate that image", 'content policy', 'against', 'policy', 'violates',
+      "can't generate that image", 'content policy', 'violates our', 'against our',
       "i won't be able to"],
     wrap: (p) => 'Create an image (no extra text). ' + p,
   },
@@ -80,8 +82,38 @@ async function waitForComposer(wc, composer, timeoutMs) {
   return false;
 }
 
-// Dan prompt vao o nhap + gui (giong cach webai lam, an voi ProseMirror/contenteditable)
+// BAN su kien input/beforeinput de framework (Angular/Quill cua Gemini, ProseMirror cua ChatGPT)
+// GHI NHAN text vua chen. KHONG lam viec nay -> nut Gui KHONG BAT -> gui truot -> chat trong.
+// (Da kiem chung tren Gemini live: execCommand chen text OK nhung nut "Send message" chi hien
+//  sau khi ban 'input'/'beforeinput'.)
+async function fireInputEvents(wc, composer) {
+  await jsEval(wc, `(function(){
+    var el=document.querySelector(${JSON.stringify(composer)}); if(!el) return false; el.focus();
+    try{ el.dispatchEvent(new InputEvent('beforeinput',{bubbles:true,cancelable:true,inputType:'insertText',data:' '})); }catch(_){}
+    try{ el.dispatchEvent(new InputEvent('input',{bubbles:true,cancelable:true,inputType:'insertText'})); }catch(_){}
+    try{ el.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){}
+    try{ el.dispatchEvent(new KeyboardEvent('keydown',{bubbles:true,key:'a'})); el.dispatchEvent(new KeyboardEvent('keyup',{bubbles:true,key:'a'})); }catch(_){}
+    return true;
+  })()`);
+}
+// Doi NUT GUI xuat hien & enabled (nut chi hien sau khi framework ghi nhan text). Tra selector khop hay false.
+async function waitSendButton(wc, sendSel, timeoutMs) {
+  const dl = Date.now() + timeoutMs;
+  while (Date.now() < dl) {
+    const ok = await jsEval(wc, `(function(){var b=document.querySelector(${JSON.stringify(sendSel)}); return !!(b && !b.disabled && b.offsetParent!==null);})()`);
+    if (ok) return true;
+    await delay(300);
+  }
+  return false;
+}
+async function boxLen(wc, composer) {
+  return await jsEval(wc, `(function(){var e=document.querySelector(${JSON.stringify(composer)}); return e?((e.innerText||e.value||'')+'').trim().length:-1;})()`);
+}
+
+// Dan prompt vao o nhap + gui, CO VERIFY BAT BUOC (khong bao ao). Tra:
+//  {ok:true} | {ok:false, notSent:true, error} (KHONG bao gio la "bi loc").
 async function typeAndSend(wc, cfg, prompt, log) {
+  // 1) CHEN text
   await jsEval(wc, `(function(){
     var el = document.querySelector(${JSON.stringify(cfg.composer)});
     if (!el) return false;
@@ -89,26 +121,57 @@ async function typeAndSend(wc, cfg, prompt, log) {
     try { document.execCommand('selectAll', false, null); document.execCommand('delete', false, null); } catch(_){}
     try { return document.execCommand('insertText', false, ${JSON.stringify(prompt)}); } catch(_){ return false; }
   })()`);
-  await delay(600);
-  let len = await jsEval(wc, `(function(){var e=document.querySelector(${JSON.stringify(cfg.composer)}); return e?(e.innerText||e.value||'').trim().length:-1;})()`);
-  if (len < 20) { // du phong: go qua Electron
+  await delay(400);
+  await fireInputEvents(wc, cfg.composer);   // <-- MAU CHOT: bao framework "co text moi"
+  await delay(300);
+  let len = await boxLen(wc, cfg.composer);
+  if (len < 20) { // du phong: go qua Electron (go that -> tu ban input event)
     await jsEval(wc, `(function(){var e=document.querySelector(${JSON.stringify(cfg.composer)}); if(e)e.focus();})()`);
     await delay(300);
     wc.insertText(prompt);
     await delay(700);
-    len = await jsEval(wc, `(function(){var e=document.querySelector(${JSON.stringify(cfg.composer)}); return e?(e.innerText||e.value||'').trim().length:-1;})()`);
+    await fireInputEvents(wc, cfg.composer);
+    await delay(300);
+    len = await boxLen(wc, cfg.composer);
   }
-  if (len < 20) return { ok: false, error: 'Không gõ được prompt vào ' + cfg.name + ' (giao diện web có thể vừa đổi).' };
+  // VERIFY 1: prompt DA VAO O chua? Trong -> bao KHONG GO DUOC (KHONG phai "bi loc").
+  if (len < 20) {
+    const dc = await diagComposer(wc, cfg);
+    if (dc) log(`[${cfg.name}] 🔬 Ô NHẬP: ${dc.box ? ('<' + dc.box.tag + '> aria="' + dc.box.aria + '"') : 'KHÔNG THẤY'} | selector khớp: ${(dc.boxSelMatched && dc.boxSelMatched.length) ? dc.boxSelMatched.join(' ; ') : '❌ KHÔNG CÁI NÀO'}`);
+    return { ok: false, notSent: true, error: 'KHÔNG GÕ ĐƯỢC PROMPT vào ' + cfg.name + ' (ô nhập trống sau khi gõ — selector ô nhập có thể đã đổi).' };
+  }
 
-  // Gui: bam nut send; neu khong duoc thi Enter
-  const clicked = await jsEval(wc, `(function(){var b=document.querySelector(${JSON.stringify(cfg.sendButton)}); if(b&&!b.disabled){b.click(); return true;} return false;})()`);
-  await delay(1000);
-  if (!clicked) {
-    wc.sendInputEvent({ type: 'keyDown', keyCode: 'Enter' });
-    wc.sendInputEvent({ type: 'char', keyCode: '\r' });
-    wc.sendInputEvent({ type: 'keyUp', keyCode: 'Enter' });
-    await delay(1000);
+  // 2) GUI: doi nut gui XUAT HIEN roi bam; khong co thi Enter.
+  const trySend = async () => {
+    const ready = await waitSendButton(wc, cfg.sendButton, 4000);
+    let clicked = false;
+    if (ready) clicked = await jsEval(wc, `(function(){var b=document.querySelector(${JSON.stringify(cfg.sendButton)}); if(b&&!b.disabled){b.click(); return true;} return false;})()`);
+    if (!clicked) {
+      wc.sendInputEvent({ type: 'keyDown', keyCode: 'Enter' });
+      wc.sendInputEvent({ type: 'char', keyCode: '\r' });
+      wc.sendInputEvent({ type: 'keyUp', keyCode: 'Enter' });
+    }
+    return { ready, clicked };
+  };
+  const s1 = await trySend();
+  await delay(1600);
+
+  // VERIFY 2: DA GUI THAT chua? o nhap rong lai HOAC co luot NGUOI DUNG moi trong DOM.
+  let sent = await diagSent(wc, cfg);
+  if (!(sent.userTurns > 0 || sent.boxLen === 0)) {
+    log(`[${cfg.name}] ⟳ chưa thấy chat mới (nút gửi ready=${s1.ready}, click=${s1.clicked}) — bắn lại input & gửi lần 2...`);
+    await fireInputEvents(wc, cfg.composer);
+    await delay(300);
+    await trySend();
+    await delay(1800);
+    sent = await diagSent(wc, cfg);
+    if (!(sent.userTurns > 0 || sent.boxLen === 0)) {
+      const dc = await diagComposer(wc, cfg);
+      if (dc) log(`[${cfg.name}] 🔬 NÚT GỬI: ${dc.sendFound ? ('CÓ aria="' + dc.sendAria + '" disabled=' + dc.sendDisabled) : 'KHÔNG THẤY'} | selector khớp: ${(dc.sendSelMatched && dc.sendSelMatched.length) ? dc.sendSelMatched.join(' ; ') : '❌ KHÔNG CÁI NÀO'}`);
+      return { ok: false, notSent: true, error: 'ĐÃ GÕ ĐƯỢC PROMPT NHƯNG KHÔNG GỬI ĐƯỢC vào ' + cfg.name + ' (nút gửi/Enter không kích hoạt — selector nút gửi có thể đã đổi).' };
+    }
   }
+  log(`[${cfg.name}] ✅ đã gửi prompt (ô nhập còn ${sent.boxLen} ký tự, lượt người dùng=${sent.userTurns}).`);
   return { ok: true };
 }
 
@@ -307,16 +370,7 @@ async function generate(provider, prompt, { hardCapMs = 150000, stuckCapMs = 700
     const sent = await typeAndSend(wc, cfg, cfg.wrap(String(prompt)), log);
     if (!sent.ok) return { ok: false, error: sent.error };
 
-    // ---- CHAN DOAN GUI (CHI LOG, khong doi hanh vi): selector con khop? prompt co vao o? da gui chua? ----
-    const dcomp = await diagComposer(wc, cfg);
-    if (dcomp) {
-      log(`[${cfg.name}] 🔬 Ô NHẬP: ${dcomp.box ? ('<' + dcomp.box.tag + '> aria="' + dcomp.box.aria + '" ph="' + dcomp.box.ph + '" — độ dài nội dung=' + dcomp.box.len) : 'KHÔNG THẤY Ô NHẬP'} | selector khớp: ${(dcomp.boxSelMatched && dcomp.boxSelMatched.length) ? dcomp.boxSelMatched.join('  ;  ') : '❌ KHÔNG CÁI NÀO'}`);
-      log(`[${cfg.name}] 🔬 NÚT GỬI: ${dcomp.sendFound ? ('CÓ aria="' + dcomp.sendAria + '" disabled=' + dcomp.sendDisabled) : '❌ KHÔNG THẤY NÚT GỬI'} | selector khớp: ${(dcomp.sendSelMatched && dcomp.sendSelMatched.length) ? dcomp.sendSelMatched.join('  ;  ') : '❌ KHÔNG CÁI NÀO'}`);
-    }
-    await delay(2500);
-    const dsent = await diagSent(wc, cfg);
-    const looksSent = dsent.userTurns > 0 || dsent.boxLen === 0;
-    log(`[${cfg.name}] 🔬 SAU GỬI 2.5s: ô nhập còn ${dsent.boxLen} ký tự | lượt người dùng trong DOM=${dsent.userTurns} → ${looksSent ? '✅ CÓ VẺ ĐÃ GỬI (có chat/lượt mới)' : '⚠️ NGHI CHƯA GỬI ĐƯỢC — không thấy chat/lượt mới (prompt có thể chưa vào)'}`);
+    // (typeAndSend da VERIFY gui that + log ket qua; block chan doan selector chi bat khi NGHI loi.)
 
     // ---- CHO THONG MINH (do TIN HIEU, khong do dong ho) ----
     //  - Con tin hieu "dang tao" (nut Stop / placeholder gstatic) -> cho tiep, toi tran hardCap 150s.
@@ -350,20 +404,24 @@ async function generate(provider, prompt, { hardCapMs = 150000, stuckCapMs = 700
           return { ok: false, error: 'Không lấy được bytes ảnh từ ' + cfg.name + ' sau khi thử mọi cách (CORS/định dạng).' };
         }
       } else {
-        // chua co anh -> soi text tu choi / het quota TRUOC
+        // chua co anh -> soi text tu choi / het quota. CHI TIN khi text den tu MODEL THAT (assistant),
+        // KHONG BAO GIO ket luan "tu choi/quota" tu chu tren trang (body) - vi body co san 'policy'/'terms'
+        // -> tranh BAO NHAM "bi loc" (loi cu da xac nhan: 'policy' khop dong 'Privacy Policy' cua trang).
         const lt = await lastTextSrc(wc);
-        const rf = firstMatch(lt.text, cfg.refusePhrases);
-        if (rf) {
-          const snip = lt.text.slice(Math.max(0, rf.idx - 40), rf.idx + 60).replace(/\s+/g, ' ');
-          const nghiBia = lt.src === 'body' ? ' (⚠️ CHỈ là chữ trên trang, KHÔNG phải model trả lời — RẤT CÓ THỂ BÁO NHẦM)' : '';
-          log(`[${cfg.name}] ⊘ KẾT LUẬN "từ chối" DO khớp cụm "${rf.phrase}" | nguồn text=${lt.src}${nghiBia} | trích: "…${snip}…"`);
-          return { ok: false, flagged: true, error: cfg.name + ' từ chối tạo ảnh (khớp "' + rf.phrase + '", nguồn=' + lt.src + ').' };
+        if (lt.src === 'assistant') {
+          const rf = firstMatch(lt.text, cfg.refusePhrases);
+          if (rf) {
+            const snip = lt.text.slice(Math.max(0, rf.idx - 40), rf.idx + 60).replace(/\s+/g, ' ');
+            log(`[${cfg.name}] ⊘ model TỪ CHỐI (khớp "${rf.phrase}") | trích: "…${snip}…"`);
+            return { ok: false, flagged: true, error: cfg.name + ' từ chối tạo ảnh (model: "' + rf.phrase + '").' };
+          }
+          const qf = firstMatch(lt.text, cfg.quotaPhrases);
+          if (qf) {
+            log(`[${cfg.name}] ⚠️ model báo hết quota (khớp "${qf.phrase}").`);
+            return { ok: false, quota: true, error: cfg.name + ' hết quota/giới hạn ngày.' };
+          }
         }
-        const qf = firstMatch(lt.text, cfg.quotaPhrases);
-        if (qf) {
-          log(`[${cfg.name}] ⚠️ báo hết quota (khớp "${qf.phrase}", nguồn=${lt.src}).`);
-          return { ok: false, quota: true, error: cfg.name + ' hết quota/giới hạn ngày.' };
-        }
+        // src='body'/'none': CHUA co loi model -> KHONG ket luan gi, de vong lap cho tiep (idle/stuck se xu ly).
       }
 
       // TIN HIEU DANG TAO (nut Stop / placeholder). Con thay = tien trien -> reset dong ho idle.
