@@ -27,6 +27,9 @@ const PROVIDERS = {
     stopButton: 'button[aria-label="Stop response"], button[aria-label="Stop generating"], button.stop',
     // Anh Gemini sinh ra thuong nam trong response, src googleusercontent hoac blob
     imageSelectors: 'single-image img, generated-image img, image-container img, message-content img, response-container img, img',
+    // Dau hieu "DANG TAO ANH": src placeholder 150x150 gstatic/lamda (animation cua Gemini).
+    // Con thay dau hieu nay = Gemini van dang ve -> cho tiep (khong cat o mốc cứng).
+    genPlaceholder: ['gstatic.com/lamda', 'lamda/images/gemini'],
     // Cau bao HET QUOTA / bi gioi han (chuyen sang ChatGPT)
     quotaPhrases: ["you've reached your limit", 'you have reached your limit', 'try again later',
       'daily limit', 'come back later', 'upgrade to', 'limit for', 'quota'],
@@ -44,6 +47,9 @@ const PROVIDERS = {
     sendButton: 'button[data-testid="send-button"], #composer-submit-button, button[data-testid="composer-submit-button"], button[aria-label="Send prompt"]',
     stopButton: 'button[data-testid="stop-button"], button[data-testid="composer-stop-button"], #composer-stop-button, button[aria-label="Stop generating"]',
     imageSelectors: '[data-message-author-role="assistant"] img, img[src*="oaiusercontent"], img[alt*="Generated"], figure img, img',
+    // ChatGPT khong co placeholder src co dinh -> dua vao nut Stop (isGenerating). Anh tao dan
+    // (progressive) da duoc status 'pending' xu ly.
+    genPlaceholder: [],
     quotaPhrases: ["you've reached", 'reached your limit', 'try again later', 'usage limit',
       'come back later', 'upgrade to', 'image generation limit', 'rate limit'],
     refusePhrases: ["i can't create", "i'm unable", 'i cannot create', 'unable to generate',
@@ -189,6 +195,33 @@ function dataUrlToBuffer(dataUrl) {
   return { mimeType: m[1], buffer: Buffer.from(m[2], 'base64') };
 }
 
+// LOGIC THUAN (test duoc, khong can DOM): con dang tao khong?
+//  nut Stop hien -> co. HOAC 1 img co src chua dau hieu placeholder "dang tao" (vd gstatic/lamda).
+function detectGenerating(hasStop, srcs, marks) {
+  if (hasStop) return true;
+  if (marks && marks.length && Array.isArray(srcs)) {
+    for (const s of srcs) { const str = String(s || ''); for (const m of marks) if (str.indexOf(m) >= 0) return true; }
+  }
+  return false;
+}
+// LOGIC THUAN: nen cho tiep hay bo? 'continue' | 'giveup-idle' (tac) | 'giveup-hardcap' (qua tran).
+function waitVerdict({ generating, hasImageSignal, idleElapsed, idleMs, totalElapsed, hardCapMs }) {
+  if (totalElapsed > hardCapMs) return 'giveup-hardcap';
+  if (!generating && !hasImageSignal && idleElapsed > idleMs) return 'giveup-idle';
+  return 'continue';
+}
+
+// DANG TAO ANH? (tin hieu THAT, khong doi dong ho). Query DOM lay {hasStop, srcs} roi cham thuan.
+async function isGenerating(wc, cfg) {
+  const sig = await jsEval(wc, `(function(){
+    var hasStop=false; try{ hasStop=!!document.querySelector(${JSON.stringify(cfg.stopButton)}); }catch(_){}
+    var srcs=[]; var imgs=document.querySelectorAll('img');
+    for(var i=0;i<imgs.length && srcs.length<12;i++){ srcs.push(imgs[i].currentSrc||imgs[i].src||''); }
+    return {hasStop:hasStop, srcs:srcs};
+  })()`) || { hasStop: false, srcs: [] };
+  return detectGenerating(sig.hasStop, sig.srcs, cfg.genPlaceholder || []);
+}
+
 function hasAny(text, phrases) {
   const t = String(text || '').toLowerCase();
   return phrases.some((p) => t.includes(p));
@@ -198,7 +231,9 @@ function hasAny(text, phrases) {
  * Tao 1 anh qua dieu khien cua so.
  * @returns {ok:true, buffer, mimeType} | {ok:false, error, quota?, flagged?}
  */
-async function generate(provider, prompt, { timeoutMs = 60000, show = false, log = () => {} } = {}) {
+// hardCapMs: tran TUYET DOI khi Gemini con dang tao (mac dinh 150s).
+// idleMs: khong tin hieu dang-tao + khong anh + khong text lien tuc qua nguong nay -> TAC that -> bo som.
+async function generate(provider, prompt, { hardCapMs = 150000, idleMs = 20000, show = false, log = () => {} } = {}) {
   const cfg = cfgOf(provider);
   if (!cfg) return { ok: false, error: 'Nguồn ảnh không hỗ trợ: ' + provider };
   if (!prompt || !String(prompt).trim()) return { ok: false, error: 'Prompt ảnh rỗng' };
@@ -215,33 +250,38 @@ async function generate(provider, prompt, { timeoutMs = 60000, show = false, log
     const sent = await typeAndSend(wc, cfg, cfg.wrap(String(prompt)), log);
     if (!sent.ok) return { ok: false, error: sent.error };
 
-    // Cho anh render + TRICH BYTES ngay khi co, thu nhieu cach. Song song soi tu choi/het quota.
-    const deadline = Date.now() + timeoutMs;
-    let sawImage = false;      // da tung thay the <img> chua (de phan biet "khong render" vs "trich fail")
-    let failStreak = 0;        // so lan lien tiep co anh nhung trich khong duoc
-    let lastDiag = 0;          // moc thoi gian dump DOM chan doan gan nhat
-    while (Date.now() < deadline) {
+    // ---- CHO THONG MINH (do TIN HIEU, khong do dong ho) ----
+    //  - Con tin hieu "dang tao" (nut Stop / placeholder gstatic) -> cho tiep, toi tran hardCap 150s.
+    //  - Khong tin hieu + khong anh + khong text lien tuc qua idleMs (20s) -> TAC that -> bo som.
+    //  - Co text tu choi/het quota -> bo NGAY.
+    const start = Date.now();
+    let lastProgress = start;  // lan cuoi thay TIEN TRIEN (dang-tao HOAC co the <img>)
+    let sawImage = false, failStreak = 0, lastDiag = 0;
+    while (true) {
+      const now = Date.now();
+      if (now - start > hardCapMs) {
+        return { ok: false, error: cfg.name + ' quá ' + Math.round(hardCapMs / 1000) + 's vẫn chưa ra ảnh — dừng (fallback lo phần còn lại).' };
+      }
       const ex = await extractBestImage(wc, cfg);
 
       if (ex.status === 'ok') {
         const got = dataUrlToBuffer(ex.dataUrl);
         if (got && got.buffer.length) {
-          log(`[${cfg.name}] ✓ lấy ảnh ${Math.round(got.buffer.length / 1024)}KB (${got.mimeType}) bằng: ${ex.method}${ex.mime ? ' [' + ex.mime + ']' : ''}.`);
+          log(`[${cfg.name}] ✓ lấy ảnh ${Math.round(got.buffer.length / 1024)}KB (${got.mimeType}) bằng: ${ex.method}${ex.mime ? ' [' + ex.mime + ']' : ''} (sau ${Math.round((now - start) / 1000)}s).`);
           return { ok: true, buffer: got.buffer, mimeType: got.mimeType };
         }
-        // dataUrl hong -> coi nhu fail, thu lai
-        sawImage = true; failStreak++;
+        sawImage = true; failStreak++; lastProgress = now;
       } else if (ex.status === 'pending') {
-        sawImage = true; failStreak = 0; // anh dang load -> cho them, khong tinh fail
+        sawImage = true; failStreak = 0; lastProgress = now;
         log(`[${cfg.name}] ảnh đang tải, chờ thêm...`);
       } else if (ex.status === 'fail') {
-        sawImage = true; failStreak++;
+        sawImage = true; failStreak++; lastProgress = now;
         log(`[${cfg.name}] có ảnh nhưng trích bytes chưa được (thử lại ${failStreak}/4)...`);
         if (failStreak >= 4) {
           return { ok: false, error: 'Không lấy được bytes ảnh từ ' + cfg.name + ' sau khi thử mọi cách (CORS/định dạng).' };
         }
       } else {
-        // chua co anh -> soi text tu choi / het quota
+        // chua co anh -> soi text tu choi / het quota TRUOC
         const txt = await lastText(wc);
         if (hasAny(txt, cfg.refusePhrases)) {
           log(`[${cfg.name}] ⊘ bị từ chối tạo ảnh (bộ lọc nội dung).`);
@@ -251,25 +291,31 @@ async function generate(provider, prompt, { timeoutMs = 60000, show = false, log
           log(`[${cfg.name}] ⚠️ báo hết quota/giới hạn.`);
           return { ok: false, quota: true, error: cfg.name + ' hết quota/giới hạn ngày.' };
         }
-        // CHAN DOAN: ~10s/lan, dump DOM thuc te co gi -> lan chay that lo ra anh nam dau
-        // (selector khong bat / la CSS background / trong shadow DOM / iframe).
-        if (Date.now() - lastDiag > 10000) {
-          lastDiag = Date.now();
-          const d = await domImageDiag(wc);
-          if (d) {
-            const top = (d.imgs || []).slice(0, 3).map((x) => `${x.w}x${x.h}(${x.src})`).join(' , ');
-            log(`[${cfg.name}] 🔍 DOM: ${d.imgTotal} <img> (lớn nhất: ${top || 'không có'}) | bg-image≥256: ${d.bg} | iframe: ${d.iframes} | shadowRoot: ${d.shadow}`);
-          }
+      }
+
+      // TIN HIEU DANG TAO (nut Stop / placeholder). Con thay = tien trien -> reset dong ho idle.
+      const generating = await isGenerating(wc, cfg);
+      if (generating) lastProgress = now;
+      const hasImageSignal = ex.status !== 'none';   // co the <img> (dang tai/trich) = co tien trien
+
+      // CHAN DOAN ~10s/lan (kem trang thai generating de doc log ro nguyen nhan)
+      if (now - lastDiag > 10000) {
+        lastDiag = now;
+        const d = await domImageDiag(wc);
+        if (d) {
+          const top = (d.imgs || []).slice(0, 3).map((x) => `${x.w}x${x.h}(${x.src})`).join(' , ');
+          log(`[${cfg.name}] 🔍 DOM: ${d.imgTotal} <img> (lớn nhất: ${top || 'không có'}) | đang-tạo: ${generating ? 'CÓ (chờ tiếp)' : 'không'} | idle ${Math.round((now - lastProgress) / 1000)}s | ${Math.round((now - start) / 1000)}s`);
         }
       }
+
+      // QUYET DINH cho/bo bang LOGIC THUAN (test duoc).
+      const verdict = waitVerdict({ generating, hasImageSignal, idleElapsed: now - lastProgress, idleMs, totalElapsed: now - start, hardCapMs });
+      if (verdict === 'giveup-idle') {
+        return { ok: false, error: cfg.name + ' không có tín hiệu đang tạo suốt ' + Math.round((now - lastProgress) / 1000) + 's (tắc) — bỏ sớm, thử nguồn kế.' };
+      }
+      // giveup-hardcap da duoc chan o dau vong (now-start>hardCapMs); con lai -> continue.
       await delay(1800); // cho 1.8s roi thu lai (retry)
     }
-    return {
-      ok: false,
-      error: cfg.name + (sawImage
-        ? ' có ảnh nhưng không lấy được bytes sau ' + Math.round(timeoutMs / 1000) + 's.'
-        : ' không thấy ảnh sau ' + Math.round(timeoutMs / 1000) + 's (giao diện có thể đổi, hoặc chưa render).'),
-    };
   } catch (e) {
     return { ok: false, error: cfg.name + ' lỗi: ' + e.message };
   } finally {
@@ -277,4 +323,4 @@ async function generate(provider, prompt, { timeoutMs = 60000, show = false, log
   }
 }
 
-module.exports = { generate, PROVIDERS, dataUrlToBuffer };
+module.exports = { generate, PROVIDERS, dataUrlToBuffer, detectGenerating, waitVerdict };
