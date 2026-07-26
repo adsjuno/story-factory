@@ -112,13 +112,47 @@ async function typeAndSend(wc, cfg, prompt, log) {
   return { ok: true };
 }
 
-// Lay text tra loi gan nhat (de nhan dien het quota / tu choi)
-async function lastText(wc) {
+// Lay text tra loi gan nhat + NGUON lay tu dau.
+//  src='assistant' -> LA loi MODEL that (ket luan tu choi tu day moi dang tin).
+//  src='body'      -> CHI la chu tren trang (chrome/UI) - ket luan "tu choi" tu day co the BIA,
+//                     vi body co san 'policy'/'terms'/'against' du model KHONG he tu choi.
+async function lastTextSrc(wc) {
   return (await jsEval(wc, `(function(){
     var sels=['[data-message-author-role="assistant"]','message-content','.model-response-text','div.markdown','.response-container-content'];
-    for(var i=0;i<sels.length;i++){var a=document.querySelectorAll(sels[i]); if(a.length) return (a[a.length-1].innerText||'').slice(0,4000);}
-    return (document.body.innerText||'').slice(-4000);
-  })()`)) || '';
+    for(var i=0;i<sels.length;i++){var a=document.querySelectorAll(sels[i]); if(a.length) return {text:(a[a.length-1].innerText||'').slice(0,4000), src:'assistant'};}
+    return {text:(document.body.innerText||'').slice(-4000), src:'body'};
+  })()`)) || { text: '', src: 'none' };
+}
+async function lastText(wc) { return (await lastTextSrc(wc)).text; }
+
+// LOGIC THUAN (test duoc): cum tu dau tien khop + vi tri (de log dan chung "tu choi").
+function firstMatch(text, phrases) {
+  const t = String(text || '').toLowerCase();
+  for (const p of (phrases || [])) { const i = t.indexOf(String(p).toLowerCase()); if (i >= 0) return { phrase: p, idx: i }; }
+  return null;
+}
+
+// CHAN DOAN GUI: mo ta O NHAP + NUT GUI HIEN TAI + selector nao con khop (biet giao dien co doi khong).
+async function diagComposer(wc, cfg) {
+  return await jsEval(wc, `(function(){
+    function d(el){ if(!el) return null; return {tag:(el.tagName||'').toLowerCase(), aria:(el.getAttribute&&el.getAttribute('aria-label'))||'', ph:(el.getAttribute&&(el.getAttribute('data-placeholder')||el.getAttribute('placeholder')))||'', len:((el.innerText||el.value||'')+'').trim().length}; }
+    function matched(sel){ var out=[]; var parts=sel.split(','); for(var i=0;i<parts.length;i++){ var p=parts[i].trim(); try{ if(p && document.querySelector(p)) out.push(p); }catch(_){}} return out; }
+    var el=document.querySelector(${JSON.stringify(cfg.composer)});
+    var sb=document.querySelector(${JSON.stringify(cfg.sendButton)});
+    return { box:d(el), boxSelMatched:matched(${JSON.stringify(cfg.composer)}),
+             sendFound:!!sb, sendSelMatched:matched(${JSON.stringify(cfg.sendButton)}),
+             sendDisabled: sb?!!sb.disabled:null, sendAria: sb?((sb.getAttribute('aria-label'))||''):'' };
+  })()`) || null;
+}
+// CHAN DOAN DA GUI CHUA: o nhap da rong lai chua + co luot NGUOI DUNG moi trong DOM khong.
+async function diagSent(wc, cfg) {
+  return await jsEval(wc, `(function(){
+    var el=document.querySelector(${JSON.stringify(cfg.composer)});
+    var boxLen = el?((el.innerText||el.value||'')+'').trim().length:-1;
+    var userSel=['[data-message-author-role="user"]','user-query','.query-text','.user-query-bubble-with-background','[data-testid="conversation-turn"] [data-message-author-role="user"]'];
+    var userTurns=0; for(var i=0;i<userSel.length;i++){ try{ userTurns+=document.querySelectorAll(userSel[i]).length; }catch(_){}}
+    return {boxLen:boxLen, userTurns:userTurns};
+  })()`) || { boxLen: -1, userTurns: 0 };
 }
 
 /**
@@ -168,11 +202,26 @@ async function extractBestImage(wc, cfg) {
 
 // CHAN DOAN: khi khong tim thay anh, dump thuc te DOM co GI (moi img + kich thuoc + src prefix,
 // va co background-image lon nao khong). Giup lan chay that lo ra Gemini dat anh o dau.
-async function domImageDiag(wc) {
+async function domImageDiag(wc, marks) {
   const code = `(function(){
-    var out={imgs:[],bg:0,iframes:0,shadow:0};
+    var marks=${JSON.stringify(marks || [])};
+    var out={imgs:[],bg:0,iframes:0,shadow:0,ph:[]};
     var all=document.querySelectorAll('img');
     out.imgTotal=all.length;
+    // PHAN LOAI placeholder "dang tao": nam trong RESPONSE that (assistant) hay chi la UI trang tri?
+    for(var pi=0; pi<all.length && out.ph.length<3; pi++){
+      var pim=all[pi]; var ps=(pim.currentSrc||pim.src||''); var hit=false;
+      for(var mi=0;mi<marks.length;mi++){ if(ps.indexOf(marks[mi])>=0){hit=true;break;} }
+      if(!hit) continue;
+      var p=pim, chain=[], inResp=false;
+      for(var up=0; up<5 && p; up++){ p=p.parentElement; if(!p)break;
+        var role=p.getAttribute&&p.getAttribute('data-message-author-role');
+        var tn=(p.tagName||'').toLowerCase();
+        if(role==='assistant'||/response|message-content|model-response/.test(tn)||/response|model-response/.test((p.className||'')+'')) inResp=true;
+        chain.push(tn+(role?('['+role+']'):''));
+      }
+      out.ph.push({w:pim.naturalWidth||pim.width||0, inResp:inResp, parent:chain.join('>')});
+    }
     for(var i=0;i<all.length;i++){var im=all[i];var s=im.currentSrc||im.src||'';
       out.imgs.push({w:im.naturalWidth||0,h:im.naturalHeight||0,dw:im.width||0,dh:im.height||0,src:s.slice(0,42)});}
     // giu lai 8 anh LON nhat de log gon
@@ -258,6 +307,17 @@ async function generate(provider, prompt, { hardCapMs = 150000, stuckCapMs = 700
     const sent = await typeAndSend(wc, cfg, cfg.wrap(String(prompt)), log);
     if (!sent.ok) return { ok: false, error: sent.error };
 
+    // ---- CHAN DOAN GUI (CHI LOG, khong doi hanh vi): selector con khop? prompt co vao o? da gui chua? ----
+    const dcomp = await diagComposer(wc, cfg);
+    if (dcomp) {
+      log(`[${cfg.name}] 🔬 Ô NHẬP: ${dcomp.box ? ('<' + dcomp.box.tag + '> aria="' + dcomp.box.aria + '" ph="' + dcomp.box.ph + '" — độ dài nội dung=' + dcomp.box.len) : 'KHÔNG THẤY Ô NHẬP'} | selector khớp: ${(dcomp.boxSelMatched && dcomp.boxSelMatched.length) ? dcomp.boxSelMatched.join('  ;  ') : '❌ KHÔNG CÁI NÀO'}`);
+      log(`[${cfg.name}] 🔬 NÚT GỬI: ${dcomp.sendFound ? ('CÓ aria="' + dcomp.sendAria + '" disabled=' + dcomp.sendDisabled) : '❌ KHÔNG THẤY NÚT GỬI'} | selector khớp: ${(dcomp.sendSelMatched && dcomp.sendSelMatched.length) ? dcomp.sendSelMatched.join('  ;  ') : '❌ KHÔNG CÁI NÀO'}`);
+    }
+    await delay(2500);
+    const dsent = await diagSent(wc, cfg);
+    const looksSent = dsent.userTurns > 0 || dsent.boxLen === 0;
+    log(`[${cfg.name}] 🔬 SAU GỬI 2.5s: ô nhập còn ${dsent.boxLen} ký tự | lượt người dùng trong DOM=${dsent.userTurns} → ${looksSent ? '✅ CÓ VẺ ĐÃ GỬI (có chat/lượt mới)' : '⚠️ NGHI CHƯA GỬI ĐƯỢC — không thấy chat/lượt mới (prompt có thể chưa vào)'}`);
+
     // ---- CHO THONG MINH (do TIN HIEU, khong do dong ho) ----
     //  - Con tin hieu "dang tao" (nut Stop / placeholder gstatic) -> cho tiep, toi tran hardCap 150s.
     //  - Khong tin hieu + khong anh + khong text lien tuc qua idleMs (20s) -> TAC that -> bo som.
@@ -291,13 +351,17 @@ async function generate(provider, prompt, { hardCapMs = 150000, stuckCapMs = 700
         }
       } else {
         // chua co anh -> soi text tu choi / het quota TRUOC
-        const txt = await lastText(wc);
-        if (hasAny(txt, cfg.refusePhrases)) {
-          log(`[${cfg.name}] ⊘ bị từ chối tạo ảnh (bộ lọc nội dung).`);
-          return { ok: false, flagged: true, error: cfg.name + ' từ chối tạo ảnh (bộ lọc nội dung).' };
+        const lt = await lastTextSrc(wc);
+        const rf = firstMatch(lt.text, cfg.refusePhrases);
+        if (rf) {
+          const snip = lt.text.slice(Math.max(0, rf.idx - 40), rf.idx + 60).replace(/\s+/g, ' ');
+          const nghiBia = lt.src === 'body' ? ' (⚠️ CHỈ là chữ trên trang, KHÔNG phải model trả lời — RẤT CÓ THỂ BÁO NHẦM)' : '';
+          log(`[${cfg.name}] ⊘ KẾT LUẬN "từ chối" DO khớp cụm "${rf.phrase}" | nguồn text=${lt.src}${nghiBia} | trích: "…${snip}…"`);
+          return { ok: false, flagged: true, error: cfg.name + ' từ chối tạo ảnh (khớp "' + rf.phrase + '", nguồn=' + lt.src + ').' };
         }
-        if (hasAny(txt, cfg.quotaPhrases)) {
-          log(`[${cfg.name}] ⚠️ báo hết quota/giới hạn.`);
+        const qf = firstMatch(lt.text, cfg.quotaPhrases);
+        if (qf) {
+          log(`[${cfg.name}] ⚠️ báo hết quota (khớp "${qf.phrase}", nguồn=${lt.src}).`);
           return { ok: false, quota: true, error: cfg.name + ' hết quota/giới hạn ngày.' };
         }
       }
@@ -316,11 +380,12 @@ async function generate(provider, prompt, { hardCapMs = 150000, stuckCapMs = 700
       // CHAN DOAN ~10s/lan (kem trang thai generating de doc log ro nguyen nhan)
       if (now - lastDiag > 10000) {
         lastDiag = now;
-        const d = await domImageDiag(wc);
+        const d = await domImageDiag(wc, cfg.genPlaceholder || []);
         if (d) {
           const top = (d.imgs || []).slice(0, 3).map((x) => `${x.w}x${x.h}(${x.src})`).join(' , ');
           const stuckTxt = genStart ? ` | placeholder đứng im ${Math.round(genOnlyElapsed / 1000)}s/${Math.round(stuckCapMs / 1000)}s` : '';
-          log(`[${cfg.name}] 🔍 DOM: ${d.imgTotal} <img> (lớn nhất: ${top || 'không có'}) | đang-tạo: ${generating ? (hasImageSignal ? 'CÓ, ảnh đang hiện dần' : 'CÓ (placeholder)') : 'không'}${stuckTxt} | idle ${Math.round((now - lastProgress) / 1000)}s | ${Math.round((now - start) / 1000)}s`);
+          const phTxt = (d.ph && d.ph.length) ? ` | placeholder ${d.ph.map((x) => (x.inResp ? 'TRONG-RESPONSE' : 'chỉ-UI') + '(' + x.parent + ')').join(' , ')}` : '';
+          log(`[${cfg.name}] 🔍 DOM: ${d.imgTotal} <img> (lớn nhất: ${top || 'không có'}) | đang-tạo: ${generating ? (hasImageSignal ? 'CÓ, ảnh đang hiện dần' : 'CÓ (placeholder)') : 'không'}${stuckTxt}${phTxt} | idle ${Math.round((now - lastProgress) / 1000)}s | ${Math.round((now - start) / 1000)}s`);
         }
       }
 
@@ -342,4 +407,4 @@ async function generate(provider, prompt, { hardCapMs = 150000, stuckCapMs = 700
   }
 }
 
-module.exports = { generate, PROVIDERS, dataUrlToBuffer, detectGenerating, waitVerdict };
+module.exports = { generate, PROVIDERS, dataUrlToBuffer, detectGenerating, waitVerdict, firstMatch };
