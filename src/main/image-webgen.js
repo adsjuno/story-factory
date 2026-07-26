@@ -204,9 +204,16 @@ function detectGenerating(hasStop, srcs, marks) {
   }
   return false;
 }
-// LOGIC THUAN: nen cho tiep hay bo? 'continue' | 'giveup-idle' (tac) | 'giveup-hardcap' (qua tran).
-function waitVerdict({ generating, hasImageSignal, idleElapsed, idleMs, totalElapsed, hardCapMs }) {
+// LOGIC THUAN: nen cho tiep hay bo?
+//  'continue' | 'giveup-idle' (tac, khong tin hieu) | 'giveup-stuck' (placeholder DUNG IM,
+//  dang-tao gia) | 'giveup-hardcap' (qua tran khi CO tien trien that).
+//  Phan biet:
+//   - hasImageSignal=true  = co the <img> THAT (>=256, dang render dan) -> cho toi hardCap 150s.
+//   - generating nhung hasImageSignal=false = chi co placeholder (gstatic/lamda 150x150) DUNG IM
+//     -> neu keo dai qua stuckCapMs (70s) coi la KET GIA -> bo som.
+function waitVerdict({ generating, hasImageSignal, idleElapsed, idleMs, totalElapsed, hardCapMs, genOnlyElapsed = 0, stuckCapMs = Infinity }) {
   if (totalElapsed > hardCapMs) return 'giveup-hardcap';
+  if (generating && !hasImageSignal && genOnlyElapsed > stuckCapMs) return 'giveup-stuck';
   if (!generating && !hasImageSignal && idleElapsed > idleMs) return 'giveup-idle';
   return 'continue';
 }
@@ -231,9 +238,10 @@ function hasAny(text, phrases) {
  * Tao 1 anh qua dieu khien cua so.
  * @returns {ok:true, buffer, mimeType} | {ok:false, error, quota?, flagged?}
  */
-// hardCapMs: tran TUYET DOI khi Gemini con dang tao (mac dinh 150s).
+// hardCapMs: tran TUYET DOI khi CO tien trien that (anh dang render dan) - mac dinh 150s.
+// stuckCapMs: placeholder "dang tao" DUNG IM (chua co anh that) qua nguong nay -> ket gia -> bo (70s).
 // idleMs: khong tin hieu dang-tao + khong anh + khong text lien tuc qua nguong nay -> TAC that -> bo som.
-async function generate(provider, prompt, { hardCapMs = 150000, idleMs = 20000, show = false, log = () => {} } = {}) {
+async function generate(provider, prompt, { hardCapMs = 150000, stuckCapMs = 70000, idleMs = 20000, show = false, log = () => {} } = {}) {
   const cfg = cfgOf(provider);
   if (!cfg) return { ok: false, error: 'Nguồn ảnh không hỗ trợ: ' + provider };
   if (!prompt || !String(prompt).trim()) return { ok: false, error: 'Prompt ảnh rỗng' };
@@ -256,6 +264,7 @@ async function generate(provider, prompt, { hardCapMs = 150000, idleMs = 20000, 
     //  - Co text tu choi/het quota -> bo NGAY.
     const start = Date.now();
     let lastProgress = start;  // lan cuoi thay TIEN TRIEN (dang-tao HOAC co the <img>)
+    let genStart = 0;          // moc bat dau chuoi "dang-tao NHUNG chua co anh that" (placeholder dung im)
     let sawImage = false, failStreak = 0, lastDiag = 0;
     while (true) {
       const now = Date.now();
@@ -296,7 +305,13 @@ async function generate(provider, prompt, { hardCapMs = 150000, idleMs = 20000, 
       // TIN HIEU DANG TAO (nut Stop / placeholder). Con thay = tien trien -> reset dong ho idle.
       const generating = await isGenerating(wc, cfg);
       if (generating) lastProgress = now;
-      const hasImageSignal = ex.status !== 'none';   // co the <img> (dang tai/trich) = co tien trien
+      const hasImageSignal = ex.status !== 'none';   // co the <img> THAT (>=256, dang tai/trich) = tien trien that
+
+      // "PLACEHOLDER DUNG IM": dang-tao NHUNG chua co anh that -> dem tu luc bat dau chuoi nay.
+      // Co anh that (hasImageSignal) HOAC het dang-tao -> reset moc (chuyen sang che do "render dan"/idle).
+      if (generating && !hasImageSignal) { if (!genStart) genStart = now; }
+      else { genStart = 0; }
+      const genOnlyElapsed = genStart ? now - genStart : 0;
 
       // CHAN DOAN ~10s/lan (kem trang thai generating de doc log ro nguyen nhan)
       if (now - lastDiag > 10000) {
@@ -304,14 +319,18 @@ async function generate(provider, prompt, { hardCapMs = 150000, idleMs = 20000, 
         const d = await domImageDiag(wc);
         if (d) {
           const top = (d.imgs || []).slice(0, 3).map((x) => `${x.w}x${x.h}(${x.src})`).join(' , ');
-          log(`[${cfg.name}] 🔍 DOM: ${d.imgTotal} <img> (lớn nhất: ${top || 'không có'}) | đang-tạo: ${generating ? 'CÓ (chờ tiếp)' : 'không'} | idle ${Math.round((now - lastProgress) / 1000)}s | ${Math.round((now - start) / 1000)}s`);
+          const stuckTxt = genStart ? ` | placeholder đứng im ${Math.round(genOnlyElapsed / 1000)}s/${Math.round(stuckCapMs / 1000)}s` : '';
+          log(`[${cfg.name}] 🔍 DOM: ${d.imgTotal} <img> (lớn nhất: ${top || 'không có'}) | đang-tạo: ${generating ? (hasImageSignal ? 'CÓ, ảnh đang hiện dần' : 'CÓ (placeholder)') : 'không'}${stuckTxt} | idle ${Math.round((now - lastProgress) / 1000)}s | ${Math.round((now - start) / 1000)}s`);
         }
       }
 
       // QUYET DINH cho/bo bang LOGIC THUAN (test duoc).
-      const verdict = waitVerdict({ generating, hasImageSignal, idleElapsed: now - lastProgress, idleMs, totalElapsed: now - start, hardCapMs });
+      const verdict = waitVerdict({ generating, hasImageSignal, idleElapsed: now - lastProgress, idleMs, totalElapsed: now - start, hardCapMs, genOnlyElapsed, stuckCapMs });
       if (verdict === 'giveup-idle') {
         return { ok: false, error: cfg.name + ' không có tín hiệu đang tạo suốt ' + Math.round((now - lastProgress) / 1000) + 's (tắc) — bỏ sớm, thử nguồn kế.' };
+      }
+      if (verdict === 'giveup-stuck') {
+        return { ok: false, error: cfg.name + ' chỉ có placeholder đứng im ' + Math.round(genOnlyElapsed / 1000) + 's (kẹt giả, không ra ảnh thật) — bỏ sớm, thử nguồn kế.' };
       }
       // giveup-hardcap da duoc chan o dau vong (now-start>hardCapMs); con lai -> continue.
       await delay(1800); // cho 1.8s roi thu lai (retry)

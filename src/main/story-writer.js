@@ -644,12 +644,13 @@ async function generateArticleImages(storyId, s, onProgress = () => {}, shouldSt
   ];
   let okCount = 0;
   const got = {};                          // kind -> url tao THANH CONG (de fallback cheo)
+  const circuit = imageRouter.makeCircuit();  // CAU DAO pham vi 1 BAI: nguon fail 2 lan lien tiep -> bo cho cac anh con lai
   for (const j of jobs) {
     // DUNG giua chung khi dang tao anh: bo cac anh con lai.
     if (shouldStop()) { result.errors.push(`${j.kind}: đã dừng theo yêu cầu`); result.stopped = true; continue; }
     if (!j.prompt) { result.errors.push(`${j.kind}: thiếu prompt`); continue; }
     if (j.kind === 'thumb' && j.fallback) onProgress({ message: 'ℹ️ Skill chưa xuất THUMB_PROMPT — dùng tạm web_p1_prompt cho thumbnail ngang.' });
-    const r = await imageRouter.createAndUpload({ prompt: j.prompt, storyId, kind: j.kind, cfg }, logger);
+    const r = await imageRouter.createAndUpload({ prompt: j.prompt, storyId, kind: j.kind, cfg, circuit }, logger);
     if (r.ok) {
       okCount++; got[j.kind] = r.url;
       if (j.kind === 'fb') result.fbImageUrl = r.url;
