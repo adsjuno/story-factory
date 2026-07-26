@@ -23,8 +23,9 @@ const PROVIDERS = {
     url: 'https://gemini.google.com/app',
     partition: 'persist:gemini',
     composer: 'rich-textarea div[contenteditable="true"], div.ql-editor[contenteditable="true"], div[contenteditable="true"]',
-    sendButton: 'button[aria-label="Send message"], button.send-button, button[aria-label="Gửi"], button[mattooltip="Send message"]',
-    stopButton: 'button[aria-label="Stop response"], button[aria-label="Stop generating"], button.stop',
+    sendButton: 'button[aria-label="Send message"], button.send-button, button[aria-label="Gửi"], button[aria-label*="Gửi" i], button[mattooltip="Send message"]',
+    // KHONG le thuoc ngon ngu: bat ca "Stop..." (Anh) lan "Dừng..." (Viet) - giao dien Gemini localize theo tai khoan.
+    stopButton: 'button[aria-label*="Stop" i], button[aria-label*="Dừng" i], button[aria-label*="Dung" i], button.stop',
     // Anh Gemini sinh ra thuong nam trong response, src googleusercontent hoac blob
     imageSelectors: 'single-image img, generated-image img, image-container img, message-content img, response-container img, img',
     // Dau hieu "DANG TAO ANH": src placeholder 150x150 gstatic/lamda (animation cua Gemini).
@@ -318,22 +319,18 @@ function placeholderPresent(srcs, marks) {
 function detectGenerating(hasStop, srcs, marks) {
   return !!hasStop || placeholderPresent(srcs, marks);
 }
-// LOGIC THUAN: nen cho tiep hay bo? PHAN BIET 2 loai tin hieu "dang tao":
-//   - hasStop=true  = nut Stop con hien = DANG TAO THAT (ChatGPT/Gemini that su lam viec)
-//                     -> KIEN NHAN toi hardCap 150s, KHONG cat o 70s (khong giet oan anh cham).
-//   - hasPlaceholder (gstatic/lamda) NHUNG khong Stop = tin hieu GIA (animation trang tri)
-//                     -> neu dung im qua stuckCapMs (70s) va chua co anh that -> KET GIA -> bo som.
-//   - hasImageSignal=true = co the <img> THAT (>=256, dang render dan) -> cho toi hardCap.
-// Tra: 'continue' | 'giveup-idle' (tac) | 'giveup-stuck' (placeholder gia dung im) | 'giveup-hardcap'.
-function waitVerdict({ hasStop, hasPlaceholder, hasImageSignal, idleElapsed, idleMs, totalElapsed, hardCapMs, absMaxMs = Infinity, genOnlyElapsed = 0, stuckCapMs = Infinity }) {
-  if (totalElapsed > absMaxMs) return 'giveup-hardcap';                 // tran tuyet doi (du con Stop)
-  // SOFT-CAP: qua 150s MA khong con lam viec that (khong Stop) + chua co anh -> bo.
-  //  (Con nut Stop = van dang tao -> KHONG bo o 150s, cho toi absMax -> khong mat anh cham do prompt dai.)
-  if (totalElapsed > hardCapMs && !hasStop && !hasImageSignal) return 'giveup-hardcap';
-  // STUCK chi ap khi placeholder GIA (khong co nut Stop that) + chua co anh that.
-  if (!hasStop && hasPlaceholder && !hasImageSignal && genOnlyElapsed > stuckCapMs) return 'giveup-stuck';
-  const generating = !!hasStop || !!hasPlaceholder;
-  if (!generating && !hasImageSignal && idleElapsed > idleMs) return 'giveup-idle';
+// LOGIC THUAN: nen cho tiep hay bo? "DANG LAM VIEC" = 1 trong 3 tin hieu THAT:
+//   - hasStop        = nut Stop/Dừng con hien (dang tra loi).
+//   - hasPlaceholder = placeholder gstatic/lamda 150x150 = Gemini DANG VE ANH THAT (khong phai gia!).
+//   - hasImageSignal = the <img> that (>=256) dang render dan.
+// Con BAT KY tin hieu nao -> KIEN NHAN toi absMax (300s), khong cat non (prompt dai -> ve cham).
+// KHONG con tin hieu nao: qua 150s HOAC im lang 20s -> bo (that su tac / xong ma khong ra anh).
+// Tra: 'continue' | 'giveup-idle' (tac) | 'giveup-hardcap' (qua tran / het lam viec).
+function waitVerdict({ hasStop, hasPlaceholder, hasImageSignal, idleElapsed, idleMs, totalElapsed, hardCapMs, absMaxMs = Infinity }) {
+  const working = !!hasStop || !!hasPlaceholder || !!hasImageSignal;
+  if (totalElapsed > absMaxMs) return 'giveup-hardcap';                    // tran tuyet doi (du con dang lam viec)
+  if (totalElapsed > hardCapMs && !working) return 'giveup-hardcap';       // qua 150s ma khong lam gi -> bo
+  if (!working && idleElapsed > idleMs) return 'giveup-idle';              // im lang -> tac
   return 'continue';
 }
 
@@ -357,12 +354,11 @@ function hasAny(text, phrases) {
  * Tao 1 anh qua dieu khien cua so.
  * @returns {ok:true, buffer, mimeType} | {ok:false, error, quota?, flagged?}
  */
-// hardCapMs: soft-cap - qua nguong nay MA KHONG con nut Stop (het lam viec) + chua co anh -> bo (150s).
-// absMaxMs: tran TUYET DOI - du con nut Stop (dang lam viec) cung khong cho qua (300s = 5 phut).
-//   -> prompt DAI khien ChatGPT xu ly >150s van cho tiep (con Stop), toi 300s -> khong mat anh cham.
-// stuckCapMs: placeholder "dang tao" DUNG IM (chua co anh, khong Stop) qua nguong nay -> ket gia -> bo (70s).
-// idleMs: khong tin hieu dang-tao + khong anh + khong text lien tuc qua nguong nay -> TAC that -> bo som.
-async function generate(provider, prompt, { hardCapMs = 150000, absMaxMs = 300000, stuckCapMs = 70000, idleMs = 20000, show = false, log = () => {} } = {}) {
+// hardCapMs: soft-cap - qua nguong nay MA KHONG con tin hieu lam viec nao + chua co anh -> bo (150s).
+// absMaxMs: tran TUYET DOI - du con dang lam viec (Stop/placeholder/anh) cung khong cho qua (300s).
+//   -> prompt DAI khien Gemini/ChatGPT ve cham >150s van cho tiep, toi 300s -> khong mat anh cham.
+// idleMs: khong tin hieu lam viec nao + khong anh + khong text lien tuc qua nguong nay -> TAC that -> bo som.
+async function generate(provider, prompt, { hardCapMs = 150000, absMaxMs = 300000, idleMs = 20000, show = false, log = () => {} } = {}) {
   const cfg = cfgOf(provider);
   if (!cfg) return { ok: false, error: 'Nguồn ảnh không hỗ trợ: ' + provider };
   if (!prompt || !String(prompt).trim()) return { ok: false, error: 'Prompt ảnh rỗng' };
@@ -386,8 +382,7 @@ async function generate(provider, prompt, { hardCapMs = 150000, absMaxMs = 30000
     //  - Khong tin hieu + khong anh + khong text lien tuc qua idleMs (20s) -> TAC that -> bo som.
     //  - Co text tu choi/het quota -> bo NGAY.
     const start = Date.now();
-    let lastProgress = start;  // lan cuoi thay TIEN TRIEN (dang-tao HOAC co the <img>)
-    let genStart = 0;          // moc bat dau chuoi "dang-tao NHUNG chua co anh that" (placeholder dung im)
+    let lastProgress = start;  // lan cuoi thay TIEN TRIEN (dang lam viec HOAC co the <img>)
     let sawImage = false, failStreak = 0, lastDiag = 0;
     while (true) {
       const now = Date.now();
@@ -400,6 +395,9 @@ async function generate(provider, prompt, { hardCapMs = 150000, absMaxMs = 30000
         const got = dataUrlToBuffer(ex.dataUrl);
         if (got && got.buffer.length) {
           log(`[${cfg.name}] ✓ lấy ảnh ${Math.round(got.buffer.length / 1024)}KB (${got.mimeType}) bằng: ${ex.method}${ex.mime ? ' [' + ex.mime + ']' : ''} (sau ${Math.round((now - start) / 1000)}s).`);
+          // Cho ~2s truoc khi dong cua so de Gemini/ChatGPT kip LUU cuoc tro chuyen vao lich su
+          // (dong ngay se huy request luu nen -> chat khong hien trong lich su tai khoan).
+          await delay(2000);
           return { ok: true, buffer: got.buffer, mimeType: got.mimeType };
         }
         sawImage = true; failStreak++; lastProgress = now;
@@ -435,42 +433,31 @@ async function generate(provider, prompt, { hardCapMs = 150000, absMaxMs = 30000
 
       // TIN HIEU DANG TAO tach rieng: nut Stop (THAT) vs placeholder gstatic (GIA).
       const sig = await genSignals(wc, cfg);
-      const generating = sig.hasStop || sig.hasPlaceholder;
-      if (generating) lastProgress = now;
       const hasImageSignal = ex.status !== 'none';   // co the <img> THAT (>=256, dang tai/trich) = tien trien that
+      const working = sig.hasStop || sig.hasPlaceholder || hasImageSignal;
+      if (working) lastProgress = now;
 
-      // "PLACEHOLDER GIA DUNG IM" CHI tinh khi: co placeholder + KHONG co nut Stop + chua co anh that.
-      //  (Con nut Stop = dang tao THAT -> KHONG dem stuck, de hardCap 150s lo -> khong giet oan ChatGPT cham.)
-      const stuckEligible = sig.hasPlaceholder && !sig.hasStop && !hasImageSignal;
-      if (stuckEligible) { if (!genStart) genStart = now; }
-      else { genStart = 0; }
-      const genOnlyElapsed = genStart ? now - genStart : 0;
-
-      // CHAN DOAN ~10s/lan (kem trang thai generating de doc log ro nguyen nhan)
+      // CHAN DOAN ~10s/lan (kem trang thai lam viec de doc log ro nguyen nhan)
       if (now - lastDiag > 10000) {
         lastDiag = now;
         const d = await domImageDiag(wc, cfg.genPlaceholder || []);
         if (d) {
           const top = (d.imgs || []).slice(0, 3).map((x) => `${x.w}x${x.h}(${x.src})`).join(' , ');
           const genTxt = hasImageSignal ? 'CÓ, ảnh đang hiện dần'
-            : sig.hasStop ? 'CÓ — nút Stop (đang tạo THẬT, chờ đủ)'
-              : sig.hasPlaceholder ? 'CÓ (placeholder — nghi kẹt giả)' : 'không';
-          const stuckTxt = genStart ? ` | placeholder giả đứng im ${Math.round(genOnlyElapsed / 1000)}s/${Math.round(stuckCapMs / 1000)}s` : '';
+            : sig.hasStop ? 'CÓ — nút Stop/Dừng (đang trả lời)'
+              : sig.hasPlaceholder ? 'CÓ — placeholder gstatic (Gemini đang VẼ ảnh)' : 'không';
           const phTxt = (d.ph && d.ph.length) ? ` | placeholder ${d.ph.map((x) => (x.inResp ? 'TRONG-RESPONSE' : 'chỉ-UI') + '(' + x.parent + ')').join(' , ')}` : '';
-          log(`[${cfg.name}] 🔍 DOM: ${d.imgTotal} <img> (lớn nhất: ${top || 'không có'}) | đang-tạo: ${genTxt}${stuckTxt}${phTxt} | idle ${Math.round((now - lastProgress) / 1000)}s | ${Math.round((now - start) / 1000)}s`);
+          log(`[${cfg.name}] 🔍 DOM: ${d.imgTotal} <img> (lớn nhất: ${top || 'không có'}) | đang-làm-việc: ${genTxt}${phTxt} | idle ${Math.round((now - lastProgress) / 1000)}s | ${Math.round((now - start) / 1000)}s`);
         }
       }
 
       // QUYET DINH cho/bo bang LOGIC THUAN (test duoc).
-      const verdict = waitVerdict({ hasStop: sig.hasStop, hasPlaceholder: sig.hasPlaceholder, hasImageSignal, idleElapsed: now - lastProgress, idleMs, totalElapsed: now - start, hardCapMs, absMaxMs, genOnlyElapsed, stuckCapMs });
+      const verdict = waitVerdict({ hasStop: sig.hasStop, hasPlaceholder: sig.hasPlaceholder, hasImageSignal, idleElapsed: now - lastProgress, idleMs, totalElapsed: now - start, hardCapMs, absMaxMs });
       if (verdict === 'giveup-idle') {
-        return { ok: false, error: cfg.name + ' không có tín hiệu đang tạo suốt ' + Math.round((now - lastProgress) / 1000) + 's (tắc) — bỏ sớm, thử nguồn kế.' };
-      }
-      if (verdict === 'giveup-stuck') {
-        return { ok: false, error: cfg.name + ' chỉ có placeholder đứng im ' + Math.round(genOnlyElapsed / 1000) + 's (kẹt giả, không ra ảnh thật) — bỏ sớm, thử nguồn kế.' };
+        return { ok: false, error: cfg.name + ' không có tín hiệu làm việc suốt ' + Math.round((now - lastProgress) / 1000) + 's (tắc) — bỏ sớm, thử nguồn kế.' };
       }
       if (verdict === 'giveup-hardcap') {
-        return { ok: false, error: cfg.name + ' quá ' + Math.round((now - start) / 1000) + 's chưa ra ảnh (hết tín hiệu làm việc) — dừng, thử nguồn kế.' };
+        return { ok: false, error: cfg.name + ' quá ' + Math.round((now - start) / 1000) + 's chưa ra ảnh — dừng, thử nguồn kế.' };
       }
       await delay(1800); // cho 1.8s roi thu lai (retry)
     }
