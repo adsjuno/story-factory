@@ -82,24 +82,29 @@ async function jsEval(wc, code) { try { return await wc.executeJavaScript(code, 
 // loi/khong thay -> giu model mac dinh, KHONG lam sap luong tao anh.
 async function ensureModel(wc, cfg, log) {
   if (!cfg.modelTrigger || !cfg.modelWanted) return;
-  const want = String(cfg.modelWanted).toLowerCase();
+  // Khop theo TOKEN (vd 'flash'+'lite') - bo qua dau gach/khoang trang/dau khac, va KHONG dinh nham
+  // '3.6 Flash' (thieu 'lite'). Vung ben khi giao dien localize tieng Viet.
+  const tokens = String(cfg.modelWanted).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  const hasAll = (s) => { const t = String(s || '').toLowerCase(); return tokens.every((tk) => t.indexOf(tk) >= 0); };
   try {
     // Da dung model roi? (doc aria-label "currently ..." / text nut)
     const cur = (await jsEval(wc, `(function(){var b=document.querySelector(${JSON.stringify(cfg.modelTrigger)}); return b?((b.getAttribute('aria-label')||'')+' '+(b.innerText||'')):'';})()`)) || '';
-    if (cur.toLowerCase().indexOf(want) >= 0) { log(`[${cfg.name}] model đã là ${cfg.modelWanted}.`); return; }
+    if (hasAll(cur)) { log(`[${cfg.name}] model đã là ${cfg.modelWanted}.`); return; }
     // Mo menu chon model
     const opened = await jsEval(wc, `(function(){var b=document.querySelector(${JSON.stringify(cfg.modelTrigger)}); if(b){b.click(); return true;} return false;})()`);
     if (!opened) { log(`[${cfg.name}] ⚠️ không thấy nút chọn model — giữ mặc định.`); return; }
-    await delay(500);
-    // Chon muc chua chu modelWanted (vd "3.5 Flash-Lite")
+    await delay(600);
+    // Chon muc chua DU CAC token (vd 'flash' VA 'lite') -> dung 3.5 Flash-Lite, khong dinh 3.6 Flash
     const picked = await jsEval(wc, `(function(){
       var items=document.querySelectorAll('[role="menuitem"],[role="menuitemradio"],[role="option"]');
-      var want=${JSON.stringify(want)};
-      for(var i=0;i<items.length;i++){ var t=(items[i].innerText||'').toLowerCase(); if(t.indexOf(want)>=0){ items[i].click(); return (items[i].innerText||'').trim().slice(0,40); } }
+      var toks=${JSON.stringify(tokens)};
+      for(var i=0;i<items.length;i++){ var t=(items[i].innerText||'').toLowerCase(); var ok=true;
+        for(var k=0;k<toks.length;k++){ if(t.indexOf(toks[k])<0){ ok=false; break; } }
+        if(ok){ items[i].click(); return (items[i].innerText||'').trim().slice(0,50); } }
       return '';
     })()`);
-    await delay(600);
-    if (picked) log(`[${cfg.name}] ✓ đã chọn model ${picked.replace(/\s+/g, ' ')} (nhanh hơn Pro).`);
+    await delay(700);
+    if (picked) log(`[${cfg.name}] ✓ đã chọn model ${picked.replace(/\s+/g, ' ')} (nhanh).`);
     else log(`[${cfg.name}] ⚠️ không thấy "${cfg.modelWanted}" trong menu — giữ model mặc định.`);
   } catch (_) { /* best-effort */ }
 }
