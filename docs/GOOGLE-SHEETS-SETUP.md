@@ -69,6 +69,24 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
+    // DOI status 1 bai theo story_id (dung sau khi "Tao lai anh" du 5 anh -> set 'new')
+    if (data.action === 'update_status') {
+      var sid = String(data.story_id || '').trim();
+      var st = String(data.status || '').trim();
+      if (!sid || !st) throw new Error('Thiếu story_id/status');
+      var lastU = sheet.getLastRow();
+      var updated = 0;
+      if (lastU > 1) {
+        // cot A (1) = story_id ; cot C (3) = status
+        var idsU = sheet.getRange(2, 1, lastU - 1, 1).getValues();
+        for (var u = 0; u < idsU.length; u++) {
+          if (String(idsU[u][0]).trim() === sid) { sheet.getRange(u + 2, 3).setValue(st); updated++; }
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({ ok: true, updated: updated }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     // Ho tro ca 1 dong (row) lan nhieu dong (rows)
     var rows = data.rows || (data.row ? [data.row] : null);
     if (!rows || !rows.length) throw new Error('Thiếu dữ liệu rows');

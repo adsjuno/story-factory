@@ -250,6 +250,21 @@ ipcMain.handle('story:regenImages', async (_e, { storyId }) => {
     const r = await storyWriter.regenerateImages(String(storyId || ''), (p) => {
       mainWindow.webContents.send('story:progress', p);
     }, () => REGEN_STOP);
+    // Du 5 anh (filledAll) + khong bi dung -> DOI status ve 'new' de n8n dang lai len WP.
+    if (r && r.ok && r.filledAll && !r.stopped) {
+      const s = loadSettings();
+      const url = s.sheets && s.sheets.webhookUrl;
+      if (url) {
+        try {
+          const u = await sheets.updateStatus(url, r.storyId, 'new');
+          mainWindow.webContents.send('story:progress', { message: `✅ Đã đổi status ${r.storyId} → new (${u.updated} dòng) — n8n sẽ đăng lại lên WP.` });
+        } catch (e) {
+          mainWindow.webContents.send('story:progress', { message: `⚠️ Tạo lại ảnh xong nhưng KHÔNG đổi được status: ${e.message}` });
+        }
+      } else {
+        mainWindow.webContents.send('story:progress', { message: 'ℹ️ Chưa cấu hình Google Sheet — bỏ qua đổi status (ảnh đã ghi đè).' });
+      }
+    }
     return r;
   } catch (e) { return { ok: false, error: e.message }; }
   finally { REGEN_STOP = false; }

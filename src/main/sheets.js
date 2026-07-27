@@ -76,4 +76,40 @@ async function deleteByStatus(webhookUrl, status) {
   return { ok: true, deleted: data.deleted != null ? data.deleted : 0 };
 }
 
-module.exports = { appendRow, appendRows, deleteByStatus };
+/**
+ * DOI status cua 1 bai (theo story_id) — dung sau khi "Tao lai anh" du 5 anh -> set 'new'
+ * de n8n biet dang lai len WP. Can Apps Script ban MOI co xu ly action='update_status'.
+ */
+async function updateStatus(webhookUrl, storyId, status) {
+  const url = String(webhookUrl || '').trim();
+  if (!/^https:\/\/script\.google(usercontent)?\.com\//i.test(url)) {
+    throw new Error('URL Google Apps Script không hợp lệ.');
+  }
+  const sid = String(storyId || '').trim();
+  const st = String(status || '').trim();
+  if (!sid || !st) throw new Error('Thiếu story_id/status cần đổi.');
+
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'update_status', story_id: sid, status: st }),
+      redirect: 'follow',
+    });
+  } catch (e) {
+    throw new Error('Không gọi được Google Apps Script: ' + e.message);
+  }
+  const txt = await res.text();
+  if (!res.ok) throw new Error('Apps Script trả lỗi HTTP ' + res.status);
+  let data = null;
+  try { data = JSON.parse(txt); } catch (_) {}
+  if (!data) throw new Error('Apps Script không trả JSON — kiểm tra deploy.');
+  if (data.ok === false) {
+    throw new Error('Apps Script chưa hỗ trợ đổi status (' + (data.error || '') + '). '
+      + 'Dán bản Apps Script mới (có action update_status) rồi Deploy → New version.');
+  }
+  return { ok: true, updated: data.updated != null ? data.updated : 0 };
+}
+
+module.exports = { appendRow, appendRows, deleteByStatus, updateStatus };

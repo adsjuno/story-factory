@@ -56,6 +56,8 @@ async function genOne(source, prompt, kind, cfg, log) {
   }
   if (source === 'gemini' || source === 'chatgpt') {
     const show = !!(cfg.source && cfg.source.showWindow);
+    // CHAN DOAN cua so an/hien: in ra cfg.source that su nhan duoc luc chay (biet showWindow co toi khong)
+    log(`[${source}] 🔬 cfg.source=${JSON.stringify(cfg.source || null)} → show=${show}`);
     return imageWebgen.generate(source, prompt, { show, log });
   }
   return { ok: false, skip: true, error: 'Nguồn không hỗ trợ: ' + source };
