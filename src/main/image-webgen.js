@@ -26,6 +26,10 @@ const PROVIDERS = {
     sendButton: 'button[aria-label="Send message"], button.send-button, button[aria-label="Gửi"], button[aria-label*="Gửi" i], button[mattooltip="Send message"]',
     // KHONG le thuoc ngon ngu: bat ca "Stop..." (Anh) lan "Dừng..." (Viet) - giao dien Gemini localize theo tai khoan.
     stopButton: 'button[aria-label*="Stop" i], button[aria-label*="Dừng" i], button[aria-label*="Dung" i], button.stop',
+    // CHON MODEL: Flash-Lite tao anh RAT NHANH (vai giay) thay vi Pro suy luan cham (>200s).
+    // Nut mo menu model + chuoi text cua muc muon chon (khop khong dau, khong le thuoc ngon ngu).
+    modelTrigger: 'button[aria-label^="Open mode picker"], bard-mode-switcher button',
+    modelWanted: 'Flash-Lite',
     // Anh Gemini sinh ra thuong nam trong response, src googleusercontent hoac blob
     imageSelectors: 'single-image img, generated-image img, image-container img, message-content img, response-container img, img',
     // Dau hieu "DANG TAO ANH": src placeholder 150x150 gstatic/lamda (animation cua Gemini).
@@ -73,6 +77,32 @@ function makeWindow(partition, show) {
   });
 }
 async function jsEval(wc, code) { try { return await wc.executeJavaScript(code, true); } catch (_) { return null; } }
+
+// CHON MODEL truoc khi tao (chi Gemini): dam bao dung Flash-Lite (nhanh). BEST-EFFORT:
+// loi/khong thay -> giu model mac dinh, KHONG lam sap luong tao anh.
+async function ensureModel(wc, cfg, log) {
+  if (!cfg.modelTrigger || !cfg.modelWanted) return;
+  const want = String(cfg.modelWanted).toLowerCase();
+  try {
+    // Da dung model roi? (doc aria-label "currently ..." / text nut)
+    const cur = (await jsEval(wc, `(function(){var b=document.querySelector(${JSON.stringify(cfg.modelTrigger)}); return b?((b.getAttribute('aria-label')||'')+' '+(b.innerText||'')):'';})()`)) || '';
+    if (cur.toLowerCase().indexOf(want) >= 0) { log(`[${cfg.name}] model đã là ${cfg.modelWanted}.`); return; }
+    // Mo menu chon model
+    const opened = await jsEval(wc, `(function(){var b=document.querySelector(${JSON.stringify(cfg.modelTrigger)}); if(b){b.click(); return true;} return false;})()`);
+    if (!opened) { log(`[${cfg.name}] ⚠️ không thấy nút chọn model — giữ mặc định.`); return; }
+    await delay(500);
+    // Chon muc chua chu modelWanted (vd "3.5 Flash-Lite")
+    const picked = await jsEval(wc, `(function(){
+      var items=document.querySelectorAll('[role="menuitem"],[role="menuitemradio"],[role="option"]');
+      var want=${JSON.stringify(want)};
+      for(var i=0;i<items.length;i++){ var t=(items[i].innerText||'').toLowerCase(); if(t.indexOf(want)>=0){ items[i].click(); return (items[i].innerText||'').trim().slice(0,40); } }
+      return '';
+    })()`);
+    await delay(600);
+    if (picked) log(`[${cfg.name}] ✓ đã chọn model ${picked.replace(/\s+/g, ' ')} (nhanh hơn Pro).`);
+    else log(`[${cfg.name}] ⚠️ không thấy "${cfg.modelWanted}" trong menu — giữ model mặc định.`);
+  } catch (_) { /* best-effort */ }
+}
 
 async function waitForComposer(wc, composer, timeoutMs) {
   const deadline = Date.now() + timeoutMs;
@@ -371,6 +401,7 @@ async function generate(provider, prompt, { hardCapMs = 150000, absMaxMs = 30000
     if (!(await waitForComposer(wc, cfg.composer, 25000))) {
       return { ok: false, error: 'Chưa đăng nhập ' + cfg.name + ' (không thấy ô nhập). Vào Cài đặt → "Đăng nhập ' + cfg.name + '".' };
     }
+    await ensureModel(wc, cfg, log);   // Gemini: chon Flash-Lite (nhanh) truoc khi gui
     log(`[${cfg.name}] gõ prompt & gửi...`);
     const sent = await typeAndSend(wc, cfg, cfg.wrap(String(prompt)), log);
     if (!sent.ok) return { ok: false, error: sent.error };
